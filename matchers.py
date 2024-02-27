@@ -8,6 +8,7 @@ from pathlib import Path
 from kornia.feature import LoFTR
 import torchvision.transforms as tfm
 
+sys.path.append(str(Path('third_party/LightGlue')))
 from lightglue import viz2d
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED
