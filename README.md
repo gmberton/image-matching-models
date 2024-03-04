@@ -25,3 +25,13 @@ git submodule add https://github.com/cvg/LightGlue.git third_party/LightGlue
 ```
 
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work, I don't really know why).
+
+## Roadmap
+
+Gabriele Trivigno to implement: Roma, Duster, Dedode, Sift+nn, SURF+nn, ORB+NN, SuperGlue, R2D2+NN, D2-Net+NN
+
+Alex Stoken to implement: Se2-LoFTR, Steerers
+
+### Link to paper
+https://www.overleaf.com/4695153514pwywhphtnpkq#6c2784
+
