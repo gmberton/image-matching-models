@@ -39,16 +39,16 @@ class MatchWrapper(torch.nn.Module):
             self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='sift', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "superpoint-lg":
-            self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().cuda()
+            self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='superpoint', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "disk-lg":
-            self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().cuda()
+            self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='disk', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "aliked-lg":
-            self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().cuda()
+            self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='aliked', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "doghardnet-lg":
-            self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().cuda()
+            self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='doghardnet', depth_confidence=-1, width_confidence=-1).to(self.device)
     
     @staticmethod
@@ -71,6 +71,20 @@ class MatchWrapper(torch.nn.Module):
         return fm, inliers_mask.astype(bool)
     
     def forward(self, img0, img1):
+        """
+        Parameters
+        ----------
+        img0 : torch.tensor (C x H x W)
+        img1 : torch.tensor (C x H x W)
+
+        Returns
+        -------
+        score : int, a method-dependent confidence score
+        fm : np.array (3 x 3), the fundamental matrix of the homography to map
+            mkpts0 to mkpts1
+        mkpts0 : torch.tensor (N x 2), keypoints from img0 that match mkpts1
+        mkpts1 : torch.tensor (N x 2), keypoints from img1 that match mkpts0
+        """
         # Take as input a pair of images (not a batch)
         assert isinstance(img0, torch.Tensor)
         assert isinstance(img1, torch.Tensor)
@@ -85,24 +99,22 @@ class MatchWrapper(torch.nn.Module):
             batch = {'image0': img0, 'image1': img1}
             output = self.loftr(batch)
             mkpts0, mkpts1 = output["keypoints0"], output["keypoints1"]
-            num_kpts = len(mkpts0), len(mkpts1)
         
         elif self.matcher_name.endswith("lg"):
             feats0, feats1, matches01 = match_pair(
                 self.extractor, self.__matcher, img0, img1, device=self.device
             )
             kpts0, kpts1, matches = feats0["keypoints"], feats1["keypoints"], matches01["matches"]
-            num_kpts = len(kpts0), len(kpts1)
             mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
         
         if len(mkpts0) < 5:
-            return len(mkpts0), None, None, None, None
+            return 0, None, mkpts0, mkpts1
         
         fm, inliers_mask = self.find_homography(mkpts0, mkpts1)
         mkpts0 = mkpts0[inliers_mask]
         mkpts1 = mkpts1[inliers_mask]
-        num_matches = inliers_mask.sum()
-        return num_matches, fm, mkpts0, mkpts1, num_kpts
+        score = inliers_mask.sum()
+        return score, fm, mkpts0, mkpts1
 
 
 if __name__ == "__main__":
@@ -110,26 +122,24 @@ if __name__ == "__main__":
     
     # Choose a matcher
     # matcher = MatchWrapper("loftr")
-    matcher = MatchWrapper("sift-lg")
+    # matcher = MatchWrapper("sift-lg")
     # matcher = MatchWrapper("superpoint-lg")
     # matcher = MatchWrapper("disk-lg")
-    # matcher = MatchWrapper("aliked-lg")
+    matcher = MatchWrapper("aliked-lg")
     # matcher = MatchWrapper("doghardnet-lg")
     
     # Choose a pair of images
-    # p1 = Path("assets/pair1/@20.157303@-103.578883@20.316536@-102.958397@20.995949@-103.224349@20.836715@-103.844834@ISS068-E-30124@20221216@20.5@-106.6@5382@105.8@.jpg")
-    # p2 = Path("assets/pair1/pred_1.png")
-    # p1 = Path("assets/pair2/@28.081177@-112.256183@26.493845@-114.224898@25.362401@-112.632199@26.949733@-110.663485@ISS066-E-103558@20220101@23.4@-117.0@52632@-62.4@.jpg")
-    # p2 = Path("assets/pair2/pred_1.png")
-    p1 = Path("assets/pair3/@35.957100@-112.398399@35.761996@-113.311426@35.186793@-113.097258@35.381896@-112.184231@ISS047-E-99060@20160505@34.2@-119.4@5714@-81.4@.jpg")
-    p2 = Path("assets/pair3/pred_4.png")
-    # p1 = Path("/home/gaber/Desktop/outputs/outputs_000_0/@20.157303@-103.578883@20.316536@-102.958397@20.995949@-103.224349@20.836715@-103.844834@ISS068-E-30124@20221216@20.5@-106.6@5382@105.8@.jpg")
-    # p2 = Path("/home/gaber/Desktop/outputs/outputs_000_0/pred_1.png")
+    # path0 = Path("assets/pair1/@20.157303@-103.578883@20.316536@-102.958397@20.995949@-103.224349@20.836715@-103.844834@ISS068-E-30124@20221216@20.5@-106.6@5382@105.8@.jpg")
+    # path1 = Path("assets/pair1/pred_1.png")
+    # path0 = Path("assets/pair2/@28.081177@-112.256183@26.493845@-114.224898@25.362401@-112.632199@26.949733@-110.663485@ISS066-E-103558@20220101@23.4@-117.0@52632@-62.4@.jpg")
+    # path1 = Path("assets/pair2/pred_1.png")
+    path0 = Path("assets/pair3/@35.957100@-112.398399@35.761996@-113.311426@35.186793@-113.097258@35.381896@-112.184231@ISS047-E-99060@20160505@34.2@-119.4@5714@-81.4@.jpg")
+    path1 = Path("assets/pair3/pred_4.png")
     
-    image0 = matcher.image_loader(p1, resize=image_size)
-    image1 = matcher.image_loader(p2, resize=image_size)
-    num_matches, fm, mkpts0, mkpts1, num_kpts = matcher(image0, image1)
-    print(f"Found {num_matches} matches, {num_kpts} kpts")
+    image0 = matcher.image_loader(path0, resize=image_size)
+    image1 = matcher.image_loader(path1, resize=image_size)
+    score, fm, mkpts0, mkpts1 = matcher(image0, image1)
+    print(f"Found {len(mkpts0)} matches, with (confidence) score {score}")
     
     axes = viz2d.plot_images([image0, image1])
     viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
