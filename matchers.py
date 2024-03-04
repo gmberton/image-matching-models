@@ -8,9 +8,10 @@ from pathlib import Path
 from kornia.feature import LoFTR
 import torchvision.transforms as tfm
 
+sys.path.append(str(Path('third_party/LightGlue')))
 from lightglue import viz2d
 from lightglue import match_pair
-from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED
+from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 
 torch.set_grad_enabled(False)
 
@@ -27,7 +28,8 @@ class MatchWrapper(torch.nn.Module):
             "sift-lg",
             "superpoint-lg",
             "disk-lg",
-            "aliked-lg"
+            "aliked-lg",
+            "doghardnet-lg"
         ]
         self.matcher_name = matcher_name
         self.device = device
@@ -37,14 +39,17 @@ class MatchWrapper(torch.nn.Module):
             self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='sift', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "superpoint-lg":
-            self.extractor = SuperPoint(max_num_keypoints=2048).eval().to(self.device)
+            self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='superpoint', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "disk-lg":
-            self.extractor = DISK(max_num_keypoints=2048).eval().to(self.device)
+            self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='disk', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "aliked-lg":
-            self.extractor = ALIKED(max_num_keypoints=2048).eval().to(self.device)
+            self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='aliked', depth_confidence=-1, width_confidence=-1).to(self.device)
+        if matcher_name == "doghardnet-lg":
+            self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().cuda()
+            self.__matcher = LightGlue(features='doghardnet', depth_confidence=-1, width_confidence=-1).to(self.device)
     
     @staticmethod
     def image_loader(path, resize, rot_angle=0):
@@ -104,11 +109,12 @@ if __name__ == "__main__":
     image_size = [512, 512]
     
     # Choose a matcher
-    # matcher = MatchWrapper("loftr", image_size=image_size)
+    # matcher = MatchWrapper("loftr")
     matcher = MatchWrapper("sift-lg")
-    # matcher = MatchWrapper("superpoint-lg", image_size=image_size)
-    # matcher = MatchWrapper("disk-lg", image_size=image_size)
-    # matcher = MatchWrapper("aliked-lg", image_size=image_size)
+    # matcher = MatchWrapper("superpoint-lg")
+    # matcher = MatchWrapper("disk-lg")
+    # matcher = MatchWrapper("aliked-lg")
+    # matcher = MatchWrapper("doghardnet-lg")
     
     # Choose a pair of images
     # p1 = Path("assets/pair1/@20.157303@-103.578883@20.316536@-102.958397@20.995949@-103.224349@20.836715@-103.844834@ISS068-E-30124@20221216@20.5@-106.6@5382@105.8@.jpg")
@@ -129,4 +135,3 @@ if __name__ == "__main__":
     viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
     viz2d.add_text(0, f'{len(mkpts1)} matches', fs=20)
     viz2d.save_plot("assets/output.jpg")
-
