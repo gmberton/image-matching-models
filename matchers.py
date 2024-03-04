@@ -37,14 +37,14 @@ class MatchWrapper(torch.nn.Module):
         if matcher_name == "sift-lg":
             self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
             self.__matcher = LightGlue(features='sift', depth_confidence=-1, width_confidence=-1).to(self.device)
-        if matcher_name == "superpoint-lg":
-            self.extractor = SuperPoint(max_num_keypoints=2048).eval().to(self.device)
+        if matcher_name == "sp-lg":
+            self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='superpoint', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "disk-lg":
-            self.extractor = DISK(max_num_keypoints=2048).eval().to(self.device)
+            self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='disk', depth_confidence=-1, width_confidence=-1).to(self.device)
         if matcher_name == "aliked-lg":
-            self.extractor = ALIKED(max_num_keypoints=2048).eval().to(self.device)
+            self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().cuda()
             self.__matcher = LightGlue(features='aliked', depth_confidence=-1, width_confidence=-1).to(self.device)
     
     @staticmethod
@@ -130,4 +130,3 @@ if __name__ == "__main__":
     viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
     viz2d.add_text(0, f'{len(mkpts1)} matches', fs=20)
     viz2d.save_plot("assets/output.jpg")
-
