@@ -79,7 +79,8 @@ class MatchWrapper(torch.nn.Module):
 
         Returns
         -------
-        score : int, a method-dependent confidence score
+        score : int, a method-dependent confidence score. For almost every
+            method, score is the number of inliers, i.e. num(mkpts0)
         fm : np.array (3 x 3), the fundamental matrix of the homography to map
             mkpts0 to mkpts1
         mkpts0 : torch.tensor (N x 2), keypoints from img0 that match mkpts1
