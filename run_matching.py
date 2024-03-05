@@ -20,7 +20,7 @@ def main(args):
 
     device = torch.device('cuda')
     # Choose a matcher
-    matcher = get_matcher(args.matcher, device=device)
+    matcher = get_matcher(args.matcher, device=device, max_num_keypoints=args.n_kpts)
 
     pair_folders = sorted(glob('assets/pair*'))
     img_pairs = []
@@ -48,6 +48,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Argument parser')
     parser.add_argument('-m', '--matcher', type=str, default='loftr', help='log folder')
     parser.add_argument('--im_size', type=int, default=512, help='resize im to im_size x im_size')
+    parser.add_argument('--n_kpts', type=int, default=2048, help='max num keypoints')
 
     args = parser.parse_args()
     main(args)
