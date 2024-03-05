@@ -1,2 +1,5 @@
 .spyproject
 __pycache__
+*.ipynb*
+assets/out*
+*_old.py
