@@ -13,7 +13,7 @@ class LightGlueBase(BaseMatcher):
     This class is the parent for all methods that use LightGlue as a matcher,
     with different local features. It implements the forward which is the same
     regardless of the feature extractor of choice.
-    Therefore this class should be instatiated, as it needs its children to define
+    Therefore this class should *NOT* be instatiated, as it needs its children to define
     the extractor and the matcher.
     """
     def __init__(self, device="cpu"):
