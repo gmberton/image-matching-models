@@ -28,7 +28,7 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 ## Roadmap
 
-Gabriele Trivigno to implement: Roma, Duster, Dedode, Sift+nn, SURF+nn, ORB+NN, SuperGlue, R2D2+NN, D2-Net+NN
+Gabriele Trivigno to implement: Duster
 
 Alex Stoken to implement: Se2-LoFTR, Steerers
 

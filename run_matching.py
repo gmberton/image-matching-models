@@ -38,7 +38,7 @@ def main(args):
         image0 = matcher.image_loader(p1, resize=image_size).to(device)
         image1 = matcher.image_loader(p2, resize=image_size).to(device)
         score, fm, mkpts0, mkpts1 = matcher(image0, image1)
-        print(f"Found n. inliers after RANSAC: {len(mkpts0)} ")
+        print(f"Found n. inliers after RANSAC: {score} ")
 
         axes = viz2d.plot_images([image0, image1])
         viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)

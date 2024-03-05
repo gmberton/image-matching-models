@@ -23,6 +23,9 @@ class HandcraftedBaseMatcher(BaseMatcher):
         return im
 
     def forward(self, img0, img1):
+        """
+        "det_descr" is instantiated by the subclasses.
+        """
         super().forward(img0, img1)
 
         # convert tensors to numpy 255-based for OpenCV
@@ -45,11 +48,11 @@ class HandcraftedBaseMatcher(BaseMatcher):
         
         mkpts0, mkpts1 = [], []
         for good_match in good:
-            kpt_1 = np.array(kp0[good_match.queryIdx].pt)
-            kpt_2 = np.array(kp1[good_match.trainIdx].pt)
+            kpt_0 = np.array(kp0[good_match.queryIdx].pt)
+            kpt_1 = np.array(kp1[good_match.trainIdx].pt)
 
-            mkpts0.append(kpt_1)
-            mkpts1.append(kpt_2)
+            mkpts0.append(kpt_0)
+            mkpts1.append(kpt_1)
 
         mkpts0 = np.array(mkpts0, dtype=np.float32)
         mkpts1 = np.array(mkpts1, dtype=np.float32)
