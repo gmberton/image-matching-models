@@ -36,35 +36,35 @@ class LightGlueBase(BaseMatcher):
 
 
 class SiftLightGlue(LightGlueBase):
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features='sift', depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class SuperpoingLightGlue(LightGlueBase):
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features='superpoint', depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class DiskLightGlue(LightGlueBase):
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features='disk', depth_confidence=-1, width_confidence=-1).to(self.device)
     
 
 class AlikedLightGlue(LightGlueBase):
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features='aliked', depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class DognetLightGlue(LightGlueBase):
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features='doghardnet', depth_confidence=-1, width_confidence=-1).to(self.device)

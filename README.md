@@ -8,13 +8,13 @@ git clone --recursive https://github.com/gmberton/EarthMatch
 
 NOTE THE `--recursive` !!!
 
-Then run
+Then run this script, which will perform inference on all folders of 'pairs' inside 'assets'. It is possible to specify also resolution, num_keypoints, and other method-specific args
 
 ```
-python matchers.py
+python run_matching.py -m matcher_name
 ```
 
-which will generate the image `assets/output.jpg` with the matching keypoints for a pair of images within `assets`.
+It will generate an image with the matching keypoints for each pair, under `assets/out_matcher_name` .
 
 ### Adding a new method
 

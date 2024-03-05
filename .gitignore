@@ -3,3 +3,4 @@ __pycache__
 *.ipynb*
 assets/out*
 *_old.py
+model_weights

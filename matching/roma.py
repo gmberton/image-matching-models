@@ -15,7 +15,7 @@ class RomaMatcher(BaseMatcher):
     dino_patch_size = 14
     coarse_ratio = 560 / 864
     
-    def __init__(self, device="cpu", max_num_keypoints=2048):
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.roma_model = roma_outdoor(device=device)
         self.max_keypoints = max_num_keypoints
