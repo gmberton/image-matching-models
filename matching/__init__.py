@@ -1,15 +1,17 @@
-from matching import lightglue, loftr, roma, dedode
+from matching import lightglue, loftr, roma, dedode, handcrafted
 
 
 matchers = {
-    "loftr": loftr.LoftrMatcher,
-    "sift-lg": lightglue.SiftLightGlue,
-    "superpoint-lg": lightglue.SuperpoingLightGlue,
-    "disk-lg": lightglue.DiskLightGlue,
-    "aliked-lg": lightglue.AlikedLightGlue,
-    "doghardnet-lg": lightglue.DognetLightGlue,
-    "roma": roma.RomaMatcher,
-    "dedode": dedode.DedodeMatcher
+    'loftr': loftr.LoftrMatcher,
+    'sift-lg': lightglue.SiftLightGlue,
+    'superpoint-lg': lightglue.SuperpoingLightGlue,
+    'disk-lg': lightglue.DiskLightGlue,
+    'aliked-lg': lightglue.AlikedLightGlue,
+    'doghardnet-lg': lightglue.DognetLightGlue,
+    'roma': roma.RomaMatcher,
+    'dedode': dedode.DedodeMatcher,
+    'sift-nn': handcrafted.SiftNNMatcher,
+    'orb-nn': handcrafted.OrbNNMatcher,
 }
 
 

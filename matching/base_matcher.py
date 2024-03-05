@@ -45,7 +45,7 @@ class BaseMatcher(torch.nn.Module):
     def process_matches(self, mkpts0, mkpts1):
         if len(mkpts0) < 5:
             return 0, None, mkpts0, mkpts1
-        
+
         fm, inliers_mask = self.find_homography(mkpts0, mkpts1)
         mkpts0 = mkpts0[inliers_mask]
         mkpts1 = mkpts1[inliers_mask]

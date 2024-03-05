@@ -21,7 +21,7 @@ def main(args):
     device = torch.device('cuda')
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=device, max_num_keypoints=args.n_kpts,
-        dedode_thresh=args.dedode_thresh
+        dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh
     )
 
     pair_folders = sorted(glob('assets/pair*'))
@@ -38,7 +38,7 @@ def main(args):
         image0 = matcher.image_loader(p1, resize=image_size).to(device)
         image1 = matcher.image_loader(p2, resize=image_size).to(device)
         score, fm, mkpts0, mkpts1 = matcher(image0, image1)
-        print(f"Found {len(mkpts0)} matches, with (confidence) score {score}")
+        print(f"Found n. inliers after RANSAC: {len(mkpts0)} ")
 
         axes = viz2d.plot_images([image0, image1])
         viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
@@ -56,6 +56,7 @@ if __name__ == '__main__':
     parser.add_argument('--n_kpts', type=int, default=2048, help='max num keypoints')
     # method-specific
     parser.add_argument('--dedode_thresh', type=float, default=0.05, help='threshold on match confidence for DeDoDe')
+    parser.add_argument('--lowe_thresh', type=float, default=0.75, help='threshold on lowe ratio test for SIFT or ORB')
 
     args = parser.parse_args()
     main(args)
