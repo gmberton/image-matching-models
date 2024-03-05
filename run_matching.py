@@ -23,9 +23,8 @@ def main(args):
     out_dir = join('assets', f'out_{args.matcher}')
     os.makedirs(out_dir, exist_ok=True)
 
-    device = torch.device('cuda')
     # Choose a matcher
-    matcher = get_matcher(args.matcher, device=device, max_num_keypoints=args.n_kpts,
+    matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts,
         dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh
     )
 
@@ -40,8 +39,8 @@ def main(args):
         print(f'\n[---]Folder: {pair_folders[i]}: [---]')
         p1, p2 = img_pair
 
-        image0 = matcher.image_loader(p1, resize=image_size).to(device)
-        image1 = matcher.image_loader(p2, resize=image_size).to(device)
+        image0 = matcher.image_loader(p1, resize=image_size).to(args.device)
+        image1 = matcher.image_loader(p2, resize=image_size).to(args.device)
         score, fm, mkpts0, mkpts1 = matcher(image0, image1)
         print(f"Found n. inliers after RANSAC: {score} ")
 

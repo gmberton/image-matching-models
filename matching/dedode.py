@@ -1,3 +1,6 @@
+
+import urllib.request
+
 import sys
 from pathlib import Path
 import math
@@ -18,10 +21,22 @@ class DedodeMatcher(BaseMatcher):
     descriptor_path = 'model_weights/dedode_descriptor_G.pth'
     dino_patch_size = 14
 
-    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05):
+    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, *args, **kwargs):
         super().__init__(device)
-        assert os.path.isfile(self.detector_path), "You have to run the script 'download_models.sh'"
-        assert os.path.isfile(self.descriptor_path), "You have to run the script 'download_models.sh'"
+        
+        os.makedirs("model_weights", exist_ok=True)
+        if not os.path.isfile(self.detector_path):
+            print("Downloading dedode_detector_L.pth")
+            urllib.request.urlretrieve(
+                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
+                self.detector_path
+            )
+        if not os.path.isfile(self.descriptor_path):
+            print("Downloading dedode_descriptor_G.pth")
+            urllib.request.urlretrieve(
+                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
+                self.descriptor_path
+            )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
