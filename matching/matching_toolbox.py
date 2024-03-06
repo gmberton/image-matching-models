@@ -1,26 +1,40 @@
 import sys
 from pathlib import Path
 import yaml
+import urllib.request
 import numpy as np
+import os
 from os.path import join
 import torchvision.transforms as tfm
 
-sys.path.append(str(Path('/home/gtrivigno/image-matching-toolbox')))
+BASE_PATH = 'third_party/imatch-toolbox'
+sys.path.append(str(Path(BASE_PATH)))
 import immatch
 from matching.base_matcher import BaseMatcher
 
-
-bp = '/home/gtrivigno/image-matching-toolbox'
 class Patch2pixMatcher(BaseMatcher):
+    url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
+    url2 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth'
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device)
         
-        with open(join(bp, f'configs/patch2pix.yml'), 'r') as f:
+        with open(join(BASE_PATH, f'configs/patch2pix.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         
-        args['ckpt'] = join(bp, args['ckpt'])
+        args['ckpt'] = join(BASE_PATH, args['ckpt'])
+        args['ncn_ckpt'] = join(BASE_PATH, args['ncn_ckpt'])
+        if not os.path.isfile(args['ckpt']):
+            self.download_weights(args['ckpt'], args['ncn_ckpt'])
+
         self.matcher = immatch.__dict__[args['class']](args)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+
+    @staticmethod
+    def download_weights(ckpt, ncn_ckpt):
+        print("Downloading Patch2Pix model weights...")
+        os.makedirs(os.path.dirname(ckpt), exist_ok=True)
+        urllib.request.urlretrieve(Patch2pixMatcher.url1, ckpt)
+        urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
     def forward(self, img0, img1):
         super().forward(img0, img1)
@@ -60,10 +74,14 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.to_gray = tfm.Grayscale()
         
-        with open(join(bp, f'configs/patch2pix_superglue.yml'), 'r') as f:
+        with open(join(BASE_PATH, f'configs/patch2pix_superglue.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         
-        args['ckpt'] = join(bp, args['ckpt'])
+        args['ckpt'] = join(BASE_PATH, args['ckpt'])
+        args['ncn_ckpt'] = join(BASE_PATH, args['ncn_ckpt'])
+        if not os.path.isfile(args['ckpt']):
+            Patch2pixMatcher.download_weights(args['ckpt'], args['ncn_ckpt'])
+
         self.matcher = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']
 
@@ -100,7 +118,7 @@ class SuperGlueMatcher(BaseMatcher):
         super().__init__(device)
         self.to_gray = tfm.Grayscale()
         
-        with open(join(bp, f'configs/superglue.yml'), 'r') as f:
+        with open(join(BASE_PATH, f'configs/superglue.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         
         self.matcher = immatch.__dict__[args['class']](args)
@@ -126,9 +144,9 @@ class R2D2Matcher(BaseMatcher):
         super().__init__(device)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         
-        with open(join(bp, f'configs/r2d2.yml'), 'r') as f:
+        with open(join(BASE_PATH, f'configs/r2d2.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['ckpt'] = join(bp, args['ckpt'])
+        args['ckpt'] = join(BASE_PATH, args['ckpt'])
 
         self.model = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']
@@ -156,10 +174,18 @@ class D2netMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device)
         
-        with open(join(bp, f'configs/d2net.yml'), 'r') as f:
+        with open(join(BASE_PATH, f'configs/d2net.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['ckpt'] = join(bp, args['ckpt'])
-
+        args['ckpt'] = join(BASE_PATH, args['ckpt'])
+        
+        if not os.path.isfile(args['ckpt']):
+            print("Downloading D2Net model weights...")
+            os.makedirs(os.path.dirname(args['ckpt']), exist_ok=True)
+            urllib.request.urlretrieve(
+                'https://dusmanu.com/files/d2-net/d2_tf.pth',
+                args['ckpt']
+            )
+            
         self.model = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']
 
