@@ -147,9 +147,17 @@ class R2D2Matcher(BaseMatcher):
         with open(join(BASE_PATH, f'configs/r2d2.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         args['ckpt'] = join(BASE_PATH, args['ckpt'])
+        self.get_model_weights(args['ckpt'])
 
         self.model = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']
+
+    @staticmethod
+    def get_model_weights(model_path):
+        if not os.path.isfile(model_path):
+            print('Getting R2D2 model weights...')
+            cmd = f'cp -r {BASE_PATH}/third_party/r2d2/models  {BASE_PATH}/pretrained/r2d2'
+            os.system(cmd)
 
     def forward(self, img0, img1):
         super().forward(img0, img1)

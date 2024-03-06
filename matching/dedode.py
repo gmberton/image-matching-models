@@ -23,29 +23,28 @@ class DedodeMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, *args, **kwargs):
         super().__init__(device)
-        
-        os.makedirs("model_weights", exist_ok=True)
-        if not os.path.isfile(self.detector_path):
-            print("Downloading dedode_detector_L.pth")
-            urllib.request.urlretrieve(
-                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
-                self.detector_path
-            )
-        if not os.path.isfile(self.descriptor_path):
-            print("Downloading dedode_descriptor_G.pth")
-            urllib.request.urlretrieve(
-                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
-                self.descriptor_path
-            )
-
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
+        self.download_weights()
         self.detector = dedode_detector_L(weights = torch.load(self.detector_path, map_location = device))
         self.descriptor = dedode_descriptor_G(weights = torch.load(self.descriptor_path, map_location = device))
         self.matcher = DualSoftMaxMatcher()
-        
+    
+    @staticmethod
+    def download_weights():
+        detector_url = 'https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth'
+        descr_url = 'https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth'
+
+        os.makedirs("model_weights", exist_ok=True)
+        if not os.path.isfile(DedodeMatcher.detector_path):
+            print("Downloading dedode_detector_L.pth")
+            urllib.request.urlretrieve(detector_url, DedodeMatcher.detector_path)
+        if not os.path.isfile(DedodeMatcher.descriptor_path):
+            print("Downloading dedode_descriptor_G.pth")
+            urllib.request.urlretrieve(descr_url, DedodeMatcher.descriptor_path)
+
     def forward(self, img0, img1):
         super().forward(img0, img1)
         # the super-class already makes sure that img0,img1 have same resolution
