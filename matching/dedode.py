@@ -55,13 +55,13 @@ class DedodeMatcher(BaseMatcher):
             img = tfm.functional.resize(img, imsize, antialias=True)
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
-        return img
+        return img, imsize
 
     def forward(self, img0, img1):
         super().forward(img0, img1)
 
-        img0 = self.preprocess(img0)
-        img1 = self.preprocess(img1)
+        img0, imsize = self.preprocess(img0)
+        img1, imsize = self.preprocess(img1)
 
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
