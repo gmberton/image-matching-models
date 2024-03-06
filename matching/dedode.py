@@ -45,19 +45,23 @@ class DedodeMatcher(BaseMatcher):
             print("Downloading dedode_descriptor_G.pth")
             urllib.request.urlretrieve(descr_url, DedodeMatcher.descriptor_path)
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
-        # the super-class already makes sure that img0,img1 have same resolution
-        # and that h == w
-        _, h, _ = img0.shape
+    def preprocess(self, img):
+        # the super-class already makes sure that img0,img1 have 
+        # same resolution and that h == w
+        _, h, _ = img.shape
         imsize = h
         if not ((h % self.dino_patch_size) == 0):
-            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))            
-            img0 = tfm.functional.resize(img0, imsize, antialias=True)
-            img1 = tfm.functional.resize(img1, imsize, antialias=True)
+            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
+            img = tfm.functional.resize(img, imsize, antialias=True)
 
-        img0 = self.normalize(img0).unsqueeze(0).to(self.device)
-        img1 = self.normalize(img1).unsqueeze(0).to(self.device)
+        img = self.normalize(img).unsqueeze(0).to(self.device)
+        return img
+
+    def forward(self, img0, img1):
+        super().forward(img0, img1)
+
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)
 
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)

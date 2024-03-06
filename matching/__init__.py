@@ -1,4 +1,4 @@
-from matching import lightglue, loftr, roma, dedode, handcrafted, matching_toolbox
+from matching import lightglue, loftr, roma, dedode, handcrafted, matching_toolbox, duster
 
 
 matchers = {
@@ -16,7 +16,9 @@ matchers = {
     'patch2pix_superglue': matching_toolbox.SuperGluePatch2pixMatcher,
     'superglue': matching_toolbox.SuperGlueMatcher,
     'r2d2': matching_toolbox.R2D2Matcher,
-    'd2net': matching_toolbox.D2netMatcher
+    'd2net': matching_toolbox.D2netMatcher,
+    'duster': duster.DusterMatcher,
+    'doghardnet-nn': matching_toolbox.DogAffHardNNMatcher
 }
 
 

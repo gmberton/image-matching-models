@@ -10,3 +10,6 @@
 [submodule "third_party/imatch-toolbox"]
 	path = third_party/imatch-toolbox
 	url = https://github.com/ga1i13o/image-matching-toolbox
+[submodule "third_party/duster"]
+	path = third_party/duster
+	url = https://github.com/naver/dust3r

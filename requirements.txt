@@ -15,6 +15,10 @@ tables
 imageio
 vispy
 xformers
+pyglet==1.5.28
+tensorboard
+scipy
+trimesh
 # flash_attn
 # packaging
 # pycolmap
