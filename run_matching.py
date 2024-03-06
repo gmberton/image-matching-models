@@ -1,8 +1,9 @@
 
+import os
 import sys
 import torch
 import argparse
-import os
+import matplotlib
 from glob import glob
 from pathlib import Path
 from os.path import join
@@ -12,15 +13,18 @@ from lightglue import viz2d
 
 from matching import get_matcher
 
+if not hasattr(sys, 'ps1'):
+    # Set the matplotlib backend to 'Agg' to avoid GUI-related errors
+    matplotlib.use('Agg')
+
 
 def main(args):
     image_size = [args.im_size, args.im_size]
     out_dir = join('assets', f'out_{args.matcher}')
     os.makedirs(out_dir, exist_ok=True)
 
-    device = torch.device('cuda')
     # Choose a matcher
-    matcher = get_matcher(args.matcher, device=device, max_num_keypoints=args.n_kpts,
+    matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts,
         dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh
     )
 
@@ -35,8 +39,8 @@ def main(args):
         print(f'\n[---]Folder: {pair_folders[i]}: [---]')
         p1, p2 = img_pair
 
-        image0 = matcher.image_loader(p1, resize=image_size).to(device)
-        image1 = matcher.image_loader(p2, resize=image_size).to(device)
+        image0 = matcher.image_loader(p1, resize=image_size).to(args.device)
+        image1 = matcher.image_loader(p2, resize=image_size).to(args.device)
         score, fm, mkpts0, mkpts1 = matcher(image0, image1)
         print(f"Found n. inliers after RANSAC: {score} ")
 
@@ -57,6 +61,8 @@ if __name__ == '__main__':
     # method-specific
     parser.add_argument('--dedode_thresh', type=float, default=0.05, help='threshold on match confidence for DeDoDe')
     parser.add_argument('--lowe_thresh', type=float, default=0.75, help='threshold on lowe ratio test for SIFT or ORB')
+
+    parser.add_argument('--device', type=str, default='cpu', choices=["cpu", "cuda"])
 
     args = parser.parse_args()
     main(args)
