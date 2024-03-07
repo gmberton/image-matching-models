@@ -11,7 +11,7 @@ import os
 from os.path import join
 import torchvision.transforms as tfm
 
-BASE_PATH = 'third_party/imatch-toolbox'
+BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
 sys.path.append(str(Path(BASE_PATH)))
 import immatch
 from matching.base_matcher import BaseMatcher
