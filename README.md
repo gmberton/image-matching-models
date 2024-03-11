@@ -26,20 +26,10 @@ git submodule add https://github.com/cvg/LightGlue.git third_party/LightGlue
 
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work, I don't really know why).
 
-### Note
-
-To use patch2pix and patch2pix_superglue open
-```
-third_party/imatch-toolbox/third_party/patch2pix/networks/ncn/conv4d.py
-```
-and change line 74 to
-```
-elif '1.' in torch.__version__ or '2.' in torch.__version__:
-```
 
 ## Roadmap
 
-Gabriele Trivigno to implement: Duster
+Gabriele Trivigno to implement: done
 
 Alex Stoken to implement: Se2-LoFTR, Steerers
 
