@@ -66,5 +66,9 @@ if __name__ == '__main__':
 
     # se2loftr
     parser.add_argument('--loftr_config', type=str, default='rot8', help='loftr config to use, choose from [rot8, big]')
+    
+    # steerers
+    parser.add_argument('--steerer_type', type=str, default='C8', help='Steerer type, choose from [C8, C4, SO2]')
+    
     args = parser.parse_args()
     main(args)

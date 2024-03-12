@@ -13,8 +13,7 @@ import torch.nn.functional as F
 from matching.base_matcher import BaseMatcher
 
 sys.path.append(str(Path('third_party/DeDoDe')))
-from DeDoDe import dedode_detector_L, dedode_detector_B
-from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
+from DeDoDe import dedode_detector_L, dedode_detector_B, dedode_descriptor_G, dedode_descriptor_B
 
 sys.path.append(str(Path('third_party/Steerers')))
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
@@ -23,44 +22,98 @@ from rotation_steerers.matchers.max_similarity import MaxSimilarityMatcher, Cont
 
 
 class SteererMatcher(BaseMatcher):
-    detector_path = 'model_weights/dedode_detector_L.pth'    
-    descriptor_path = 'model_weights/dedode_descriptor_G.pth'
-    steere_path = 'model_weights/B_C4_Perm_steerer_setting_C.pth'
+    detector_path_L = 'model_weights/dedode_detector_L.pth'
+
+    descriptor_path_G = 'model_weights/dedode_descriptor_G.pth'
+    descriptor_path_B_C4 = 'model_weights/B_C4_Perm_descriptor_setting_C.pth'
+    descriptor_path_B_SO2 = 'model_weights/B_SO2_Spread_descriptor_setting_B.pth'
+
+    steerer_path_C = 'model_weights/B_C4_Perm_steerer_setting_C.pth'
+    steerer_path_B = 'model_weights/B_SO2_Spread_steerer_setting_B.pth'
+
     dino_patch_size = 14
 
-    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, *args, **kwargs):
+    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, steerer_type='C8', *args, **kwargs):
         super().__init__(device)
         
         os.makedirs("model_weights", exist_ok=True)
-        if not os.path.isfile(self.detector_path):
+        # download detector
+        if not os.path.isfile(self.detector_path_L):
             print("Downloading dedode_detector_L.pth")
             urllib.request.urlretrieve(
                 "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
-                self.detector_path
+                self.detector_path_L
             )
-        if not os.path.isfile(self.descriptor_path):
+        # download descriptors
+        if not os.path.isfile(self.descriptor_path_G):
             print("Downloading dedode_descriptor_G.pth")
             urllib.request.urlretrieve(
                 "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
-                self.descriptor_path
+                self.descriptor_path_G
             )
-        if not os.path.isfile(self.steerer_path):
+        if not os.path.isfile(self.descriptor_path_B_C4):
+            print("Downloading dedode_descriptor_B_C4.pth")
+            urllib.request.urlretrieve(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_descriptor_setting_C.pth',
+                self.descriptor_path_B_C4
+            )
+        if not os.path.isfile(self.descriptor_path_B_SO2):
+            print("Downloading dedode_descriptor_B_S02.pth")
+            urllib.request.urlretrieve(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_descriptor_setting_B.pth',
+                self.descriptor_path_B_SO2
+            )
+        # download steerers
+        if not os.path.isfile(self.steerer_path_C):
             print("Downloading B_C4_Perm_steerer_setting_C.pth")
             urllib.request.urlretrieve(
-                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
-                self.steerer_path
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_steerer_setting_C.pth',
+                self.steerer_path_C
+            )
+        if not os.path.isfile(self.steerer_path_B):
+            print("Downloading B_SO2_Spread_steerer_setting_B.pth")
+            urllib.request.urlretrieve(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_steerer_setting_B.pth',
+                self.steerer_path_B
             )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
+
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        self.detector = dedode_detector_L(weights = torch.load(self.detector_path, map_location = device))
-        self.descriptor = dedode_descriptor_G(weights = torch.load(self.descriptor_path, map_location = device))
-        
-        self.steerer = DiscreteSteerer(generator=torch.load(self.steerer_path, map_location = device))
-        self.matcher = MaxSimilarityMatcher(steerer=self.steerer, steerer_order=4)
+        self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher(steerer_type, device=device)
 
+
+    def build_matcher(self, steerer_type='C8', device='cpu'):
+        if steerer_type == 'C4':
+            detector = dedode_detector_L(weights = torch.load(self.detector_path_L, map_location = device))
+            descriptor = dedode_descriptor_B(weights = torch.load(self.descriptor_path_B_C4, map_location = device))
+            steerer = DiscreteSteerer(generator=torch.load(self.steerer_path_C, map_location = device))
+            steerer_order = 4
+        elif steerer_type == 'C8':
+            detector = dedode_detector_L(weights = torch.load(self.detector_path_L, map_location = device))
+            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path_B_SO2, map_location=device))
+            steerer_order = 8
+            steerer = DiscreteSteerer(
+                generator=torch.matrix_exp(
+                    (2 * 3.14159 / steerer_order)
+                    * torch.load(self.steerer_path_B,map_location=device))
+                )
+
+        elif steerer_type == 'S02':
+            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path_B_SO2,map_location=device))
+            steerer = ContinuousSteerer(generator=torch.load(self.steerer_path_B,map_location=device))
+
+        else:
+            print(f'Steerer type {steerer_type} not yet implemented')
+
+        if steerer_type == 'SO2':
+            matcher = ContinuousMaxSimilarityMatcher(steerer=steerer, angles=[0.2, 1.2879, 3.14])
+        else:
+            matcher = MaxSimilarityMatcher(steerer=steerer, steerer_order=steerer_order)
+
+        return detector, descriptor, steerer, matcher
 
     def forward(self, img0, img1):
         super().forward(img0, img1)
@@ -83,14 +136,14 @@ class SteererMatcher(BaseMatcher):
         batch_1 = {"image": img1}
         detections_1 = self.detector.detect(batch_1, num_keypoints=self.max_keypoints)
         keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
-        
+
         description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
         description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]
 
         matches_0, matches_1, _ = self.matcher.match(
             keypoints_0, description_0,
             keypoints_1, description_1,
-            P_A = P_0, P_B = P_1, normalize = True, inv_temp=20, 
+            P_A = P_0, P_B = P_1, normalize = True, inv_temp=20,
             threshold = self.threshold # Increasing threshold -> fewer matches, fewer outliers
         )
         mkpts0, mkpts1 = self.matcher.to_pixel_coords(matches_0, matches_1, imsize, imsize, imsize, imsize)
@@ -98,21 +151,3 @@ class SteererMatcher(BaseMatcher):
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
         return self.process_matches(mkpts0, mkpts1)
-
-
-# # C8-steering with discretized steerer (recommended)
-# descriptor = dedode_descriptor_B(weights=torch.load("model_weights/B_SO2_Spread_descriptor_setting_B.pth"))
-# steerer_order = 8
-# steerer = DiscreteSteerer(
-#     generator=torch.matrix_exp(
-#         (2 * 3.14159 / steerer_order)
-#         * torch.load("model_weights/B_SO2_Spread_steerer_setting_B.pth")
-#     )
-# )
-# matcher = MaxSimilarityMatcher(steerer=steerer, steerer_order=steerer_order)
-
-# # SO(2)-steering with arbitrary angles (not recommended, but fun)
-# descriptor = dedode_descriptor_B(weights=torch.load("model_weights/B_SO2_Spread_descriptor_setting_B.pth"))
-# steerer = ContinuousSteerer(generator=torch.load("model_weights/B_SO2_Spread_steerer_setting_B.pth"))
-# matcher = ContinuousMaxSimilarityMatcher(steerer=steerer, angles=[0.2, 1.2879, 3.14])
-

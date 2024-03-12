@@ -1,4 +1,4 @@
-from matching import lightglue, loftr, roma, dedode, handcrafted, matching_toolbox, duster, se2loftr, steerers
+from matching import lightglue, loftr, roma, dedode, handcrafted, duster, se2loftr, steerers, matching_toolbox
 
 
 matchers = {
