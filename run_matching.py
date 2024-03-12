@@ -25,7 +25,7 @@ def main(args):
 
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts,
-        dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh
+        dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh, loftr_config=args.loftr_config
     )
 
     pair_folders = sorted(glob('assets/pair*'))
@@ -58,11 +58,13 @@ if __name__ == '__main__':
     # shared by all methods:
     parser.add_argument('--im_size', type=int, default=512, help='resize im to im_size x im_size')
     parser.add_argument('--n_kpts', type=int, default=2048, help='max num keypoints')
+    parser.add_argument('--device', type=str, default='cpu', choices=["cpu", "cuda"])
+
     # method-specific
     parser.add_argument('--dedode_thresh', type=float, default=0.05, help='threshold on match confidence for DeDoDe')
     parser.add_argument('--lowe_thresh', type=float, default=0.75, help='threshold on lowe ratio test for SIFT or ORB')
 
-    parser.add_argument('--device', type=str, default='cpu', choices=["cpu", "cuda"])
-
+    # se2loftr
+    parser.add_argument('--loftr_config', type=str, default='rot8', help='loftr config to use, choose from [rot8, big]')
     args = parser.parse_args()
     main(args)
