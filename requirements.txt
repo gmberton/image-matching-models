@@ -10,7 +10,7 @@ transforms3d
 h5py
 kornia_moons
 yacs
-gdown
+gdown>=5.1.0
 tables
 imageio
 vispy
