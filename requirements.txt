@@ -22,6 +22,7 @@ trimesh
 # flash_attn
 # packaging
 # pycolmap
+e2cnn
 
 #from se2loftr
 loguru==0.5.3
