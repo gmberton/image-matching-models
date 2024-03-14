@@ -4,3 +4,4 @@ __pycache__
 assets/out*
 *_old.py
 model_weights
+*.torch
