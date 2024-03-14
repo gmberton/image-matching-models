@@ -39,7 +39,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
 def compute_threshold(true_matches, false_matches, thresh=0.95):
     assert isinstance(true_matches, list)
-    assert isinstance(true_matches, list)
+    assert isinstance(false_matches, list)
 
     if (len(true_matches) < 4):
         return 4
