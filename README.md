@@ -27,12 +27,16 @@ git submodule add https://github.com/cvg/LightGlue.git third_party/LightGlue
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work, I don't really know why).
 
 
-## Roadmap
+## TODO list
 
-Gabriele Trivigno to implement: done
+- Let's use Path instead of os.path
+- Rename `score` to `num_inliers` (if we are sure that it's only inliers for every methods)
+- Avoid inconsistencies (like dust3r->duster, rotation-steerers->Steerers, se2-loftr->Se2_LoFTR, image-matching-toolbox->imatch-toolbox)
+- Clean the code for release
+- Clean the README for release
 
-Alex Stoken to implement: Se2-LoFTR, Steerers
 
-### Link to paper
-https://www.overleaf.com/4695153514pwywhphtnpkq#6c2784
+## Longer term TODO list
 
+We could add other (more specific) metching/re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
+Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
