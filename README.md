@@ -33,10 +33,10 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 - Rename `score` to `num_inliers` (if we are sure that it's only inliers for every methods)
 - Avoid inconsistencies (like dust3r->duster, rotation-steerers->Steerers, se2-loftr->Se2_LoFTR, image-matching-toolbox->imatch-toolbox)
 - Clean the code for release
-- Clean the README for release
-
+- Clean the README for release, add the images as examples in the README
+- Perhaps we can rename this repo to something more generic (like image-matching-toolbox++++) given that it has nothing specific to astronaut photographs - so that it is more likely that it will be used for other things, like re-ranking in VPR. And then we can name EarthMatch as the wrapper code for the benchmark.
 
 ## Longer term TODO list
 
-We could add other (more specific) metching/re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
-Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
+- We could add other (more specific) metching/re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
+- Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
