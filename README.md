@@ -35,6 +35,7 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 - Clean the code for release
 - Clean the README for release, add the images as examples in the README
 - Perhaps we can rename this repo to something more generic (like image-matching-toolbox++++) given that it has nothing specific to astronaut photographs - so that it is more likely that it will be used for other things, like re-ranking in VPR. And then we can name EarthMatch as the wrapper code for the benchmark.
+- Remove method-specific hyperparams like dedode_thresh, lowethresh, loftr_config, steerer_type
 
 ## Longer term TODO list
 
