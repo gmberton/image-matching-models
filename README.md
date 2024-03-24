@@ -39,5 +39,8 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 ## Longer term TODO list
 
-- We could add other (more specific) metching/re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
+- We could add DeDoDe + LightGlue from kornia
+- We could also add VPR re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
 - Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
+- Should we do a separate branch for Se2-LoFTR?
+- Double check Duster
