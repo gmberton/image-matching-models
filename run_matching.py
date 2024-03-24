@@ -13,10 +13,9 @@ from lightglue import viz2d
 
 from matching import get_matcher
 
+# This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, 'ps1'):
-    # Set the matplotlib backend to 'Agg' to avoid GUI-related errors
     matplotlib.use('Agg')
-
 
 def main(args):
     image_size = [args.im_size, args.im_size]
