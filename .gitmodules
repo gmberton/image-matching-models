@@ -16,6 +16,3 @@
 [submodule "third_party/Steerers"]
 	path = third_party/Steerers
 	url = https://github.com/georg-bn/rotation-steerers.git
-[submodule "third_party/Se2_LoFTR"]
-	path = third_party/Se2_LoFTR
-	url = https://github.com/georg-bn/se2-loftr.git
