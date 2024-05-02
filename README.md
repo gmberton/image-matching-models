@@ -29,18 +29,19 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 ## TODO list
 
-- Let's use Path instead of os.path
-- Rename `score` to `num_inliers` (if we are sure that it's only inliers for every methods)
-- Avoid inconsistencies (like dust3r->duster, rotation-steerers->Steerers, se2-loftr->Se2_LoFTR, image-matching-toolbox->imatch-toolbox)
-- Clean the code for release
-- Clean the README for release, add the images as examples in the README
-- Perhaps we can rename this repo to something more generic (like image-matching-toolbox++++) given that it has nothing specific to astronaut photographs - so that it is more likely that it will be used for other things, like re-ranking in VPR. And then we can name EarthMatch as the wrapper code for the benchmark.
-- Remove method-specific hyperparams like dedode_thresh, lowethresh, loftr_config, steerer_type
+1. Let's use Path instead of os.path
+2. Rename `score` to `num_inliers` (if we are sure that it's only inliers for every methods)
+3. Avoid inconsistencies (like dust3r->duster, rotation-steerers->Steerers, se2-loftr->Se2_LoFTR, image-matching-toolbox->imatch-toolbox)
+4. Clean the code for release
+5. Clean the README for release, add more examples in assets, we could use one example of outdoor buildings, one indoor, and one satellite
+6. Remove method-specific hyperparams like dedode_thresh, lowethresh, loftr_config, steerer_type (or find a better way to use them?)
+7. Remove Se2-LoFTR (or use a separate branch for it)
+8. Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
 
 ## Longer term TODO list
 
-- We could add DeDoDe + LightGlue from kornia
-- We could also add VPR re-ranking methods like CVNet, TransVPR, Patch-NetVLAD, SelaVPR.
-- Do we think people could benefit by returning more data than only `score, fm, mkpts0, mkpts1`? If yes, we could return more data (e.g. some methods might return `kpts0, kpts1`)
-- Should we do a separate branch for Se2-LoFTR?
-- Double check Duster
+- [ ] Add DeDoDe + LightGlue from kornia
+- [ ] Add CVNet
+- [ ] Add TransVPR
+- [ ] Add Patch-NetVLAD
+- [ ] Add SelaVPR
