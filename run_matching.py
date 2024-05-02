@@ -30,7 +30,7 @@ def main(args):
         
         image0 = matcher.image_loader(img0_path, resize=image_size).to(args.device)
         image1 = matcher.image_loader(img1_path, resize=image_size).to(args.device)
-        score, fm, mkpts0, mkpts1 = matcher(image0, image1)
+        num_inliers, fm, mkpts0, mkpts1 = matcher(image0, image1)
 
         axes = viz2d.plot_images([image0, image1])
         viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
@@ -38,7 +38,7 @@ def main(args):
         viz_path = (args.out_dir / f"output_{i}.jpg")
         viz2d.save_plot(viz_path)
         
-        print(f"Folder: {pair_dir}. Found {score} inliers after RANSAC. Viz saved in {viz_path}")
+        print(f"Folder: {pair_dir}. Found {num_inliers} inliers after RANSAC. Viz saved in {viz_path}")
 
 
 if __name__ == '__main__':
@@ -56,11 +56,7 @@ if __name__ == '__main__':
     # method-specific
     parser.add_argument('--dedode_thresh', type=float, default=0.05, help='threshold on match confidence for DeDoDe')
     parser.add_argument('--lowe_thresh', type=float, default=0.75, help='threshold on lowe ratio test for SIFT or ORB')
-
-    # se2loftr
-    parser.add_argument('--loftr_config', type=str, default='rot8', help='loftr config to use, choose from [rot8, big]')
-    
-    # steerers
+    # rotation-steerers
     parser.add_argument('--steerer_type', type=str, default='C8', help='Steerer type, choose from [C8, C4, SO2]')
     
     args = parser.parse_args()

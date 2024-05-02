@@ -49,9 +49,9 @@ class BaseMatcher(torch.nn.Module):
         fm, inliers_mask = self.find_homography(mkpts0, mkpts1)
         mkpts0 = mkpts0[inliers_mask]
         mkpts1 = mkpts1[inliers_mask]
-        score = inliers_mask.sum()
+        num_inliers = inliers_mask.sum()
 
-        return score, fm, mkpts0, mkpts1
+        return num_inliers, fm, mkpts0, mkpts1
         
     def forward(self, img0, img1):
         """
@@ -64,8 +64,7 @@ class BaseMatcher(torch.nn.Module):
 
         Returns
         -------
-        score : int, a method-dependent confidence score. For almost every
-            method, score is the number of inliers, i.e. num(mkpts0)
+        num_inliers : int, number of inliers after RANSAC, i.e. num(mkpts0)
         fm : np.array (3 x 3), the fundamental matrix of the homography to map
             mkpts0 to mkpts1
         mkpts0 : torch.tensor (N x 2), keypoints from img0 that match mkpts1

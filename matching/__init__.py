@@ -1,6 +1,3 @@
-from sklearn.linear_model import LogisticRegression 
-import numpy as np
-import os
 
 from matching import lightglue, loftr, roma, dedode, handcrafted, duster, se2loftr, steerers, matching_toolbox
 
