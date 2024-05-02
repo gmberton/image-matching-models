@@ -1,10 +1,9 @@
 
-from matching import lightglue, loftr, roma, dedode, handcrafted, duster, se2loftr, steerers, matching_toolbox
+from matching import lightglue, loftr, roma, dedode, handcrafted, duster, steerers, matching_toolbox
 
 
 matchers = {
     'loftr': loftr.LoftrMatcher,
-    'se2loftr': se2loftr.Se2LoFTRMatcher,
     'sift-lg': lightglue.SiftLightGlue,
     'superpoint-lg': lightglue.SuperpoingLightGlue,
     'disk-lg': lightglue.DiskLightGlue,
