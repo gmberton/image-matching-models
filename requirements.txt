@@ -19,14 +19,5 @@ pyglet==1.5.28
 tensorboard
 scipy
 trimesh
-# flash_attn
-# packaging
-# pycolmap
 e2cnn
 scikit-learn
-
-#from se2loftr
-# commented, as lightning breaks the env with python > 3.8
-# loguru==0.5.3
-# pytorch-lightning==1.3.5
-# joblib>=1.0.1

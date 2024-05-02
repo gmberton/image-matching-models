@@ -11,7 +11,7 @@ matchers = {
     'doghardnet-lg': lightglue.DognetLightGlue,
     'roma': roma.RomaMatcher,
     'dedode': dedode.DedodeMatcher,
-    'steerers':steerers.SteererMatcher,
+    'steerers': steerers.SteererMatcher,
     'sift-nn': handcrafted.SiftNNMatcher,
     'orb-nn': handcrafted.OrbNNMatcher,
     'patch2pix': matching_toolbox.Patch2pixMatcher,

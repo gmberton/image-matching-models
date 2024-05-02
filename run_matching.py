@@ -21,7 +21,7 @@ def main(args):
 
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts,
-        dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh, loftr_config=args.loftr_config
+        dedode_thresh=args.dedode_thresh, lowe_thresh=args.lowe_thresh
     )
 
     pair_dirs = sorted(assets_dir.glob("pair*"))
@@ -49,7 +49,7 @@ if __name__ == '__main__':
     # shared by all methods:
     parser.add_argument('--im_size', type=int, default=512, help='resize im to im_size x im_size')
     parser.add_argument('--n_kpts', type=int, default=2048, help='max num keypoints')
-    parser.add_argument('--device', type=str, default='cpu', choices=["cpu", "cuda"])
+    parser.add_argument('--device', type=str, default='cuda', choices=["cpu", "cuda"])
     
     parser.add_argument('--out_dir', type=str, default=None, help='path where outputs are saved')
 
