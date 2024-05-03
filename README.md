@@ -3,7 +3,7 @@
 To use this simply run
 
 ```
-git clone --recursive https://github.com/gmberton/EarthMatch
+git clone --recursive https://github.com/gmberton/image-matching-models
 ```
 
 NOTE THE `--recursive` !!!
