@@ -1,15 +1,8 @@
 
 import cv2
-import sys
 import torch
 from PIL import Image
-from pathlib import Path
-from kornia.feature import LoFTR
 import torchvision.transforms as tfm
-
-sys.path.append(str(Path('third_party/LightGlue')))
-from lightglue import match_pair
-from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 
 
 class BaseMatcher(torch.nn.Module):

@@ -1,7 +1,5 @@
 .spyproject
+.idea
 __pycache__
-*.ipynb*
-assets/out*
-*_old.py
 model_weights
-*.torch
+outputs_*

@@ -11,7 +11,7 @@ NOTE THE `--recursive` !!!
 Then run this script, which will perform inference on the 3 folders of image pairs inside `./assets`. It is possible to specify also resolution and num_keypoints.
 
 ```
-python run_matching.py -m sift-lg
+python main.py --matcher sift-lg
 ```
 
 Where `sift-lg` will use `SIFT + LightGlue`. You can choose any of the following methods:
@@ -33,12 +33,11 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 ## TODO list
 
-1. It would be nice if we could import only the module that is actually used without making `matching/__init__.py` too ugly
 2. Clean the README for release, add more examples in assets, we could use one example of outdoor buildings, one indoor, and one satellite
-3. Remove method-specific hyperparams like dedode_thresh, lowethresh, steerer_type (or find a better way to use them?)
 
-## Longer term TODO list
+## TODO
 
+- [ ] Add parameter for RANSAC threshold
 - [ ] It might be useful to return other params (e.g. `kpts0, kpts1`) for some methods
 - [ ] Add DeDoDe + LightGlue from kornia
 - [ ] Add CVNet
