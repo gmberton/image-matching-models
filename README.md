@@ -4,20 +4,20 @@ A repository to easily try 17 different image matching models.
 
 Some results with SIFT-LightGlue
 <p float="left">
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_3.jpg?token=GHSAT0AAAAAACPP2PJJ4C5EC7T7OVXNQOMCZRY274Q" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_2.jpg?token=GHSAT0AAAAAACPP2PJJZKVHM6QMIRUX53B4ZRY273Q" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_4.jpg?token=GHSAT0AAAAAACPP2PJJQMPWESHBPC4AEZ2MZRY275A" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_1.jpg?token=GHSAT0AAAAAACPP2PJIOQQY2754M2TVN27SZRY273A" height="150" /> 
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_0.jpg?token=GHSAT0AAAAAACPP2PJJQPHVEUCZ7C5S2D4KZRY273A" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_3.jpg?token=GHSAT0AAAAAACPP2PJJT2SCD7ZZ6QPNK6UCZRZEDBA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_2.jpg?token=GHSAT0AAAAAACPP2PJIF73JJ3EK3ACJSDP6ZRZEDCA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_4.jpg?token=GHSAT0AAAAAACPP2PJJAZVPTHFWI4T52U2UZRZEDUA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_0.jpg?token=GHSAT0AAAAAACPP2PJIOFN6TBAICU3XDYAMZRZEDDA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/example_sift-lg/output_1.jpg?token=GHSAT0AAAAAACPP2PJJYIWEKGM25WMDTKMSZRZEDDQ" height="150" />
 </p>
 
 Some results with LoFTR
 <p float="left">
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_3.jpg?token=GHSAT0AAAAAACPP2PJIO5WFULRDDKZEZAGCZRY3CUQ" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_2.jpg?token=GHSAT0AAAAAACPP2PJJOEXVY44KWUF6BRT4ZRY3CUQ" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_4.jpg?token=GHSAT0AAAAAACPP2PJJA43NQ2H2SAYN36RUZRY3CVA" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_1.jpg?token=GHSAT0AAAAAACPP2PJJQ6FYQ7A73SQTVTRMZRY3CUA" height="150" />
-  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_0.jpg?token=GHSAT0AAAAAACPP2PJJTYLPVKGR4KHIMIJQZRY3CTQ" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_3.jpg?token=GHSAT0AAAAAACPP2PJJVOPT2UXWDYSEYTGMZRZEDLA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_2.jpg?token=GHSAT0AAAAAACPP2PJILAPQ47ZLBSJLVPBSZRZEDLQ" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_4.jpg?token=GHSAT0AAAAAACPP2PJIGHW2M2WJH5ECU56OZRZEDOQ" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_0.jpg?token=GHSAT0AAAAAACPP2PJJM4IAOLI6K5IPRCSMZRZEDNA" height="150" />
+  <img src="https://raw.githubusercontent.com/gmberton/image-matching-models/main/assets/examples_loftr/output_1.jpg?token=GHSAT0AAAAAACPP2PJII64DN745EWZJICAYZRZEDOA" height="150" />
 </p>
 
 
