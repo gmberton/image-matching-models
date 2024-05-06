@@ -15,7 +15,6 @@ if not hasattr(sys, 'ps1'):
     matplotlib.use('Agg')
 
 def main(args):
-    assets_dir = Path('assets')
     
     image_size = [args.im_size, args.im_size]
     args.out_dir.mkdir(exist_ok=True, parents=True)
@@ -23,7 +22,7 @@ def main(args):
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
 
-    pair_dirs = sorted(assets_dir.glob('pair*'))
+    pair_dirs = sorted(Path('assets', 'example_pairs').glob('*'))
     for i, pair_dir in enumerate(pair_dirs):
         img0_path, img1_path = list(pair_dir.glob('*'))
         
@@ -44,7 +43,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Argument parser')
     # Choose matcher
-    parser.add_argument('--matcher', type=str, default='loftr',
+    parser.add_argument('--matcher', type=str, default='sift-lg',
                         choices=['aliked-lg', 'd2net', 'dedode', 'disk-lg', 'doghardnet-lg',
                                  'doghardnet-nn', 'duster', 'loftr', 'orb-nn', 'patch2pix',
                                  'patch2pix_superglue', 'r2d2', 'roma', 'sift-lg', 'sift-nn',
@@ -64,6 +63,5 @@ if __name__ == '__main__':
     if args.out_dir is None:
         args.out_dir = Path(f'outputs_{args.matcher}')
     args.out_dir = Path(args.out_dir)
-    
     
     main(args)
