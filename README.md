@@ -56,6 +56,10 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 ## TODO
 
+- [ ] Add a parameter to pass an input path (either a file with the image paths to match, or a dir with the image pairs)
+- [ ] Add a parameter (`--no_viz`) to avoid saving the output images
+- [ ] Save the outputs of the matching in one dict file per pair
+- [ ] Add a table to the README with the source for each model (code source and paper)
 - [ ] Add parameter for RANSAC threshold
 - [ ] It might be useful to return other params (e.g. `kpts0, kpts1`) for some methods
 - [ ] Add DeDoDe + LightGlue from kornia
