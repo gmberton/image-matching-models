@@ -21,13 +21,13 @@ Some results with LoFTR
 </p>
 
 
-To use this simply run
+To use this repo simply run
 
 ```
 git clone --recursive https://github.com/gmberton/image-matching-models
 ```
 
-Then run this script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU.
+Then run this script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
 
 ```
 python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
@@ -38,7 +38,9 @@ Where `sift-lg` will use `SIFT + LightGlue`.
 **You can choose any of the following methods:
 loftr, sift-lg, superpoint-lg, disk-lg, aliked-lg, doghardnet-lg, roma, dedode, steerers, sift-nn, orb-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, doghardnet-nn**
 
-The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg` .
+The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
+
+All the matchers can run on GPU, and most of them can run both on GPU or CPU. A few can't run on CPU.
 
 
 ### Adding a new method
