@@ -67,3 +67,20 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 - [ ] Add TransVPR
 - [ ] Add Patch-NetVLAD
 - [ ] Add SelaVPR
+
+## Note
+This repo is not optimized for speed, but for usability. The idea is to use this repo to find the matcher that best suits your needs, and then use the original code to get the best out of it.
+
+## Cite
+
+This repo was created as part of the EarthMatch paper
+
+```
+@InProceedings{Berton_2024_EarthMatch,
+    author    = {Gabriele Berton, Gabriele Goletto, Gabriele Trivigno, Alex Stoken, Barbara Caputo, Carlo Masone},
+    title     = {EarthMatch: Iterative Coregistration for Fine-grained Localization of Astronaut Photography},
+    booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+    month     = {June},
+    year      = {2024},
+}
+```
