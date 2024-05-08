@@ -8,11 +8,13 @@ from pathlib import Path
 sys.path.append(str(Path('third_party/LightGlue')))
 from lightglue import viz2d
 
+from util import get_image_pairs_paths
 from matching import get_matcher
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, 'ps1'):
     matplotlib.use('Agg')
+
 
 def main(args):
     
@@ -22,15 +24,14 @@ def main(args):
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
 
-    pair_dirs = sorted(Path('assets', 'example_pairs').glob('*'))
-    for i, pair_dir in enumerate(pair_dirs):
-        img0_path, img1_path = list(pair_dir.glob('*'))
+    pairs_of_paths = get_image_pairs_paths(args.input)
+    for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
         
         image0 = matcher.image_loader(img0_path, resize=image_size).to(args.device)
         image1 = matcher.image_loader(img1_path, resize=image_size).to(args.device)
         with torch.inference_mode():
             num_inliers, fm, mkpts0, mkpts1 = matcher(image0, image1)
-        out_str = f'Folder: {pair_dir}. Found {num_inliers} inliers after RANSAC. '
+        out_str = f'Paths: {str(img0_path), str(img1_path)}. Found {num_inliers} inliers after RANSAC. '
         
         if not args.no_viz:
             axes = viz2d.plot_images([image0, image1])
@@ -69,6 +70,8 @@ if __name__ == '__main__':
     parser.add_argument('--no_viz', action='store_true',
                         help='pass --no_viz to avoid saving visualizations')
     
+    parser.add_argument('--input', type=str, default='assets/example_pairs',
+                        help='path to either (1) dir with dirs with pairs or (2) txt file with two img paths per line')
     parser.add_argument('--out_dir', type=str, default=None,
                         help='path where outputs are saved')
     
