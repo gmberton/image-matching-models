@@ -9,7 +9,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048):
     
     if matcher_name == 'loftr':
         from matching import loftr
-        return loftr.LoftrMatcher(device, max_num_keypoints)
+        return loftr.LoftrMatcher(device)
     
     elif matcher_name == 'sift-lg':
         from matching import lightglue
@@ -53,7 +53,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048):
     
     elif matcher_name == 'patch2pix':
         from matching import matching_toolbox
-        return matching_toolbox.Patch2pixMatcher(device, max_num_keypoints)
+        return matching_toolbox.Patch2pixMatcher(device)
     
     elif matcher_name == 'patch2pix_superglue':
         from matching import matching_toolbox
@@ -69,7 +69,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048):
     
     elif matcher_name == 'd2net':
         from matching import matching_toolbox
-        return matching_toolbox.D2netMatcher(device, max_num_keypoints)
+        return matching_toolbox.D2netMatcher(device)
     
     elif matcher_name == 'duster':
         from matching import duster
@@ -77,7 +77,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048):
     
     elif matcher_name == 'doghardnet-nn':
         from matching import matching_toolbox
-        return matching_toolbox.DogAffHardNNMatcher(device, max_num_keypoints)
+        return matching_toolbox.DogAffHardNNMatcher(device)
     
     else:
         raise RuntimeError(f'Matcher {matcher_name} does not exist')
