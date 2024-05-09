@@ -1,6 +1,6 @@
 from kornia.feature import LoFTR
 import torchvision.transforms as tfm
-
+import torch
 from matching.base_matcher import BaseMatcher
 
 
@@ -10,6 +10,7 @@ class LoftrMatcher(BaseMatcher):
 
         self.model = LoFTR(pretrained='outdoor').to(self.device)
     
+    @torch.inference_mode()
     def forward(self, img0, img1):
         super().forward(img0, img1)
         

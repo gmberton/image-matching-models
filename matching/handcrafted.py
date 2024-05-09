@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from matching.base_matcher import BaseMatcher
-
+import torch
 
 class HandcraftedBaseMatcher(BaseMatcher):
     """
@@ -22,6 +22,7 @@ class HandcraftedBaseMatcher(BaseMatcher):
 
         return im
 
+    @torch.inference_mode()
     def forward(self, img0, img1):
         """
         "det_descr" is instantiated by the subclasses.

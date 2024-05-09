@@ -8,6 +8,7 @@ import kornia.feature as KF
 from kornia_moons.feature import laf_from_opencv_SIFT_kpts
 import numpy as np
 import os
+import torch
 from os.path import join
 import torchvision.transforms as tfm
 
@@ -41,6 +42,7 @@ class Patch2pixMatcher(BaseMatcher):
         urllib.request.urlretrieve(Patch2pixMatcher.url1, ckpt)
         urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
+    @torch.inference_mode()
     def forward(self, img0, img1):
         super().forward(img0, img1)
 

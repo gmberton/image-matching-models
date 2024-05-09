@@ -1,12 +1,12 @@
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path('third_party/LightGlue')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/LightGlue')))
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 
 from matching.base_matcher import BaseMatcher
-
+import torch
 
 class LightGlueBase(BaseMatcher):
     """
@@ -19,6 +19,7 @@ class LightGlueBase(BaseMatcher):
     def __init__(self, device="cpu"):
         super().__init__(device)
     
+    @torch.inference_mode()
     def forward(self, img0, img1):
         """
         "extractor" and "matcher" are instantiated by the subclasses.

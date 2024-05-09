@@ -8,7 +8,7 @@ import urllib.request
 import gdown
 
 
-sys.path.append(str(Path('third_party/Se2_LoFTR')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/Se2_LoFTR')))
 from src.loftr.loftr import LoFTR
 from configs.loftr.outdoor.loftr_ds_e2_dense_8rot import cfg as rot8_cfg
 from configs.loftr.outdoor.loftr_ds_e2_dense_big import cfg as big_cfg
@@ -59,6 +59,7 @@ class Se2LoFTRMatcher(BaseMatcher):
 
         return model.eval()
 
+    @torch.inference_mode()
     def forward(self, img0, img1):
         super().forward(img0, img1)
 
