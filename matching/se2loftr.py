@@ -60,8 +60,7 @@ class Se2LoFTRMatcher(BaseMatcher):
         return model.eval()
 
     @torch.inference_mode()
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
 
         # loftr requires grayscale imgs
         img0 = tfm.Grayscale()(img0).unsqueeze(0).to(self.device)

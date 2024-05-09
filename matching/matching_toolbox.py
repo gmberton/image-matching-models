@@ -43,8 +43,7 @@ class Patch2pixMatcher(BaseMatcher):
         urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
     @torch.inference_mode()
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
 
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)
         img1 = self.normalize(img1).unsqueeze(0).to(self.device)
@@ -97,8 +96,7 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         self.cname = cargs['name']
         self.coarse_matcher = immatch.__dict__[self.cname](cargs)
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
 
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
@@ -133,8 +131,7 @@ class SuperGlueMatcher(BaseMatcher):
         self.match_threshold = args['match_threshold']
         # print(self.matcher.detector.model.config)
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
@@ -169,8 +166,7 @@ class R2D2Matcher(BaseMatcher):
             cmd = f'cp -r {BASE_PATH}/third_party/r2d2/models  {BASE_PATH}/pretrained/r2d2'
             os.system(cmd)
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)
         img1 = self.normalize(img1).unsqueeze(0).to(self.device)
@@ -220,8 +216,7 @@ class D2netMatcher(BaseMatcher):
 
         return image
     
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
@@ -257,8 +252,7 @@ class DogAffHardNNMatcher(BaseMatcher):
 
         return im
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.tensor_to_numpy_int(img0)

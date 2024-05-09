@@ -23,11 +23,10 @@ class HandcraftedBaseMatcher(BaseMatcher):
         return im
 
     @torch.inference_mode()
-    def forward(self, img0, img1):
+    def _forward(self, img0, img1):
         """
         "det_descr" is instantiated by the subclasses.
         """
-        super().forward(img0, img1)
 
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.tensor_to_numpy_int(img0)

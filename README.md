@@ -21,6 +21,8 @@ Some results with LoFTR
 </p>
 
 
+## Use
+
 To use this repo simply run
 
 ```
@@ -43,6 +45,29 @@ The script will generate an image with the matching keypoints for each pair, und
 All the matchers can run on GPU, and most of them can run both on GPU or CPU. A few can't run on CPU.
 
 
+### Use on your own images
+
+To use on your images you have two options:
+1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
+2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
+
+
+## TODO
+
+- [ ] Add a table to the README with the source for each model (code source and paper)
+- [ ] Add parameter for RANSAC threshold
+- [ ] It might be useful to return other outputs (e.g. `kpts0, kpts1`) (for the methods that have them)
+- [ ] Add DeDoDe + LightGlue from kornia
+- [ ] Add CVNet
+- [ ] Add TransVPR
+- [ ] Add Patch-NetVLAD
+- [ ] Add SelaVPR
+- [ ] Add xFeat
+- [ ] Add any other local features method
+
+PRs are very much welcomed :-)
+
+
 ### Adding a new method
 
 To add a new method simply add it to `./matching`. If the method requires external modules, you can add them to `./third_party` with `git submodule add`: for example, I've used this command to add the LightGlue module which is automatically downloaded when using `--recursive`
@@ -53,20 +78,6 @@ git submodule add https://github.com/cvg/LightGlue third_party/LightGlue
 
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work).
 
-
-## TODO
-
-- [ ] Add a parameter to pass an input path (either a file with the image paths to match, or a dir with the image pairs)
-- [ ] Add a parameter (`--no_viz`) to avoid saving the output images
-- [ ] Save the outputs of the matching in one dict file per pair
-- [ ] Add a table to the README with the source for each model (code source and paper)
-- [ ] Add parameter for RANSAC threshold
-- [ ] It might be useful to return other params (e.g. `kpts0, kpts1`) for some methods
-- [ ] Add DeDoDe + LightGlue from kornia
-- [ ] Add CVNet
-- [ ] Add TransVPR
-- [ ] Add Patch-NetVLAD
-- [ ] Add SelaVPR
 
 ## Note
 This repo is not optimized for speed, but for usability. The idea is to use this repo to find the matcher that best suits your needs, and then use the original code to get the best out of it.

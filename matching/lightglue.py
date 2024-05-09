@@ -20,11 +20,10 @@ class LightGlueBase(BaseMatcher):
         super().__init__(device)
     
     @torch.inference_mode()
-    def forward(self, img0, img1):
+    def _forward(self, img0, img1):
         """
         "extractor" and "matcher" are instantiated by the subclasses.
         """
-        super().forward(img0, img1)
         feats0, feats1, matches01 = match_pair(
             self.extractor, self.matcher, img0, img1, device=self.device
         )

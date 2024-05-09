@@ -63,8 +63,7 @@ class DedodeMatcher(BaseMatcher):
         return img, imsize
 
     @torch.inference_mode()
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
 
         img0, imsize = self.preprocess(img0)
         img1, imsize = self.preprocess(img1)

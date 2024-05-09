@@ -11,8 +11,7 @@ class LoftrMatcher(BaseMatcher):
         self.model = LoFTR(pretrained='outdoor').to(self.device)
     
     @torch.inference_mode()
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         img0 = tfm.Grayscale()(img0).unsqueeze(0).to(self.device)
         img1 = tfm.Grayscale()(img1).unsqueeze(0).to(self.device)

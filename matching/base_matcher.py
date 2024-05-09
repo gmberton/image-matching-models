@@ -7,10 +7,10 @@ import torchvision.transforms as tfm
 
 class BaseMatcher(torch.nn.Module):
     """
-    This serves as a base class for all matchers. It provides a simple interface 
+    This serves as a base class for all matchers. It provides a simple interface
     for its sub-classes to implement, namely each matcher must specify its own
-    __init__ and forward methods. It also provides a common image_loader and 
-    homography estimator    
+    __init__ and forward methods. It also provides a common image_loader and
+    homography estimator
     """
     def __init__(self, device="cpu"):
         super().__init__()
@@ -70,4 +70,5 @@ class BaseMatcher(torch.nn.Module):
         img0 = img0.to(self.device)
         img1 = img1.to(self.device)
         
-        return
+        # The _forward() is implemented by the children classes
+        return self._forward(img0, img1)
