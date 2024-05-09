@@ -115,8 +115,7 @@ class SteererMatcher(BaseMatcher):
 
         return detector, descriptor, steerer, matcher
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         # the super-class already makes sure that img0,img1 have same resolution
         # and that h == w
         _, h, _ = img0.shape

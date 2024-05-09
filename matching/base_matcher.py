@@ -70,4 +70,5 @@ class BaseMatcher(torch.nn.Module):
         c, h, w = img0.shape
         assert h == w
         
-        return
+        # The _forward() is implemented by the children classes
+        return self._forward(img0, img1)

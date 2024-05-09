@@ -57,8 +57,7 @@ class DedodeMatcher(BaseMatcher):
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
 
         img0, imsize = self.preprocess(img0)
         img1, imsize = self.preprocess(img1)

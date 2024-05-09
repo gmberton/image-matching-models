@@ -50,8 +50,7 @@ class DusterMatcher(BaseMatcher):
 
         return img
 
-    def forward(self, img0, img1):
-        super().forward(img0, img1)
+    def _forward(self, img0, img1):
         
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
