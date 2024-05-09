@@ -12,10 +12,10 @@ import torch.nn.functional as F
 
 from matching.base_matcher import BaseMatcher
 
-sys.path.append(str(Path('third_party/DeDoDe')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
 from DeDoDe import dedode_detector_L, dedode_detector_B, dedode_descriptor_G, dedode_descriptor_B
 
-sys.path.append(str(Path('third_party/Steerers')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/Steerers')))
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
 from rotation_steerers.matchers.max_similarity import MaxSimilarityMatcher, ContinuousMaxSimilarityMatcher
 
@@ -115,19 +115,28 @@ class SteererMatcher(BaseMatcher):
 
         return detector, descriptor, steerer, matcher
 
+    def preprocess(self, img):
+        # ensure that the img has the proper w/h to be compatible with patch sizes
+        _, h, w = img.shape
+        imsize = h
+        if not ((h % self.dino_patch_size) == 0):
+            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
+            img = tfm.functional.resize(img, imsize, antialias=True)
+        _, new_h, new_w = img.shape
+        if not ((new_w % self.dino_patch_size) == 0):
+            safe_w = int(self.dino_patch_size*round(new_w / self.dino_patch_size, 0))
+            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+
+        img = self.normalize(img).unsqueeze(0).to(self.device)
+        return img, imsize
+
+    @torch.inference_mode()
     def forward(self, img0, img1):
         super().forward(img0, img1)
         # the super-class already makes sure that img0,img1 have same resolution
         # and that h == w
-        _, h, _ = img0.shape
-        imsize = h
-        if not ((h % self.dino_patch_size) == 0):
-            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
-            img0 = tfm.functional.resize(img0, imsize, antialias=True)
-            img1 = tfm.functional.resize(img1, imsize, antialias=True)
-
-        img0 = self.normalize(img0).unsqueeze(0).to(self.device)
-        img1 = self.normalize(img1).unsqueeze(0).to(self.device)
+        img0, imsize = self.preprocess(img0)
+        img1, imsize = self.preprocess(img1)
 
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)

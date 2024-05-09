@@ -30,22 +30,23 @@ class BaseMatcher(torch.nn.Module):
         assert points1.shape[1] == 2
         if isinstance(points1, torch.Tensor):
             points1, points2 = points1.cpu().numpy(), points2.cpu().numpy()
-        fm, inliers_mask = cv2.findHomography(points1, points2, cv2.RANSAC)
+        H, inliers_mask = cv2.findHomography(points1, points2, cv2.USAC_MAGSAC)
         assert inliers_mask.shape[1] == 1
         inliers_mask = inliers_mask[:, 0]
-        return fm, inliers_mask.astype(bool)
+        return H, inliers_mask.astype(bool)
     
     def process_matches(self, mkpts0, mkpts1):
         if len(mkpts0) < 5:
             return 0, None, mkpts0, mkpts1
 
-        fm, inliers_mask = self.find_homography(mkpts0, mkpts1)
+        H, inliers_mask = self.find_homography(mkpts0, mkpts1)
         mkpts0 = mkpts0[inliers_mask]
         mkpts1 = mkpts1[inliers_mask]
         num_inliers = inliers_mask.sum()
 
-        return num_inliers, fm, mkpts0, mkpts1
+        return num_inliers, H, mkpts0, mkpts1
         
+    @torch.inference_mode()
     def forward(self, img0, img1):
         """
         All sub-classes implement the following interface:
@@ -58,16 +59,15 @@ class BaseMatcher(torch.nn.Module):
         Returns
         -------
         num_inliers : int, number of inliers after RANSAC, i.e. num(mkpts0)
-        fm : np.array (3 x 3), the fundamental matrix of the homography to map
-            mkpts0 to mkpts1
+        H : np.array (3 x 3), the homography matrix to map mkpts0 to mkpts1
         mkpts0 : torch.tensor (N x 2), keypoints from img0 that match mkpts1
         mkpts1 : torch.tensor (N x 2), keypoints from img1 that match mkpts0
         """
         # Take as input a pair of images (not a batch)
         assert isinstance(img0, torch.Tensor)
         assert isinstance(img1, torch.Tensor)
-        assert img0.shape == img1.shape
-        c, h, w = img0.shape
-        assert h == w
+        
+        img0 = img0.to(self.device)
+        img1 = img1.to(self.device)
         
         return

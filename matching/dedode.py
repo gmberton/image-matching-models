@@ -9,7 +9,8 @@ import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
 
-sys.path.append(str(Path('third_party/DeDoDe')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
+
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
@@ -46,23 +47,28 @@ class DedodeMatcher(BaseMatcher):
             urllib.request.urlretrieve(descr_url, DedodeMatcher.descriptor_path)
 
     def preprocess(self, img):
-        # the super-class already makes sure that img0,img1 have 
-        # same resolution and that h == w
-        _, h, _ = img.shape
+        # ensure that the img has the proper w/h to be compatible with patch sizes
+        _, h, w = img.shape
         imsize = h
         if not ((h % self.dino_patch_size) == 0):
             imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
             img = tfm.functional.resize(img, imsize, antialias=True)
+        _, new_h, new_w = img.shape
+        if not ((new_w % self.dino_patch_size) == 0):
+            safe_w = int(self.dino_patch_size*round(new_w / self.dino_patch_size, 0))
+            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
 
+    @torch.inference_mode()
     def forward(self, img0, img1):
         super().forward(img0, img1)
 
         img0, imsize = self.preprocess(img0)
         img1, imsize = self.preprocess(img1)
-
+        
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
         keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
