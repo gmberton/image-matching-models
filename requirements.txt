@@ -21,3 +21,4 @@ scipy
 trimesh
 e2cnn
 scikit-learn
+tqdm

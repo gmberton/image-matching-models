@@ -25,11 +25,27 @@ Some results with LoFTR
 
 To use this repo simply run
 
-```
+```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 ```
+You can install this package for use in other scripts/notebooks with the following
+```bash
+cd image-matching-models
+python -m pip install -e .
+```
+You can then use any of the matchers with 
 
-Then run this script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
+```python
+from matching import get_matcher
+from torchvision.io import read_image
+
+matcher = get_matcher('your matcher name here!')
+img0 = read_image('path/to/img0.png')
+img1 = read_image('path/to/img1.png')
+num_inliers, H, mkpts0, mkpts1 = matcher(img0, img1)
+```
+
+You can also run as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
 
 ```
 python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
@@ -38,7 +54,7 @@ python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
 Where `sift-lg` will use `SIFT + LightGlue`.
 
 **You can choose any of the following methods:
-loftr, sift-lg, superpoint-lg, disk-lg, aliked-lg, doghardnet-lg, roma, dedode, steerers, sift-nn, orb-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, doghardnet-nn**
+loftr, sift-lg, superpoint-lg, disk-lg, aliked-lg, doghardnet-lg, roma, dedode, steerers, sift-nn, orb-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, doghardnet-nn, xfeat**
 
 The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
 
@@ -50,7 +66,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 To use on your images you have two options:
 1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
 2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
-
+3. import the matcher package into a script/notebook and use from there
 
 ## TODO
 
@@ -62,7 +78,7 @@ To use on your images you have two options:
 - [ ] Add TransVPR
 - [ ] Add Patch-NetVLAD
 - [ ] Add SelaVPR
-- [ ] Add xFeat
+- [x] Add xFeat
 - [ ] Add any other local features method
 
 PRs are very much welcomed :-)

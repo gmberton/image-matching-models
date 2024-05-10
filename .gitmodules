@@ -16,3 +16,6 @@
 [submodule "third_party/Steerers"]
 	path = third_party/Steerers
 	url = https://github.com/georg-bn/rotation-steerers.git
+[submodule "third_party/accelerated_features"]
+	path = third_party/accelerated_features
+	url = https://github.com/verlab/accelerated_features.git

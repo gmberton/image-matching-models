@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "image-matching-models"
+version = "1.0"
+readme = "README.md"
+description = "Easily test and apply pairwise image matching models"
+authors = [
+  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
+  {name = "Gabriele Trivigno", email="gabriele.trivigno@polito.it"},
+  {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
+]
+maintainers = [
+  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
+  {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
+]
+
+keywords = ["image matching"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Homepage = "https://github.com/gmberton/image-matching-models"
+# Documentation = "https://readthedocs.org"
+Repository = "https://github.com/gmberton/image-matching-models"
+# "Bug Tracker" = "https://github.com/me/spam/issues"
+# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+
+[tool.setuptools]
+packages = ["matching"]
