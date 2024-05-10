@@ -8,7 +8,21 @@ warnings due to unused modules.
 import sys
 sys.path.append('third_party/LightGlue')
 from lightglue import viz2d
+from pathlib import Path
 
+WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
+WEIGHTS_DIR.mkdir(exist_ok=True)
+
+available_models = ['loftr', 
+                    'sift-lg','superpoint-lg','disk-lg','aliked-lg','doghardnet-lg',
+                    'roma',
+                    'dedode', 'steerers',
+                    'sift-nn', 'orb-nn',
+                    'patch2pix', 'patch2pix_superglue',
+                    'superglue','r2d2','d2net',
+                    'duster','doghardnet-nn','xfeat',
+                    'dedode-lg',
+                    'gim-dkm', 'gim-lg']
 
 def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *args, **kwargs):
     
@@ -22,7 +36,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
     
     elif matcher_name == 'superpoint-lg':
         from matching import lightglue
-        return lightglue.SuperpoingLightGlue(device, max_num_keypoints,*args, **kwargs)
+        return lightglue.SuperpointLightGlue(device, max_num_keypoints,*args, **kwargs)
     
     elif matcher_name == 'disk-lg':
         from matching import lightglue
@@ -88,5 +102,17 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import xfeat
         return xfeat.xFeatMatcher(device, *args, **kwargs)
     
+    elif matcher_name == 'dedode-lg':
+        from matching import kornia
+        return kornia.DeDoDeLightGlue(device, *args, **kwargs)
+    
+    elif matcher_name == 'gim-dkm':
+        from matching import gim
+        return gim.GIM_DKM(device, *args, **kwargs)
+    
+    elif matcher_name == 'gim-lg':
+        from matching import gim
+        return gim.GIM_LG(device, *args, **kwargs)
+    
     else:
-        raise RuntimeError(f'Matcher {matcher_name} does not exist')
+        raise RuntimeError(f'Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}')
