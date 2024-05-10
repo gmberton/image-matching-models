@@ -22,7 +22,6 @@ class RomaMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.roma_model.train(False)
         
-    @torch.inference_mode()
     def _forward(self, img0, img1):
         # the super-class already makes sure that img0,img1 have same resolution
         # and that h == w

@@ -42,7 +42,6 @@ class Patch2pixMatcher(BaseMatcher):
         urllib.request.urlretrieve(Patch2pixMatcher.url1, ckpt)
         urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
-    @torch.inference_mode()
     def _forward(self, img0, img1):
 
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)

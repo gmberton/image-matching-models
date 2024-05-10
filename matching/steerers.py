@@ -130,7 +130,6 @@ class SteererMatcher(BaseMatcher):
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
 
-    @torch.inference_mode()
     def _forward(self, img0, img1):
         # the super-class already makes sure that img0,img1 have same resolution
         # and that h == w

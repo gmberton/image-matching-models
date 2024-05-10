@@ -47,11 +47,16 @@ class DusterMatcher(BaseMatcher):
         if not ((h % self.vit_patch_size) == 0):
             imsize = int(self.vit_patch_size*round(h / self.vit_patch_size, 0))            
             img = tfm.functional.resize(img, imsize, antialias=True)
+            
+        _, new_h, new_w = img.shape
+        if not ((new_w % self.vit_patch_size) == 0):
+            safe_w = int(self.vit_patch_size*round(new_w / self.vit_patch_size, 0))
+            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+
         img = self.normalize(img).unsqueeze(0)
 
         return img
 
-    @torch.inference_mode()
     def _forward(self, img0, img1):
         
         img0 = self.preprocess(img0)

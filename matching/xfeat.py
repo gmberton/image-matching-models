@@ -13,8 +13,7 @@ class xFeatMatcher(BaseMatcher):
         self.model = XFeat()
         self.max_num_keypoints = max_num_keypoints
         self.mode = mode
-        
-    @torch.inference_mode()
+
     def _forward(self, img0, img1):
         if self.mode == 'sparse':
             mkpts0, mkpts1 = self.model.match_xfeat(img0, img1, top_k=self.max_num_keypoints)

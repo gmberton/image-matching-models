@@ -22,7 +22,6 @@ class HandcraftedBaseMatcher(BaseMatcher):
 
         return im
 
-    @torch.inference_mode()
     def _forward(self, img0, img1):
         """
         "det_descr" is instantiated by the subclasses.

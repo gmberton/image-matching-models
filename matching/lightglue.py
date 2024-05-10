@@ -19,7 +19,6 @@ class LightGlueBase(BaseMatcher):
     def __init__(self, device="cpu"):
         super().__init__(device)
     
-    @torch.inference_mode()
     def _forward(self, img0, img1):
         """
         "extractor" and "matcher" are instantiated by the subclasses.
