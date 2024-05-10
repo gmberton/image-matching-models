@@ -4,6 +4,11 @@ a module is imported only iff needed, reducing the number of raised errors and
 warnings due to unused modules.
 '''
 
+# add viz2d from lightglue to namespace - thanks lightglue!
+import sys
+sys.path.append('third_party/LightGlue')
+from lightglue import viz2d
+
 
 def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *args, **kwargs):
     
