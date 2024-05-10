@@ -79,5 +79,9 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import matching_toolbox
         return matching_toolbox.DogAffHardNNMatcher(device,*args, **kwargs)
     
+    elif matcher_name == 'xfeat':
+        from matching import xfeat
+        return xfeat.xFeatMatcher(device, *args, **kwargs)
+    
     else:
         raise RuntimeError(f'Matcher {matcher_name} does not exist')
