@@ -1,6 +1,6 @@
 # Image-Matching-Models
 
-A repository to easily try 17 different image matching models.
+A repository to easily try 19 different image matching models.
 
 Some results with SIFT-LightGlue (respectively outdoor, indoor, satellite, painting and false positive)
 <p float="left">
@@ -71,12 +71,13 @@ To use on your images you have two options:
 2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
 3. import the matcher package into a script/notebook and use from there
 
+
 ## TODO
 
 - [ ] Add a table to the README with the source for each model (code source and paper)
 - [ ] Add parameter for RANSAC threshold
 - [ ] It might be useful to return other outputs (e.g. `kpts0, kpts1`) (for the methods that have them)
-- [ ] Add DeDoDe + LightGlue from kornia
+- [x] Add DeDoDe + LightGlue from kornia
 - [ ] Add CVNet
 - [ ] Add TransVPR
 - [ ] Add Patch-NetVLAD

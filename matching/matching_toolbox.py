@@ -8,8 +8,8 @@ import kornia.feature as KF
 from kornia_moons.feature import laf_from_opencv_SIFT_kpts
 import numpy as np
 import os
-import torch
 from os.path import join
+import shutil
 import torchvision.transforms as tfm
 
 BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
@@ -162,8 +162,7 @@ class R2D2Matcher(BaseMatcher):
     def get_model_weights(model_path):
         if not os.path.isfile(model_path):
             print('Getting R2D2 model weights...')
-            cmd = f'cp -r {BASE_PATH}/third_party/r2d2/models  {BASE_PATH}/pretrained/r2d2'
-            os.system(cmd)
+            shutil.copytree(Path(f'{BASE_PATH}/third_party/r2d2/models'), Path(f'{BASE_PATH}/pretrained/r2d2'))
 
     def _forward(self, img0, img1):
         
@@ -196,8 +195,7 @@ class D2netMatcher(BaseMatcher):
             os.makedirs(os.path.dirname(args['ckpt']), exist_ok=True)
             urllib.request.urlretrieve(
                 'https://dusmanu.com/files/d2-net/d2_tf.pth',
-                args['ckpt']
-            )
+                args['ckpt'])
             
         self.model = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']
