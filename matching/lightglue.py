@@ -6,7 +6,6 @@ from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 
 from matching.base_matcher import BaseMatcher
-import torch
 
 class LightGlueBase(BaseMatcher):
     """
@@ -41,7 +40,7 @@ class SiftLightGlue(LightGlueBase):
         self.matcher = LightGlue(features='sift', depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
-class SuperpoingLightGlue(LightGlueBase):
+class SuperpointLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device)
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)

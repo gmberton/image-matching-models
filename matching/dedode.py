@@ -18,34 +18,42 @@ from matching.base_matcher import BaseMatcher
 
 
 class DedodeMatcher(BaseMatcher):
-    detector_path = 'model_weights/dedode_detector_L.pth'    
+    detector_path = 'model_weights/dedode_detector_L.pth'  
+    detector_v2_path = 'model_weights/dedode_detector_L_v2.pth'  
     descriptor_path = 'model_weights/dedode_descriptor_G.pth'
     dino_patch_size = 14
 
-    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, *args, **kwargs):
+    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2,*args, **kwargs):
         super().__init__(device)
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         self.download_weights()
-        self.detector = dedode_detector_L(weights = torch.load(self.detector_path, map_location = device))
+        
+        detector_weight_path = self.detector_path if detector_version == 1 else self.detector_v2_path
+        self.detector = dedode_detector_L(weights = torch.load(detector_weight_path, map_location = device))
         self.descriptor = dedode_descriptor_G(weights = torch.load(self.descriptor_path, map_location = device))
         self.matcher = DualSoftMaxMatcher()
     
     @staticmethod
     def download_weights():
         detector_url = 'https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth'
+        detector_v2_url = 'https://github.com/Parskatt/DeDoDe/releases/download/v2/dedode_detector_L_v2.pth'
         descr_url = 'https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth'
-
         os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DedodeMatcher.detector_path):
             print("Downloading dedode_detector_L.pth")
             urllib.request.urlretrieve(detector_url, DedodeMatcher.detector_path)
+
+        if not os.path.isfile(DedodeMatcher.detector_v2_path):
+            print("Downloading dedode_descriptor_L-v2.pth")
+            urllib.request.urlretrieve(detector_v2_url, DedodeMatcher.detector_v2_path)
+
         if not os.path.isfile(DedodeMatcher.descriptor_path):
             print("Downloading dedode_descriptor_G.pth")
             urllib.request.urlretrieve(descr_url, DedodeMatcher.descriptor_path)
-
+            
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes
         _, h, w = img.shape
@@ -58,13 +66,11 @@ class DedodeMatcher(BaseMatcher):
             safe_w = int(self.dino_patch_size*round(new_w / self.dino_patch_size, 0))
             img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
 
-
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
 
     @torch.inference_mode()
     def _forward(self, img0, img1):
-
         img0, imsize = self.preprocess(img0)
         img1, imsize = self.preprocess(img1)
         

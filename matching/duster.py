@@ -3,8 +3,6 @@ import urllib.request
 
 import sys
 from pathlib import Path
-import math
-import torch
 import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
