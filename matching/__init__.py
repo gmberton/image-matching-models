@@ -7,7 +7,7 @@ warnings due to unused modules.
 # add viz2d from lightglue to namespace - thanks lightglue!
 import sys
 sys.path.append('third_party/LightGlue')
-from lightglue import viz2d
+from lightglue import viz2d # for quick import later 'from matching import viz2d'
 from pathlib import Path
 
 WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
@@ -23,6 +23,11 @@ available_models = ['loftr',
                     'duster','doghardnet-nn','xfeat',
                     'dedode-lg',
                     'gim-dkm', 'gim-lg']
+
+def get_version(pkg):
+    version_num = pkg.__version__.split('-')[0]
+    major, minor, patch = [int(num) for num in version_num.split('.')]
+    return major, minor, patch
 
 def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *args, **kwargs):
     

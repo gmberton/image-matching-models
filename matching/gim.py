@@ -14,9 +14,10 @@ from kornia.color import rgb_to_grayscale
 
 BASE_PATH = Path(__file__).parent.parent.joinpath('third_party/gim')
 sys.path.append(str(BASE_PATH))
+from dkm.models.model_zoo.DKMv3 import DKMv3
+
 
 class GIM_DKM(BaseMatcher):
-    from dkm.models.model_zoo.DKMv3 import DKMv3
 
     weights_src = 'https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view'
     

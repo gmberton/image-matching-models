@@ -1,14 +1,20 @@
 from kornia.feature import DeDoDe, LightGlue
 
 from matching.base_matcher import BaseMatcher
+from matching import get_version
 import torch
-
+import kornia
 class DeDoDeLightGlue(BaseMatcher):
+    
     detector_options = ['L-upright', 'L-C4', 'L-SO2', 'L-C4-v2']
     descriptor_options = ['B-upright', 'G-upright', 'B-C4', 'B-SO2', 'G-C4'] 
     
     def __init__(self, device="cpu", detector_weights='L-C4-v2', desc_weights='B-upright'):
         super().__init__(device)
+        
+        major, minor, patch = get_version(kornia)
+        assert (major > 1 or (minor >= 7 and patch >=3)), 'DeDoDe-LG only available in kornia v 0.7.3 or greater. Update kornia to use this model.'
+
         assert detector_weights in DeDoDeLightGlue.detector_options, f'Invalid detector weights passed ({detector_weights}). Choose from {DeDoDeLightGlue.detector_options}'
         assert desc_weights in DeDoDeLightGlue.descriptor_options, f'Invalid descriptor weights passed ({desc_weights}). Choose from {DeDoDeLightGlue.descriptor_options}'
 
