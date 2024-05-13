@@ -131,6 +131,12 @@ class GIM_LG(BaseMatcher):
         self.detector = self.detector.eval().to(self.device)
         self.model = self.model.eval().to(self.device)
         
+    def get_kpts(self):
+        return (self.kpts0, self.kpts1)
+    
+    def get_descriptors(self):
+        return (self.desc0, self.desc1)
+        
     def preprocess(self, img):
         # convert to grayscale
         return rgb_to_grayscale(img.unsqueeze(0))
@@ -163,15 +169,17 @@ class GIM_LG(BaseMatcher):
         pred.update(self.model({**pred, **data,
                            **{'resize0': data['size0'], 'resize1': data['size1']}}))
 
-        kpts0 = torch.cat([kp * s for kp, s in zip(pred['keypoints0'], data['scale0'][:, None])])
-        kpts1 = torch.cat([kp * s for kp, s in zip(pred['keypoints1'], data['scale1'][:, None])])
+        self.kpts0 = torch.cat([kp * s for kp, s in zip(pred['keypoints0'], data['scale0'][:, None])])
+        self.kpts1 = torch.cat([kp * s for kp, s in zip(pred['keypoints1'], data['scale1'][:, None])])
+                
+        self.desc0, self.desc1 = pred['descriptors0'], pred['descriptors1']
         
         m_bids = torch.nonzero(pred['keypoints0'].sum(dim=2) > -1)[:, 0]
         matches = pred['matches']
         bs = data['image0'].size(0)
 
-        mkpts0 = torch.cat([kpts0[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
-        mkpts1 = torch.cat([kpts1[m_bids == b_id][matches[b_id][..., 1]] for b_id in range(bs)])
+        mkpts0 = torch.cat([self.kpts0[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
+        mkpts1 = torch.cat([self.kpts1[m_bids == b_id][matches[b_id][..., 1]] for b_id in range(bs)])
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         # mconf = torch.cat(pred['scores'])
 

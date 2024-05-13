@@ -21,23 +21,28 @@ class HandcraftedBaseMatcher(BaseMatcher):
         im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
 
         return im
+    
+    def get_descriptors(self):
+        return (self.des0, self.des1)
+    
+    def get_kpts(self):
+        return (self.kp0, self.kp1)
 
     def _forward(self, img0, img1):
         """
         "det_descr" is instantiated by the subclasses.
         """
-
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.tensor_to_numpy_int(img0)
         img1 = self.tensor_to_numpy_int(img1)
 
         # find the keypoints and descriptors with SIFT
-        kp0, des0 = self.det_descr.detectAndCompute(img0, None)
-        kp1, des1 = self.det_descr.detectAndCompute(img1, None)
+        self.kp0, self.des0 = self.det_descr.detectAndCompute(img0, None)
+        self.kp1, self.des1 = self.det_descr.detectAndCompute(img1, None)
         
         # BFMatcher with default params
         bf = cv2.BFMatcher()
-        raw_matches = bf.knnMatch(des0, des1, k=2)
+        raw_matches = bf.knnMatch(self.des0, self.des1, k=2)
         
         # Apply ratio test
         good = []
@@ -47,8 +52,8 @@ class HandcraftedBaseMatcher(BaseMatcher):
         
         mkpts0, mkpts1 = [], []
         for good_match in good:
-            kpt_0 = np.array(kp0[good_match.queryIdx].pt)
-            kpt_1 = np.array(kp1[good_match.trainIdx].pt)
+            kpt_0 = np.array(self.kp0[good_match.queryIdx].pt)
+            kpt_1 = np.array(self.kp1[good_match.trainIdx].pt)
 
             mkpts0.append(kpt_0)
             mkpts1.append(kpt_1)

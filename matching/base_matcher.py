@@ -45,6 +45,30 @@ class BaseMatcher(torch.nn.Module):
         num_inliers = inliers_mask.sum()
 
         return num_inliers, H, mkpts0, mkpts1
+    
+    def get_descriptors(self):
+        """
+        Get all features/descriptors for img0, img1. 
+        
+        Must be implemented in child class.
+
+        Returns
+        -------
+        (desc0, desc1): tuple of keypoints for img0, img1 
+        """
+        return NotImplementedError
+    
+    def get_kpts(self):
+        """
+        Get all keypoints for img0, img1. 
+        
+        Must be implemented in child class.
+
+        Returns
+        -------
+        (kpts0, kpts1): tuple of keypoints for img0, img1 
+        """
+        return NotImplementedError    
         
     @torch.inference_mode()
     def forward(self, img0, img1):

@@ -17,7 +17,13 @@ class LightGlueBase(BaseMatcher):
     """
     def __init__(self, device="cpu"):
         super().__init__(device)
+        
+    def get_descriptors(self):
+        return (self.desc0.cpu().numpy(), self.desc1.cpu().numpy())
     
+    def get_kpts(self):
+        return (self.kpts0.cpu().numpy(), self.kpts1.cpu().numpy())
+        
     def _forward(self, img0, img1):
         """
         "extractor" and "matcher" are instantiated by the subclasses.
@@ -25,8 +31,12 @@ class LightGlueBase(BaseMatcher):
         feats0, feats1, matches01 = match_pair(
             self.extractor, self.matcher, img0, img1, device=self.device
         )
-        kpts0, kpts1, matches = feats0["keypoints"], feats1["keypoints"], matches01["matches"]
-        mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
+        self.kpts0, self.kpts1, matches = feats0["keypoints"], feats1["keypoints"], matches01["matches"]
+
+        self.desc0 = feats0['descriptors']
+        self.desc1 = feats1['descriptors']
+        
+        mkpts0, mkpts1 = self.kpts0[matches[..., 0]], self.kpts1[matches[..., 1]]
         
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints

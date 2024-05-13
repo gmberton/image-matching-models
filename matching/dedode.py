@@ -67,6 +67,12 @@ class DedodeMatcher(BaseMatcher):
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
+    
+    def get_descriptors(self):
+        return (self.description_0.cpu().numpy(), self.description_1.cpu().numpy())
+    
+    def get_kpts(self):
+        return (self.keypoints_0.cpu().numpy(), self.keypoints_1.cpu().numpy())
 
     @torch.inference_mode()
     def _forward(self, img0, img1):
@@ -75,18 +81,18 @@ class DedodeMatcher(BaseMatcher):
         
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
-        keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
+        self.keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
 
         batch_1 = {"image": img1}
         detections_1 = self.detector.detect(batch_1, num_keypoints=self.max_keypoints)
-        keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
+        self.keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
         
-        description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
-        description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]
-
+        self.description_0 = self.descriptor.describe_keypoints(batch_0, self.keypoints_0)["descriptions"]
+        self.description_1 = self.descriptor.describe_keypoints(batch_1, self.keypoints_1)["descriptions"]
+        
         matches_0, matches_1, _ = self.matcher.match(
-            keypoints_0, description_0,
-            keypoints_1, description_1,
+            self.keypoints_0, self.description_0,
+            self.keypoints_1, self.description_1,
             P_A = P_0, P_B = P_1, normalize = True, inv_temp=20, 
             threshold = self.threshold # Increasing threshold -> fewer matches, fewer outliers
         )
