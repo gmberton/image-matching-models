@@ -127,6 +127,11 @@ class SuperGlueMatcher(BaseMatcher):
         args['max_keypoints'] = max_num_keypoints        
 
         self.matcher = immatch.__dict__[args['class']](args)
+        
+        # move models to proper device - immatch reads cuda available and defaults to GPU
+        self.matcher.model.to(device) # SG
+        self.matcher.detector.model.to(device) # SP
+
         self.match_threshold = args['match_threshold']
         # print(self.matcher.detector.model.config)
 
@@ -156,6 +161,10 @@ class R2D2Matcher(BaseMatcher):
         
         self.get_model_weights(args['ckpt'])
         self.model = immatch.__dict__[args['class']](args)
+        
+        # move models to proper device - immatch reads cuda available and defaults to GPU
+        self.model.model.to(device)
+        
         self.match_threshold = args['match_threshold']
 
     @staticmethod
