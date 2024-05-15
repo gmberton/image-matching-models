@@ -119,5 +119,9 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import gim
         return gim.GIM_LG(device, *args, **kwargs)
     
+    elif matcher_name == 'silk':
+        from matching import silk
+        return silk.SilkMatcher(device, *args, **kwargs)
+    
     else:
         raise RuntimeError(f'Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}')
