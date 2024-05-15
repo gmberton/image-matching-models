@@ -24,4 +24,4 @@
 	url = https://github.com/xuelunshen/gim.git
 [submodule "third_party/silk"]
 	path = third_party/silk
-	url = https://github.com/facebookresearch/silk.git
+	url = https://github.com/facebookresearch/silk
