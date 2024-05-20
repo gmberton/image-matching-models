@@ -45,14 +45,14 @@ You can then use any of the matchers with
 ```python
 from matching import get_matcher
 
-matcher = get_matcher('your matcher name here!')
-img_size = 512
 device = 'cuda' # 'cpu'
+matcher = get_matcher('superglue', device=device)  # Choose any of our ~20 matchers listed below
+img_size = 512
 
 img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
 img1 = matcher.image_loader('path/to/img1.png', resize=img_size)
 
-num_inliers, H, mkpts0, mkpts1 = matcher(img0, img1, device=device)
+num_inliers, H, mkpts0, mkpts1 = matcher(img0, img1)
 ```
 
 You can also run as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
