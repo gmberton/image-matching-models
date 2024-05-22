@@ -2,7 +2,7 @@
 
 A unified API for quickly and easily trying 19 (and growing!) image matching models.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1Km898ARRTF2QWXa50MnJ5ODnfIwABChg?usp=sharing)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
 <details><summary>
 Example results using SIFT-LightGlue (respectively outdoor, indoor, satellite, painting and false positive)
 </summary>
