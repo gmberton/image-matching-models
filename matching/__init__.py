@@ -6,9 +6,9 @@ warnings due to unused modules.
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 import sys
-sys.path.append('third_party/LightGlue')
-from lightglue import viz2d # for quick import later 'from matching import viz2d'
 from pathlib import Path
+sys.path.append(str(Path(__file__).parent / 'third_party/LightGlue'))
+from lightglue import viz2d # for quick import later 'from matching import viz2d'
 
 WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
 WEIGHTS_DIR.mkdir(exist_ok=True)
