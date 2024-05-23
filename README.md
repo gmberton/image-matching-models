@@ -1,6 +1,6 @@
 # Image Matching Models
 
-A unified API for quickly and easily trying 19 (and growing!) image matching models.
+A unified API for quickly and easily trying 23 (and growing!) image matching models.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
 <details><summary>
@@ -65,7 +65,7 @@ python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
 Where `sift-lg` will use `SIFT + LightGlue`.
 
 **You can choose any of the following methods:
-loftr, sift-lg, superpoint-lg, disk-lg, aliked-lg, doghardnet-lg, roma, dedode, steerers, sift-nn, orb-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, doghardnet-nn, xfeat**
+loftr, [sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, roma, dedode, steerers, [sift, orb, doghardnet]-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, gim-dkm, xfeat, omniglue**
 
 The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
 
@@ -83,6 +83,7 @@ To use on your images you have three options:
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
+| OmniGlue (CVPR '24) | [Official](https://github.com/google-research/omniglue) | [arxiv](https://arxiv.org/abs/2405.12979) | ❌ | 6.351 |
 | xFeat (CVPR '24) | [Official](https://github.com/verlab/accelerated_features) | [arxiv](https://arxiv.org/abs/2404.19174) | 0.027 | 0.048 | 
 | GIM (ICLR '24) | [Official](https://github.com/xuelunshen/gim?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2402.11095)  |  0.077 (+LG) /  1.627 (+DKMv3) | 5.321 (+LG) /  20.301 (+DKMv3) |
 | RoMa (CVPR '24) | [Official](https://github.com/Parskatt/RoMa) | [arxiv](https://arxiv.org/abs/2305.15404) |  0.453 |  18.950 |
