@@ -4,6 +4,8 @@ from matching.base_matcher import BaseMatcher
 from matching import get_version
 import torch
 import kornia
+from util import to_numpy
+
 class DeDoDeLightGlue(BaseMatcher):
     
     detector_options = ['L-upright', 'L-C4', 'L-SO2', 'L-C4-v2']
@@ -39,20 +41,27 @@ class DeDoDeLightGlue(BaseMatcher):
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
     
-        self.kpts0, scores0, self.desc0 = self.model(img0)
-        self.kpts1, scores1, self.desc1 = self.model(img1)
+        kpts0, scores0, desc0 = self.model(img0)
+        kpts1, scores1, desc1 = self.model(img1)
         
-        match_input = {'image0':{'keypoints':self.kpts0,
-                                 'descriptors':self.desc0,
+        match_input = {'image0':{'keypoints':kpts0,
+                                 'descriptors':desc0,
                                  'image_size':torch.tensor(img0.shape[-2:][::-1]).view(1, 2).to(self.device)},
-                       'image1':{'keypoints':self.kpts1,
-                                 'descriptors':self.desc1,
+                       'image1':{'keypoints':kpts1,
+                                 'descriptors':desc1,
                                  'image_size':torch.tensor(img1.shape[-2:][::-1]).view(1, 2).to(self.device)}}
         
         matches = self.lg(match_input)
         
         matching_idxs = matches['matches'][0]  
-        mkpts0 = self.kpts0.squeeze()[matching_idxs[:, 0]].cpu().numpy()
-        mkpts1 = self.kpts1.squeeze()[matching_idxs[:, 1]].cpu().numpy()
+        mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]].cpu().numpy()
+        mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]].cpu().numpy()
         
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
+                'desc0':to_numpy(desc1),'desc1': to_numpy(desc1)}

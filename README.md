@@ -52,7 +52,10 @@ device = 'cuda' # 'cpu'
 img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
 img1 = matcher.image_loader('path/to/img1.png', resize=img_size)
 
-num_inliers, H, mkpts0, mkpts1 = matcher(img0, img1, device=device)
+result = matcher(img0, img1, device=device)
+num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['mkpts0'], result['mkpts1']
+# result.keys() = ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
+
 ```
 
 You can also run as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.

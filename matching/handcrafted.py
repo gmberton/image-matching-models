@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 
 from matching.base_matcher import BaseMatcher
-import torch
-
+from util import to_numpy
 class HandcraftedBaseMatcher(BaseMatcher):
     """
     This class is the parent for all methods that use a handcrafted detector/descriptor,
@@ -37,12 +36,12 @@ class HandcraftedBaseMatcher(BaseMatcher):
         img1 = self.tensor_to_numpy_int(img1)
 
         # find the keypoints and descriptors with SIFT
-        self.kp0, self.des0 = self.det_descr.detectAndCompute(img0, None)
-        self.kp1, self.des1 = self.det_descr.detectAndCompute(img1, None)
+        kp0, des0 = self.det_descr.detectAndCompute(img0, None)
+        kp1, des1 = self.det_descr.detectAndCompute(img1, None)
         
         # BFMatcher with default params
         bf = cv2.BFMatcher()
-        raw_matches = bf.knnMatch(self.des0, self.des1, k=2)
+        raw_matches = bf.knnMatch(des0, des1, k=2)
         
         # Apply ratio test
         good = []
@@ -52,18 +51,29 @@ class HandcraftedBaseMatcher(BaseMatcher):
         
         mkpts0, mkpts1 = [], []
         for good_match in good:
-            kpt_0 = np.array(self.kp0[good_match.queryIdx].pt)
-            kpt_1 = np.array(self.kp1[good_match.trainIdx].pt)
+            kpt_0 = np.array(kp0[good_match.queryIdx].pt)
+            kpt_1 = np.array(kp1[good_match.trainIdx].pt)
 
             mkpts0.append(kpt_0)
             mkpts1.append(kpt_1)
 
         mkpts0 = np.array(mkpts0, dtype=np.float32)
         mkpts1 = np.array(mkpts1, dtype=np.float32)
+        
+        kp0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
+        kp1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
+
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':kp0, 'kpts1':kp1, 
+                'desc0':des0,'desc1': des1}
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):

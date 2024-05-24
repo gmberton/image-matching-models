@@ -9,6 +9,7 @@ import sys
 sys.path.append('third_party/LightGlue')
 from lightglue import viz2d # for quick import later 'from matching import viz2d'
 from pathlib import Path
+from util import to_numpy
 
 WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
 WEIGHTS_DIR.mkdir(exist_ok=True)

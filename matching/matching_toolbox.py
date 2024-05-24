@@ -11,6 +11,7 @@ import os
 from os.path import join
 import shutil
 import torchvision.transforms as tfm
+from util import to_numpy
 
 BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
 sys.path.append(str(Path(BASE_PATH)))
@@ -70,7 +71,14 @@ class Patch2pixMatcher(BaseMatcher):
         mkpts1 = matches[:, 2:4]
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}
 
 
 class SuperGluePatch2pixMatcher(BaseMatcher):
@@ -96,7 +104,6 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         self.coarse_matcher = immatch.__dict__[self.cname](cargs)
 
     def _forward(self, img0, img1):
-
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)
@@ -114,7 +121,14 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}
 
 
 class SuperGlueMatcher(BaseMatcher):
@@ -146,7 +160,14 @@ class SuperGlueMatcher(BaseMatcher):
         
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':kpts0, 'kpts1':kpts1, 
+                'desc0':None,'desc1': None}
 
 
 class R2D2Matcher(BaseMatcher):
@@ -188,7 +209,14 @@ class R2D2Matcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
+                'desc0':to_numpy(desc0),'desc1': to_numpy(desc1)}
     
 
 class D2netMatcher(BaseMatcher):
@@ -236,7 +264,14 @@ class D2netMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':kpts0, 'kpts1':kpts1, 
+                'desc0':desc0,'desc1': desc1}
 
 
 class DogAffHardNNMatcher(BaseMatcher):
@@ -259,7 +294,6 @@ class DogAffHardNNMatcher(BaseMatcher):
         return im
 
     def _forward(self, img0, img1):
-        
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.tensor_to_numpy_int(img0)
         img1 = self.tensor_to_numpy_int(img1)
@@ -270,4 +304,11 @@ class DogAffHardNNMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}

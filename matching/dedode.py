@@ -7,7 +7,7 @@ import torch
 import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
-
+from util import to_numpy
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
 
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
@@ -68,12 +68,6 @@ class DedodeMatcher(BaseMatcher):
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
     
-    def get_descriptors(self):
-        return (self.description_0.cpu().numpy(), self.description_1.cpu().numpy())
-    
-    def get_kpts(self):
-        return (self.keypoints_0.cpu().numpy(), self.keypoints_1.cpu().numpy())
-
     @torch.inference_mode()
     def _forward(self, img0, img1):
         img0, imsize = self.preprocess(img0)
@@ -81,18 +75,18 @@ class DedodeMatcher(BaseMatcher):
         
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
-        self.keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
+        keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
 
         batch_1 = {"image": img1}
         detections_1 = self.detector.detect(batch_1, num_keypoints=self.max_keypoints)
-        self.keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
+        keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
         
-        self.description_0 = self.descriptor.describe_keypoints(batch_0, self.keypoints_0)["descriptions"]
-        self.description_1 = self.descriptor.describe_keypoints(batch_1, self.keypoints_1)["descriptions"]
+        description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
+        description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]
         
         matches_0, matches_1, _ = self.matcher.match(
-            self.keypoints_0, self.description_0,
-            self.keypoints_1, self.description_1,
+            keypoints_0, description_0,
+            keypoints_1, description_1,
             P_A = P_0, P_B = P_1, normalize = True, inv_temp=20, 
             threshold = self.threshold # Increasing threshold -> fewer matches, fewer outliers
         )
@@ -100,4 +94,11 @@ class DedodeMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':keypoints_0, 'kpts1':keypoints_1, 
+                'desc0':description_0,'desc1': description_1}

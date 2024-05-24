@@ -40,35 +40,12 @@ class BaseMatcher(torch.nn.Module):
             return 0, None, mkpts0, mkpts1
 
         H, inliers_mask = self.find_homography(mkpts0, mkpts1)
-        mkpts0 = mkpts0[inliers_mask]
-        mkpts1 = mkpts1[inliers_mask]
+        inlier_mkpts0 = mkpts0[inliers_mask]
+        inlier_mkpts1 = mkpts1[inliers_mask]
         num_inliers = inliers_mask.sum()
 
-        return num_inliers, H, mkpts0, mkpts1
+        return num_inliers, H, inlier_mkpts0, inlier_mkpts1
     
-    def get_descriptors(self):
-        """
-        Get all features/descriptors for img0, img1. 
-        
-        Must be implemented in child class.
-
-        Returns
-        -------
-        (desc0, desc1): tuple of keypoints for img0, img1 
-        """
-        return NotImplementedError
-    
-    def get_kpts(self):
-        """
-        Get all keypoints for img0, img1. 
-        
-        Must be implemented in child class.
-
-        Returns
-        -------
-        (kpts0, kpts1): tuple of keypoints for img0, img1 
-        """
-        return NotImplementedError    
         
     @torch.inference_mode()
     def forward(self, img0, img1):
