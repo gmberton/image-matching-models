@@ -6,7 +6,7 @@ from matching.base_matcher import BaseMatcher
 
 class LoftrMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
 
         self.model = LoFTR(pretrained='outdoor').to(self.device)
     

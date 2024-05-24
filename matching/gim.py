@@ -22,8 +22,8 @@ class GIM_DKM(BaseMatcher):
 
     weights_src = 'https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view'
     
-    def __init__(self, device="cpu"):
-        super().__init__(device)
+    def __init__(self, device="cpu", **kwargs):
+        super().__init__(device, **kwargs)
         self.ckpt_path = WEIGHTS_DIR / 'gim_dkm_100h.ckpt'
         
         self.model = DKMv3(weights=None, h=672, w=896)   
@@ -86,8 +86,8 @@ class GIM_LG(BaseMatcher):
 
     weights_src = 'https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt'
     
-    def __init__(self, device="cpu", max_keypoints=2048):
-        super().__init__(device)
+    def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
+        super().__init__(device, **kwargs)
         from gluefactory.superpoint import SuperPoint
         from gluefactory.models.matchers.lightglue import LightGlue
 
@@ -137,13 +137,7 @@ class GIM_LG(BaseMatcher):
         
         self.detector = self.detector.eval().to(self.device)
         self.model = self.model.eval().to(self.device)
-        
-    def get_kpts(self):
-        return (self.kpts0, self.kpts1)
-    
-    def get_descriptors(self):
-        return (self.desc0, self.desc1)
-        
+
     def preprocess(self, img):
         # convert to grayscale
         return rgb_to_grayscale(img.unsqueeze(0))

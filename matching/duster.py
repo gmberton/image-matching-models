@@ -22,7 +22,7 @@ class DusterMatcher(BaseMatcher):
     vit_patch_size = 16
 
     def __init__(self, device="cpu", *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 
         self.download_weights()

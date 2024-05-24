@@ -35,7 +35,14 @@ def benchmark(matcher, num_iters=1, img_size=512, device='cuda'):
             img1 = matcher.image_loader(pair[1], resize=img_size).to(device)
             
             start = time.time()
-            _ = matcher(img0, img1)
+            result = matcher(img0, img1)
+            for k, v in result.items():
+                if v is None:
+                    continue
+                if not isinstance(v, (np.ndarray, int, np.int32)):
+                    print(f'{k} is not an int or np array. is {type(v), v}')
+                    raise TypeError()
+            
             duration = time.time() - start
             
             runtime.append(duration)

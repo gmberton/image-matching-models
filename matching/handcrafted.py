@@ -10,8 +10,8 @@ class HandcraftedBaseMatcher(BaseMatcher):
     Therefore this class should *NOT* be instatiated, as it needs its children to define
     the extractor/detector.
     """
-    def __init__(self, device="cpu"):
-        super().__init__(device)
+    def __init__(self, device="cpu", **kwargs):
+        super().__init__(device, **kwargs)
 
     @staticmethod
     def tensor_to_numpy_int(im_tensor):
@@ -20,12 +20,6 @@ class HandcraftedBaseMatcher(BaseMatcher):
         im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
 
         return im
-    
-    def get_descriptors(self):
-        return (self.des0, self.des1)
-    
-    def get_kpts(self):
-        return (self.kp0, self.kp1)
 
     def _forward(self, img0, img1):
         """
@@ -78,13 +72,13 @@ class HandcraftedBaseMatcher(BaseMatcher):
 
 class SiftNNMatcher(HandcraftedBaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.SIFT_create(max_num_keypoints)
 
 
 class OrbNNMatcher(HandcraftedBaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.ORB_create(max_num_keypoints)

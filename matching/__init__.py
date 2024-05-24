@@ -24,7 +24,7 @@ available_models = ['loftr',
                     'duster','doghardnet-nn','xfeat',
                     'dedode-lg',
                     'gim-dkm', 'gim-lg',
-                    'onmiglue']
+                    'omniglue']
 
 def get_version(pkg):
     version_num = pkg.__version__.split('-')[0]
@@ -32,7 +32,6 @@ def get_version(pkg):
     return major, minor, patch
 
 def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *args, **kwargs):
-    
     if matcher_name == 'loftr':
         from matching import loftr
         return loftr.LoftrMatcher(device, *args, **kwargs)

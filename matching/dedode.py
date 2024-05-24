@@ -23,7 +23,7 @@ class DedodeMatcher(BaseMatcher):
     dino_patch_size = 14
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2,*args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])

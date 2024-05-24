@@ -3,19 +3,28 @@ import cv2
 import torch
 from PIL import Image
 import torchvision.transforms as tfm
-
+from util import to_numpy
 
 class BaseMatcher(torch.nn.Module):
     """
     This serves as a base class for all matchers. It provides a simple interface
     for its sub-classes to implement, namely each matcher must specify its own
-    __init__ and forward methods. It also provides a common image_loader and
+    __init__ and _forward methods. It also provides a common image_loader and
     homography estimator
     """
-    def __init__(self, device="cpu"):
+    # OpenCV default ransac params
+    DEFAULT_RANSAC_ITERS = 2000
+    DEFAULT_RANSAC_CONF = 0.95
+    DEFAULT_REPROJ_THRESH = 3
+    
+    def __init__(self, device="cpu", **kwargs):
         super().__init__()
         self.device = device
-    
+        
+        self.ransac_iters = kwargs.get('ransac_iters', BaseMatcher.DEFAULT_RANSAC_ITERS)
+        self.ransac_conf = kwargs.get('ransac_conf', BaseMatcher.DEFAULT_RANSAC_CONF)
+        self.ransac_reproj_thresh = kwargs.get('ransac_reproj_thresh', BaseMatcher.DEFAULT_REPROJ_THRESH)
+
     @staticmethod
     def image_loader(path, resize, rot_angle=0):
         if isinstance(resize, int):
@@ -25,12 +34,12 @@ class BaseMatcher(torch.nn.Module):
         return img
     
     @staticmethod
-    def find_homography(points1, points2):
+    def find_homography(points1, points2, reproj_thresh=DEFAULT_REPROJ_THRESH, num_iters=DEFAULT_RANSAC_ITERS, ransac_conf=DEFAULT_RANSAC_CONF):
         assert points1.shape == points2.shape
         assert points1.shape[1] == 2
-        if isinstance(points1, torch.Tensor):
-            points1, points2 = points1.cpu().numpy(), points2.cpu().numpy()
-        H, inliers_mask = cv2.findHomography(points1, points2, cv2.USAC_MAGSAC)
+        points1, points2 = to_numpy(points1), to_numpy(points2)
+        
+        H, inliers_mask = cv2.findHomography(points1, points2, cv2.USAC_MAGSAC, reproj_thresh, ransac_conf, num_iters)
         assert inliers_mask.shape[1] == 1
         inliers_mask = inliers_mask[:, 0]
         return H, inliers_mask.astype(bool)
@@ -39,7 +48,7 @@ class BaseMatcher(torch.nn.Module):
         if len(mkpts0) < 5:
             return 0, None, mkpts0, mkpts1
 
-        H, inliers_mask = self.find_homography(mkpts0, mkpts1)
+        H, inliers_mask = self.find_homography(mkpts0, mkpts1, self.ransac_reproj_thresh, self.ransac_iters, self.ransac_conf)
         inlier_mkpts0 = mkpts0[inliers_mask]
         inlier_mkpts1 = mkpts1[inliers_mask]
         num_inliers = inliers_mask.sum()
@@ -48,7 +57,7 @@ class BaseMatcher(torch.nn.Module):
     
         
     @torch.inference_mode()
-    def forward(self, img0, img1):
+    def forward(self, img0: torch.Tensor, img1:torch.Tensor):
         """
         All sub-classes implement the following interface:
         

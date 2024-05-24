@@ -1,5 +1,6 @@
 
 from matching.base_matcher import BaseMatcher
+from util import to_numpy
 import sys
 from pathlib import Path
 BASE_PATH = Path(__file__).parent.parent.joinpath('third_party/omniglue')
@@ -16,6 +17,7 @@ from kornia import tensor_to_image
 import torch
 import numpy as np
 from skimage.util import img_as_ubyte
+
 WEIGHTS_DIR = BASE_PATH.joinpath('models')
 WEIGHTS_DIR.mkdir(exist_ok=True)
 
@@ -27,8 +29,8 @@ class OmniglueMatcher(BaseMatcher):
 
     DINOv2_PATH = WEIGHTS_DIR.joinpath('dinov2_vitb14_pretrain.pth')
     
-    def __init__(self, device="cpu", conf_thresh=0.02):
-        super().__init__(device)
+    def __init__(self, device="cpu", conf_thresh=0.02, **kwargs):
+        super().__init__(device, **kwargs)
         
         
         self.download_weights()
@@ -87,5 +89,12 @@ class OmniglueMatcher(BaseMatcher):
             mkpts0 = mkpts0[keep_idx]
             mkpts1 = mkpts1[keep_idx]
             match_conf = match_conf[keep_idx]
-
-        return self.process_matches(mkpts0, mkpts1)
+            
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}

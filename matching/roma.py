@@ -17,7 +17,7 @@ class RomaMatcher(BaseMatcher):
     coarse_ratio = 560 / 864
     
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.roma_model = roma_outdoor(device=device, amp_dtype=torch.float32 if device=='cpu' else torch.float16)
         self.max_keypoints = max_num_keypoints
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])

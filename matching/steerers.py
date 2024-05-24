@@ -33,7 +33,7 @@ class SteererMatcher(BaseMatcher):
     dino_patch_size = 14
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, steerer_type='C8', *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         
         os.makedirs("model_weights", exist_ok=True)
         # download detector

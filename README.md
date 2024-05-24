@@ -47,13 +47,16 @@ You can then use any of the matchers with
 from matching import get_matcher
 
 device = 'cuda' # 'cpu'
-matcher = get_matcher('superglue', device=device)  # Choose any of our ~20 matchers listed below
+ransac_kwargs = {'ransac_reproj_thresh':3, 
+                  'ransac_conf':0.95, 
+                  'ransac_iters':2000} # optional ransac params
+matcher = get_matcher('superglue', device=device, **ransac_kwargs)  # Choose any of our ~20 matchers listed below
 img_size = 512
 
 img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
 img1 = matcher.image_loader('path/to/img1.png', resize=img_size)
 
-result = matcher(img0, img1, device=device)
+result = matcher(img0, img1)
 num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['mkpts0'], result['mkpts1']
 # result.keys() = ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
 ```
@@ -112,8 +115,8 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 ## TODO
 
 - [x] Add a table to the README with the source for each model (code source and paper)
-- [ ] Add parameter for RANSAC threshold
-- [ ] It might be useful to return other outputs (e.g. `kpts0, kpts1`) (for the methods that have them)
+- [x] Add parameter for RANSAC threshold
+- [x] It might be useful to return other outputs (e.g. `kpts0, kpts1`) (for the methods that have them)
 - [x] Add DeDoDe + LightGlue from kornia
 - [ ] Add CVNet
 - [ ] Add TransVPR

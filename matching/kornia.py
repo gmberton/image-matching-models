@@ -11,8 +11,8 @@ class DeDoDeLightGlue(BaseMatcher):
     detector_options = ['L-upright', 'L-C4', 'L-SO2', 'L-C4-v2']
     descriptor_options = ['B-upright', 'G-upright', 'B-C4', 'B-SO2', 'G-C4'] 
     
-    def __init__(self, device="cpu", detector_weights='L-C4-v2', desc_weights='B-upright'):
-        super().__init__(device)
+    def __init__(self, device="cpu", detector_weights='L-C4-v2', desc_weights='B-upright', **kwargs):
+        super().__init__(device, **kwargs)
         
         major, minor, patch = get_version(kornia)
         assert (major > 1 or (minor >= 7 and patch >=3)), 'DeDoDe-LG only available in kornia v 0.7.3 or greater. Update kornia to use this model.'
@@ -25,12 +25,6 @@ class DeDoDeLightGlue(BaseMatcher):
                                             descriptor_weights=desc_weights, 
                                             amp_dtype=torch.float16 if 'cuda' in device else torch.float32).to(device)
         self.lg = LightGlue(features='dedode'+ desc_type).to(device).eval()
-    
-    def get_descriptors(self):
-        return (self.desc0.cpu().numpy(), self.desc1.cpu().numpy())
-    
-    def get_kpts(self):
-        return (self.kpts0.cpu().numpy(), self.kpts1.cpu().numpy())
     
     def preprocess(self, img):
         # kornia version applies imagenet normalization

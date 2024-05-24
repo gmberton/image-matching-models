@@ -9,7 +9,7 @@ from modules.xfeat import XFeat
 
 class xFeatMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=4096,  mode='sparse', *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         
         self.model = XFeat()
         self.max_num_keypoints = max_num_keypoints

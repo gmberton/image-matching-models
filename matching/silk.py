@@ -38,8 +38,8 @@ class SilkMatcher(BaseMatcher):
     
     MATCHER_POSTPROCESS_OPTIONS = ['ratio-test', 'mnn', 'double-softmax']
     
-    def __init__(self, device="cpu", matcher_post_processing='ratio-test', matcher_thresh=0.8):
-        super().__init__(device)
+    def __init__(self, device="cpu", matcher_post_processing='ratio-test', matcher_thresh=0.8, **kwargs):
+        super().__init__(device, **kwargs)
         SilkMatcher.CKPT_DIR.mkdir(exist_ok=True)
         
         

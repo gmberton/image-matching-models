@@ -23,7 +23,7 @@ class Patch2pixMatcher(BaseMatcher):
     url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
     url2 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth'
     def __init__(self, device="cpu", *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         
         with open(join(BASE_PATH, f'configs/patch2pix.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
@@ -83,7 +83,7 @@ class Patch2pixMatcher(BaseMatcher):
 
 class SuperGluePatch2pixMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.to_gray = tfm.Grayscale()
 
@@ -133,7 +133,7 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
 
 class SuperGlueMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.to_gray = tfm.Grayscale()
         
         with open(join(BASE_PATH, f'configs/superglue.yml'), 'r') as f:
@@ -172,7 +172,7 @@ class SuperGlueMatcher(BaseMatcher):
 
 class R2D2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         
         with open(join(BASE_PATH, f'configs/r2d2.yml'), 'r') as f:
@@ -221,7 +221,7 @@ class R2D2Matcher(BaseMatcher):
 
 class D2netMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         
         with open(join(BASE_PATH, f'configs/d2net.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
@@ -276,7 +276,7 @@ class D2netMatcher(BaseMatcher):
 
 class DogAffHardNNMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device)
+        super().__init__(device, **kwargs)
         
         with open(join(BASE_PATH, f'configs/dogaffnethardnet.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['example']
