@@ -59,10 +59,18 @@ class BaseMatcher(torch.nn.Module):
 
         Returns
         -------
+        dict with keys: ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
+        
         num_inliers : int, number of inliers after RANSAC, i.e. num(mkpts0)
         H : np.array (3 x 3), the homography matrix to map mkpts0 to mkpts1
-        mkpts0 : torch.tensor (N x 2), keypoints from img0 that match mkpts1
-        mkpts1 : torch.tensor (N x 2), keypoints from img1 that match mkpts0
+        mkpts0 : np.ndarray (N x 2), keypoints from img0 that match mkpts1 (pre-RANSAC)
+        mkpts1 : np.ndarray (N x 2), keypoints from img1 that match mkpts0 (pre-RANSAC)
+        inliers0 : np.ndarray (N x 2), filtered mkpts0 that fit the H model (post-RANSAC mkpts)
+        inliers1 : np.ndarray (N x 2), filtered mkpts1 that fit the H model (post-RANSAC mkpts)
+        kpts0 : np.ndarray (N x 2), all detected keypoints from img0 
+        kpts1 : np.ndarray (N x 2), all detected keypoints from img1
+        desc0 : np.ndarray (N x 2), all descriptors from img0 
+        desc1 : np.ndarray (N x 2), all descriptors from img1
         """
         # Take as input a pair of images (not a batch)
         assert isinstance(img0, torch.Tensor)
