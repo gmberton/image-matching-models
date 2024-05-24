@@ -31,7 +31,7 @@ def main(args):
         image1 = matcher.image_loader(img1_path, resize=image_size).to(args.device)
         with torch.inference_mode():
             result = matcher(image0, image1)
-            num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['mkpts0'], result['mkpts1']
+            num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inliers0'], result['inliers1']
         out_str = f'Paths: {str(img0_path), str(img1_path)}. Found {num_inliers} inliers after RANSAC. '
         
         if not args.no_viz:

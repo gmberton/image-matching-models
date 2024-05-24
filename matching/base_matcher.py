@@ -1,9 +1,15 @@
 
 import cv2
 import torch
+import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
-from util import to_numpy
+
+def to_numpy(x):
+    if isinstance(x, torch.Tensor):
+        return x.cpu().numpy()
+    if isinstance(x, np.ndarray):
+        return x
 
 class BaseMatcher(torch.nn.Module):
     """

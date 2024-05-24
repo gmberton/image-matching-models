@@ -1,6 +1,5 @@
 
-from matching.base_matcher import BaseMatcher
-from util import to_numpy
+from matching.base_matcher import BaseMatcher, to_numpy
 import sys
 from pathlib import Path
 BASE_PATH = Path(__file__).parent.parent.joinpath('third_party/omniglue')

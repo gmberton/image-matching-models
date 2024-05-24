@@ -7,7 +7,6 @@ warnings due to unused modules.
 # add viz2d from lightglue to namespace - thanks lightglue!
 import sys
 from pathlib import Path
-from util import to_numpy
 sys.path.append(str(Path(__file__).parent.parent / 'third_party/LightGlue'))
 from lightglue import viz2d # for quick import later 'from matching import viz2d'
 

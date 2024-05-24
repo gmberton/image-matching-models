@@ -4,8 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/LightGlue')))
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
-from util import to_numpy
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 class LightGlueBase(BaseMatcher):
     """

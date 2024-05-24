@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 import urllib.request
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 from kornia.color import rgb_to_grayscale
 import shutil
 
@@ -85,4 +85,11 @@ class SilkMatcher(BaseMatcher):
         mkpts0 = mkpts0[:, [1,0]]
         mkpts1 = mkpts1[:, [1,0]]
 
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0': inliers0, 'inliers1': inliers1,
+                'kpts0':to_numpy(sparse_positions_0[0][:, :2])[:, [1,0]], 'kpts1':to_numpy(sparse_positions_1[0][:, :2])[:, [1,0]], 
+                'desc0':to_numpy(sparse_descriptors_0[0]),'desc1': to_numpy(sparse_descriptors_1[0])}

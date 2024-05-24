@@ -11,12 +11,11 @@ import os
 from os.path import join
 import shutil
 import torchvision.transforms as tfm
-from util import to_numpy
 
 BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
 sys.path.append(str(Path(BASE_PATH)))
 import immatch
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 
 class Patch2pixMatcher(BaseMatcher):

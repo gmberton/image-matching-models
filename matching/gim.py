@@ -1,6 +1,6 @@
 
 
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 from matching import WEIGHTS_DIR
 import torch
 import sys
@@ -11,7 +11,6 @@ from PIL import Image
 import numpy as np
 from kornia import tensor_to_image
 from kornia.color import rgb_to_grayscale
-from util import to_numpy
 
 BASE_PATH = Path(__file__).parent.parent.joinpath('third_party/gim')
 sys.path.append(str(BASE_PATH))

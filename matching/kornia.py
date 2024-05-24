@@ -1,10 +1,9 @@
 from kornia.feature import DeDoDe, LightGlue
 
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 from matching import get_version
 import torch
 import kornia
-from util import to_numpy
 
 class DeDoDeLightGlue(BaseMatcher):
     

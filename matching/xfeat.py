@@ -1,9 +1,7 @@
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 import sys
-import torch
 from pathlib import Path
-from util import to_numpy
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/accelerated_features')))
 from modules.xfeat import XFeat
 

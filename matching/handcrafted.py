@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
 
-from matching.base_matcher import BaseMatcher
-from util import to_numpy
+from matching.base_matcher import BaseMatcher, to_numpy
+
+
 class HandcraftedBaseMatcher(BaseMatcher):
     """
     This class is the parent for all methods that use a handcrafted detector/descriptor,

@@ -7,9 +7,8 @@ import torch
 import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
-from util import to_numpy
 
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
 from DeDoDe import dedode_detector_L, dedode_detector_B, dedode_descriptor_G, dedode_descriptor_B

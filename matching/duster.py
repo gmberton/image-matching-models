@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
-from util import to_numpy
+
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/duster')))
 from dust3r.inference import inference, load_model
@@ -14,7 +14,7 @@ from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
 
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 
 class DusterMatcher(BaseMatcher):

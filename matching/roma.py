@@ -4,12 +4,11 @@ import math
 import torch
 import torchvision.transforms as tfm
 import torch.nn.functional as F
-from util import to_numpy
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/RoMa')))
 from roma import roma_outdoor
 
-from matching.base_matcher import BaseMatcher
+from matching.base_matcher import BaseMatcher, to_numpy
 
 
 class RomaMatcher(BaseMatcher):
