@@ -3,6 +3,7 @@ from matching.base_matcher import BaseMatcher
 import sys
 import torch
 from pathlib import Path
+from util import to_numpy
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/accelerated_features')))
 from modules.xfeat import XFeat
 
@@ -21,4 +22,12 @@ class xFeatMatcher(BaseMatcher):
             mkpts0, mkpts1 = self.model.match_xfeat_star(img0, img1, top_k=self.max_num_keypoints)
         else:
             raise ValueError(f'unsupported mode for xfeat: {self.mode}. Must choose from ["sparse", "semi-dense"]')
-        return self.process_matches(mkpts0, mkpts1)
+        
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0': inliers0, 'inliers1': inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}

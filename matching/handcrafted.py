@@ -2,8 +2,7 @@ import cv2
 import numpy as np
 
 from matching.base_matcher import BaseMatcher
-import torch
-
+from util import to_numpy
 class HandcraftedBaseMatcher(BaseMatcher):
     """
     This class is the parent for all methods that use a handcrafted detector/descriptor,
@@ -21,12 +20,17 @@ class HandcraftedBaseMatcher(BaseMatcher):
         im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
 
         return im
+    
+    def get_descriptors(self):
+        return (self.des0, self.des1)
+    
+    def get_kpts(self):
+        return (self.kp0, self.kp1)
 
     def _forward(self, img0, img1):
         """
         "det_descr" is instantiated by the subclasses.
         """
-
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.tensor_to_numpy_int(img0)
         img1 = self.tensor_to_numpy_int(img1)
@@ -55,10 +59,21 @@ class HandcraftedBaseMatcher(BaseMatcher):
 
         mkpts0 = np.array(mkpts0, dtype=np.float32)
         mkpts1 = np.array(mkpts1, dtype=np.float32)
+        
+        kp0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
+        kp1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
+
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':kp0, 'kpts1':kp1, 
+                'desc0':des0,'desc1': des1}
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):

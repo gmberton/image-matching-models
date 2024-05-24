@@ -4,6 +4,8 @@ from matching.base_matcher import BaseMatcher
 from matching import get_version
 import torch
 import kornia
+from util import to_numpy
+
 class DeDoDeLightGlue(BaseMatcher):
     
     detector_options = ['L-upright', 'L-C4', 'L-SO2', 'L-C4-v2']
@@ -23,6 +25,12 @@ class DeDoDeLightGlue(BaseMatcher):
                                             descriptor_weights=desc_weights, 
                                             amp_dtype=torch.float16 if 'cuda' in device else torch.float32).to(device)
         self.lg = LightGlue(features='dedode'+ desc_type).to(device).eval()
+    
+    def get_descriptors(self):
+        return (self.desc0.cpu().numpy(), self.desc1.cpu().numpy())
+    
+    def get_kpts(self):
+        return (self.kpts0.cpu().numpy(), self.kpts1.cpu().numpy())
     
     def preprocess(self, img):
         # kornia version applies imagenet normalization
@@ -49,4 +57,11 @@ class DeDoDeLightGlue(BaseMatcher):
         mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]].cpu().numpy()
         mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]].cpu().numpy()
         
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
+                'desc0':to_numpy(desc1),'desc1': to_numpy(desc1)}

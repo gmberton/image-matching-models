@@ -7,7 +7,7 @@ import torch
 import os
 import torchvision.transforms as tfm
 import torch.nn.functional as F
-
+from util import to_numpy
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
 
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
@@ -67,7 +67,7 @@ class DedodeMatcher(BaseMatcher):
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, imsize
-
+    
     @torch.inference_mode()
     def _forward(self, img0, img1):
         img0, imsize = self.preprocess(img0)
@@ -83,7 +83,7 @@ class DedodeMatcher(BaseMatcher):
         
         description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
         description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]
-
+        
         matches_0, matches_1, _ = self.matcher.match(
             keypoints_0, description_0,
             keypoints_1, description_1,
@@ -94,4 +94,11 @@ class DedodeMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':keypoints_0, 'kpts1':keypoints_1, 
+                'desc0':description_0,'desc1': description_1}

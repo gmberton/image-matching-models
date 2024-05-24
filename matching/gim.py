@@ -11,6 +11,7 @@ from PIL import Image
 import numpy as np
 from kornia import tensor_to_image
 from kornia.color import rgb_to_grayscale
+from util import to_numpy
 
 BASE_PATH = Path(__file__).parent.parent.joinpath('third_party/gim')
 sys.path.append(str(BASE_PATH))
@@ -72,8 +73,14 @@ class GIM_DKM(BaseMatcher):
         mkpts1 = torch.stack((width1 * (mkpts1[:, 0] + 1) / 2, height1 * (mkpts1[:, 1] + 1) / 2), dim=-1,)
         
         # b_ids = torch.where(mconf[None])[0]
-        
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, # already returns matched kpts, so no raw kpt / descs
+                'desc0':None,'desc1': None}
     
 class GIM_LG(BaseMatcher):
 
@@ -131,6 +138,12 @@ class GIM_LG(BaseMatcher):
         self.detector = self.detector.eval().to(self.device)
         self.model = self.model.eval().to(self.device)
         
+    def get_kpts(self):
+        return (self.kpts0, self.kpts1)
+    
+    def get_descriptors(self):
+        return (self.desc0, self.desc1)
+        
     def preprocess(self, img):
         # convert to grayscale
         return rgb_to_grayscale(img.unsqueeze(0))
@@ -165,6 +178,8 @@ class GIM_LG(BaseMatcher):
 
         kpts0 = torch.cat([kp * s for kp, s in zip(pred['keypoints0'], data['scale0'][:, None])])
         kpts1 = torch.cat([kp * s for kp, s in zip(pred['keypoints1'], data['scale1'][:, None])])
+                
+        desc0, desc1 = pred['descriptors0'], pred['descriptors1']
         
         m_bids = torch.nonzero(pred['keypoints0'].sum(dim=2) > -1)[:, 0]
         matches = pred['matches']
@@ -175,4 +190,11 @@ class GIM_LG(BaseMatcher):
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         # mconf = torch.cat(pred['scores'])
 
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
+                'desc0':to_numpy(desc0),'desc1': to_numpy(desc1)}

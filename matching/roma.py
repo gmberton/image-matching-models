@@ -4,6 +4,7 @@ import math
 import torch
 import torchvision.transforms as tfm
 import torch.nn.functional as F
+from util import to_numpy
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/RoMa')))
 from roma import roma_outdoor
@@ -93,4 +94,12 @@ class RomaMatcher(BaseMatcher):
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, # dense matcher, no kpts / descs
+                'desc0':None,'desc1': None}

@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/LightGlue')))
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
-
+from util import to_numpy
 from matching.base_matcher import BaseMatcher
 
 class LightGlueBase(BaseMatcher):
@@ -17,7 +17,13 @@ class LightGlueBase(BaseMatcher):
     """
     def __init__(self, device="cpu"):
         super().__init__(device)
+        
+    def get_descriptors(self):
+        return (self.desc0.cpu().numpy(), self.desc1.cpu().numpy())
     
+    def get_kpts(self):
+        return (self.kpts0.cpu().numpy(), self.kpts1.cpu().numpy())
+        
     def _forward(self, img0, img1):
         """
         "extractor" and "matcher" are instantiated by the subclasses.
@@ -26,11 +32,22 @@ class LightGlueBase(BaseMatcher):
             self.extractor, self.matcher, img0, img1, device=self.device
         )
         kpts0, kpts1, matches = feats0["keypoints"], feats1["keypoints"], matches01["matches"]
+
+        desc0 = feats0['descriptors']
+        desc1 = feats1['descriptors']
+        
         mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
         
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
-        return self.process_matches(mkpts0, mkpts1)
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
+                'desc0':to_numpy(desc0),'desc1': to_numpy(desc1)}
 
 
 class SiftLightGlue(LightGlueBase):

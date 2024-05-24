@@ -26,3 +26,12 @@ def get_image_pairs_paths(inputs):
             if len(pair) != 2:
                 raise RuntimeError(f'{pair} should be a pair of paths')
     return pairs_of_paths
+
+import torch
+import numpy as np
+
+def to_numpy(x):
+    if isinstance(x, torch.Tensor):
+        return x.cpu().numpy()
+    if isinstance(x, np.ndarray):
+        return x
