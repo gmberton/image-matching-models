@@ -6,10 +6,10 @@ warnings due to unused modules.
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 import sys
-sys.path.append('third_party/LightGlue')
-from lightglue import viz2d # for quick import later 'from matching import viz2d'
 from pathlib import Path
 from util import to_numpy
+sys.path.append(str(Path(__file__).parent.parent / 'third_party/LightGlue'))
+from lightglue import viz2d # for quick import later 'from matching import viz2d'
 
 WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
 WEIGHTS_DIR.mkdir(exist_ok=True)
@@ -23,7 +23,8 @@ available_models = ['loftr',
                     'superglue','r2d2','d2net',
                     'duster','doghardnet-nn','xfeat',
                     'dedode-lg',
-                    'gim-dkm', 'gim-lg']
+                    'gim-dkm', 'gim-lg',
+                    'onmiglue']
 
 def get_version(pkg):
     version_num = pkg.__version__.split('-')[0]
@@ -120,5 +121,12 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import gim
         return gim.GIM_LG(device, *args, **kwargs)
     
+    elif matcher_name == 'silk':
+        from matching import silk
+        return silk.SilkMatcher(device, *args, **kwargs)
+    
+    elif matcher_name == 'omniglue':
+        from matching import omniglue
+        return omniglue.OmniglueMatcher(device, *args, **kwargs)
     else:
         raise RuntimeError(f'Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}')
