@@ -22,3 +22,4 @@ trimesh
 e2cnn
 scikit-learn
 tqdm
+scikit-image

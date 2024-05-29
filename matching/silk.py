@@ -14,10 +14,15 @@ def setup_silk():
     # this often doesnt work (see https://github.com/facebookresearch/silk/issues/32)
     # this solves the issue with the "ugly but works" method
     silk_dir = BASE_PATH.joinpath('silk')
-    if not silk_dir.exists():
-        lib_dir = BASE_PATH.joinpath('lib')
-        assert lib_dir.exists() and lib_dir.is_dir()
-        shutil.copytree(lib_dir, silk_dir)
+    if silk_dir.exists():
+        if silk_dir.is_dir():
+            shutil.rmtree(silk_dir)
+        else:
+            silk_dir.unlink()
+        
+    lib_dir = BASE_PATH.joinpath('lib')
+    assert lib_dir.exists() and lib_dir.is_dir()
+    shutil.copytree(lib_dir, silk_dir)
     return None
 
 try:
