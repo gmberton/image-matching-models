@@ -13,12 +13,12 @@ from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
 from matching.base_matcher import BaseMatcher, to_numpy
-
+from matching import WEIGHTS_DIR
 
 class DedodeMatcher(BaseMatcher):
-    detector_path = 'model_weights/dedode_detector_L.pth'  
-    detector_v2_path = 'model_weights/dedode_detector_L_v2.pth'  
-    descriptor_path = 'model_weights/dedode_descriptor_G.pth'
+    detector_path = WEIGHTS_DIR.joinpath('dedode_detector_L.pth')  
+    detector_v2_path = WEIGHTS_DIR.joinpath('dedode_detector_L_v2.pth')  
+    descriptor_path = WEIGHTS_DIR.joinpath('dedode_descriptor_G.pth')
     dino_patch_size = 14
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2,*args, **kwargs):
