@@ -3,27 +3,31 @@
 A unified API for quickly and easily trying 23 (and growing!) image matching models.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
-<details><summary>
-Example results using SIFT-LightGlue (respectively outdoor, indoor, satellite, painting and false positive)
+
+### Example Results
+Compare matching models across various scenes. For example, we show SIFT-LightGlue and LoFTR matches on pairs: 
+<p>(1) outdoor, (2) indoor, (3) satellite remote sensing, (4) paintings, and (5) a false positive. </p>
+<details open><summary>
+SIFT-LightGlue
 </summary>
 <p float="left">
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_3.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_2.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_4.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_1.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_0.jpg" height="150" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_3.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_2.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_4.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_1.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_0.jpg" width="195" />
 </p>
 </details>
 
-<details><summary>
-Example results with LoFTR
+<details open><summary>
+LoFTR
 </summary>
 <p float="left">
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_3.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_2.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_4.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_1.jpg" height="150" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_0.jpg" height="150" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_3.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_2.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_4.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_1.jpg" width="195" />
+  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_0.jpg" width="195" />
 </p>
 </details>
 
@@ -41,16 +45,13 @@ python -m pip install -e .
 ```
 ## Use
 
-You can then use any of the matchers with 
+You can use any of the matchers with 
 
 ```python
 from matching import get_matcher
 
 device = 'cuda' # 'cpu'
-ransac_kwargs = {'ransac_reproj_thresh':3, 
-                  'ransac_conf':0.95, 
-                  'ransac_iters':2000} # optional ransac params
-matcher = get_matcher('superglue', device=device, **ransac_kwargs)  # Choose any of our ~20 matchers listed below
+matcher = get_matcher('superglue', device=device)  # Choose any of our ~20 matchers listed below
 img_size = 512
 
 img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
@@ -61,7 +62,7 @@ num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['mkp
 # result.keys() = ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
 ```
 
-You can also run as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
+You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
 
 ```
 python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
@@ -82,7 +83,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 To use on your images you have three options:
 1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
 2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
-3. import the matcher package into a script/notebook and use from there
+3. import the matcher package into a script/notebook and use from there, as in the example above
 
 ## Models
 
@@ -111,25 +112,14 @@ Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are base
 Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in the `assets/example_pairs` folder at image size 512x512. Benchmark is done using `benchmark.py` on an NVIDIA RTX A4000 GPU. Results rounded to the hundredths place.
 
 \* LightGlue model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
-
-## TODO
-
-- [x] Add a table to the README with the source for each model (code source and paper)
-- [x] Add parameter for RANSAC threshold
-- [x] It might be useful to return other outputs (e.g. `kpts0, kpts1`) (for the methods that have them)
-- [x] Add DeDoDe + LightGlue from kornia
-- [ ] Add CVNet
-- [ ] Add TransVPR
-- [ ] Add Patch-NetVLAD
-- [ ] Add SelaVPR
-- [x] Add xFeat
-- [ ] Add any other local features method
-
-PRs are very much welcomed :-)
-
-
+##
+<details>
+<summary>
+  
 ### Adding a new method
-
+    
+</summary>
+  
 To add a new method simply add it to `./matching`. If the method requires external modules, you can add them to `./third_party` with `git submodule add`: for example, I've used this command to add the LightGlue module which is automatically downloaded when using `--recursive`
 
 ```
@@ -138,16 +128,31 @@ git submodule add https://github.com/cvg/LightGlue third_party/LightGlue
 
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work).
 
+</details>
 
-## Note
+<details>
+<summary>
+    
+### Note 
+    
+</summary>
+  
 This repo is not optimized for speed, but for usability. The idea is to use this repo to find the matcher that best suits your needs, and then use the original code to get the best out of it.
+  
+</details>
 
-## Acknowledgements
-
+<details>
+<summary>
+    
+### Acknowledgements
+    
+</summary>
+  
 Special thanks to the authors of the respective works that are included in this repo (see their papers above). Additional thanks to [@GrumpyZhou](https://github.com/GrumpyZhou) for developing and maintaining the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main), which we have wrapped in this repo, and the [maintainers](https://github.com/kornia/kornia?tab=readme-ov-file#community) of [Kornia](https://github.com/kornia/kornia).
+  
+</details>
 
 ## Cite
-
 This repo was created as part of the EarthMatch paper.
 
 ```
