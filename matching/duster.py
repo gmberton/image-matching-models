@@ -1,10 +1,9 @@
 
-import urllib.request
-
 import sys
 from pathlib import Path
 import os
 import torchvision.transforms as tfm
+import py3_wget
 
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/duster')))
@@ -34,7 +33,7 @@ class DusterMatcher(BaseMatcher):
         os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DusterMatcher.model_path):
             print("Downloading Duster(ViT large)... (takes a while)")
-            urllib.request.urlretrieve(url, DusterMatcher.model_path)
+            py3_wget.download_file(url, DusterMatcher.model_path)
 
     def preprocess(self, img):
         # the super-class already makes sure that img0,img1 have 

@@ -22,3 +22,5 @@ trimesh
 e2cnn
 scikit-learn
 tqdm
+py3_wget
+roma
