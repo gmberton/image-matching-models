@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 
 logger = logging.getLogger()
-logger.setLevel(31)  # Avoid useless low-level logs
+logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
 def get_image_pairs_paths(inputs):

@@ -3,9 +3,6 @@ from pathlib import Path
 import yaml
 import urllib.request
 import cv2
-import kornia as K
-import kornia.feature as KF
-from kornia_moons.feature import laf_from_opencv_SIFT_kpts
 import numpy as np
 import os
 from os.path import join
@@ -24,7 +21,7 @@ class Patch2pixMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
         
-        with open(join(BASE_PATH, f'configs/patch2pix.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/patch2pix.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         
         args['ckpt'] = join(BASE_PATH, args['ckpt'])
@@ -86,7 +83,7 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.to_gray = tfm.Grayscale()
 
-        with open(join(BASE_PATH, f'configs/patch2pix_superglue.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/patch2pix_superglue.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         args['coarse']['max_keypoints'] = max_num_keypoints        
         args['ckpt'] = join(BASE_PATH, args['ckpt'])
@@ -135,7 +132,7 @@ class SuperGlueMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         self.to_gray = tfm.Grayscale()
         
-        with open(join(BASE_PATH, f'configs/superglue.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/superglue.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         args['max_keypoints'] = max_num_keypoints        
 
@@ -174,7 +171,7 @@ class R2D2Matcher(BaseMatcher):
         super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         
-        with open(join(BASE_PATH, f'configs/r2d2.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/r2d2.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         args['ckpt'] = join(BASE_PATH, args['ckpt'])
         args['top_k'] = max_num_keypoints
@@ -222,7 +219,7 @@ class D2netMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
         
-        with open(join(BASE_PATH, f'configs/d2net.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/d2net.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         args['ckpt'] = join(BASE_PATH, args['ckpt'])
         
@@ -277,7 +274,7 @@ class DogAffHardNNMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         
-        with open(join(BASE_PATH, f'configs/dogaffnethardnet.yml'), 'r') as f:
+        with open(join(BASE_PATH, 'configs/dogaffnethardnet.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['example']
         args['npts'] = max_num_keypoints
 

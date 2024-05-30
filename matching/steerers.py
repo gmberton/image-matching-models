@@ -6,7 +6,6 @@ from pathlib import Path
 import torch
 import os
 import torchvision.transforms as tfm
-import torch.nn.functional as F
 
 from matching.base_matcher import BaseMatcher, to_numpy
 

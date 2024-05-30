@@ -4,7 +4,6 @@ from pathlib import Path
 import torchvision.transforms as tfm
 import torch
 import os
-import urllib.request
 import gdown
 
 
@@ -13,7 +12,6 @@ from src.loftr.loftr import LoFTR
 from configs.loftr.outdoor.loftr_ds_e2_dense_8rot import cfg as rot8_cfg
 from configs.loftr.outdoor.loftr_ds_e2_dense_big import cfg as big_cfg
 from configs.loftr.outdoor.loftr_ds_e2_dense import cfg as e2dense_cfg
-from configs.loftr.outdoor.loftr_ds_e2 import cfg as baseline_cfg
 
 from src.utils.misc import lower_config
 

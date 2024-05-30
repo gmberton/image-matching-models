@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 import os
 import torchvision.transforms as tfm
-import torch.nn.functional as F
 
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/duster')))
