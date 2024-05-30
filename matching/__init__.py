@@ -16,7 +16,7 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 available_models = ['loftr', 
                     'sift-lg','superpoint-lg','disk-lg','aliked-lg','doghardnet-lg',
                     'roma',
-                    'dedode', 'steerers',
+                    'dedode', 'steerers','dedode-kornia'
                     'sift-nn', 'orb-nn',
                     'patch2pix', 'patch2pix_superglue',
                     'superglue','r2d2','d2net',
@@ -65,6 +65,10 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
     elif matcher_name == 'dedode':
         from matching import dedode
         return dedode.DedodeMatcher(device, max_num_keypoints,*args, **kwargs)
+    
+    elif matcher_name == 'dedode-kornia':
+        from matching import dedode
+        return dedode.DedodeKorniaMatcher(device, max_num_keypoints,*args, **kwargs)
     
     elif matcher_name == 'steerers':
         from matching import steerers

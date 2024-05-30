@@ -99,5 +99,55 @@ class DedodeMatcher(BaseMatcher):
                 'H': H,
                 'mkpts0':mkpts0, 'mkpts1':mkpts1,
                 'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':keypoints_0, 'kpts1':keypoints_1, 
-                'desc0':description_0,'desc1': description_1}
+                'kpts0':to_numpy(keypoints_0), 'kpts1':to_numpy(keypoints_1), 
+                'desc0':to_numpy(description_0),'desc1': to_numpy(description_1)}
+
+from kornia.feature import DeDoDe
+import kornia
+from matching import get_version
+class DedodeKorniaMatcher(BaseMatcher):
+    def __init__(self, device="cpu", max_num_keypoints=2048, detector_weights='L-C4-v2',descriptor_weights='G-C4',*args, **kwargs):
+        super().__init__(device, **kwargs)
+        
+        major, minor, patch = get_version(kornia)
+        assert (major > 1 or (minor >= 7 and patch >=3)), 'DeDoDeKornia only available in kornia v 0.7.3 or greater. Update kornia to use this model.'
+
+        self.max_keypoints = max_num_keypoints
+        
+        self.model = DeDoDe.from_pretrained(detector_weights=detector_weights, 
+                                            descriptor_weights=descriptor_weights,
+                                            amp_dtype=torch.float32 if device!='cuda' else torch.float16)
+        self.model.to(device)
+        self.matcher = DualSoftMaxMatcher()
+
+    def preprocess(self, img):
+        if img.ndim == 3:
+            return img[None]
+        else:
+            return img
+    
+    @torch.inference_mode()
+    def _forward(self, img0, img1):
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)
+        
+        keypoints_0, P_0, description_0 = self.model(img0, n=self.max_keypoints)        
+        keypoints_1, P_1, description_1 = self.model(img1, n=self.max_keypoints)        
+
+        mkpts0, mkpts1, _ = self.matcher.match(
+            keypoints_0, description_0,
+            keypoints_1, description_1,
+            P_A = P_0, P_B = P_1, normalize = True, inv_temp=20, 
+            threshold = self.threshold # Increasing threshold -> fewer matches, fewer outliers
+        )
+
+        # process_matches is implemented by the parent BaseMatcher, it is the
+        # same for all methods, given the matched keypoints
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':to_numpy(keypoints_0), 'kpts1':to_numpy(keypoints_1), 
+                'desc0':to_numpy(description_0),'desc1': to_numpy(description_1)}
