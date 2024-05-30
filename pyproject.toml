@@ -32,3 +32,15 @@ Repository = "https://github.com/gmberton/image-matching-models"
 
 [tool.setuptools]
 packages = ["matching"]
+
+[project.optional-dependencies]
+silk = [
+        "hydra-core",
+        "loguru",
+        "pytorch-lightning==1.5.2",
+        "jax",
+        "jaxlib"
+        ]
+
+omniglue = ["tensorflow"
+            ] 

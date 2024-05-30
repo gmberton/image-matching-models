@@ -4,6 +4,9 @@ import torch
 import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
+from copy import deepcopy
+
+from matching import get_matcher
 
 def to_numpy(x):
     if isinstance(x, torch.Tensor):
@@ -96,3 +99,28 @@ class BaseMatcher(torch.nn.Module):
         
         # The _forward() is implemented by the children classes
         return self._forward(img0, img1)
+
+
+class EnsembleMatcher(BaseMatcher):
+    def __init__(self, matcher_names = [], device="cpu", **kwargs):
+        super().__init__(device, **kwargs)
+        
+        self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
+        
+    def _forward(self, img0, img1):
+        all_mkpts0, all_mkpts1 = [], []
+        for matcher in self.matchers:
+            result = matcher(img0, img1)
+            all_mkpts0.append(deepcopy(result['mkpts0']))
+            all_mkpts1.append(deepcopy(result['mkpts1']))
+        all_mkpts0, all_mkpts1 = np.concatenate(all_mkpts0), np.concatenate(all_mkpts1)
+        
+        num_inliers, H, inliers0, inliers1 = self.process_matches(all_mkpts0, all_mkpts1)
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':all_mkpts0, 'mkpts1':all_mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, 
+                'desc0':None,'desc1': None}
+       
+        
