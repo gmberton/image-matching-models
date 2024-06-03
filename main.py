@@ -55,7 +55,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Argument parser')
+    parser = argparse.ArgumentParser(description='Argument parser', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     # Choose matcher
     parser.add_argument('--matcher', type=str, default='sift-lg',
                         choices=['aliked-lg', 'd2net', 'dedode', 'disk-lg', 'doghardnet-lg',
