@@ -62,10 +62,10 @@ if __name__ == '__main__':
                                  'doghardnet-nn', 'duster', 'loftr', 'orb-nn', 'patch2pix',
                                  'patch2pix_superglue', 'r2d2', 'roma', 'sift-lg', 'sift-nn',
                                  'steerers', 'superglue', 'superpoint-lg'],
-                        help='log folder')
+                        help='choose your matcher')
     
     # Hyperparameters shared by all methods:
-    parser.add_argument('--im_size', type=int, default=512, help='resize im to im_size x im_size')
+    parser.add_argument('--im_size', type=int, default=512, help='resize img to im_size x im_size')
     parser.add_argument('--n_kpts', type=int, default=2048, help='max num keypoints')
     parser.add_argument('--device', type=str, default='cuda', choices=['cpu', 'cuda'])
     parser.add_argument('--no_viz', action='store_true',
