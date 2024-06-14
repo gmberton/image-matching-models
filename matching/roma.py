@@ -4,6 +4,7 @@ import math
 import torch
 import torchvision.transforms as tfm
 import torch.nn.functional as F
+from kornia.augmentation import PadTo
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/RoMa')))
 from roma import roma_outdoor
@@ -22,11 +23,24 @@ class RomaMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.roma_model.train(False)
         
-    def _forward(self, img0, img1):
-        # the super-class already makes sure that img0,img1 have same resolution
-        # and that h == w
+    def preprocess(self, img0, img1):
+        print('WARNING: RoMa requires square images, and input images are not square. Padding them to square.')
+        _, h0, w0 = img0.shape
+        _, h1, w1 = img1.shape
+        pad_dim = max(h0, w0, h1, w1)
+        
+        pad = PadTo((pad_dim, pad_dim), keepdim=True)
+        
+        return pad(img0), pad(img1)
+        
+        
+    def _forward(self, img0, img1, pad=True):
+        if pad:
+            img0, img1 = self.preprocess(img0, img1)
         _, h, w = img0.shape
+
         assert h == w, 'We currently only support square images for RoMA.'
+        assert img0.shape == img1.shape
         upsample_res = h
         if not ((h % self.dino_patch_size) == 0):
             upsample_res = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))            

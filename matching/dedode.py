@@ -30,8 +30,8 @@ class DedodeMatcher(BaseMatcher):
         self.download_weights()
         
         detector_weight_path = self.detector_path if detector_version == 1 else self.detector_v2_path
-        self.detector = dedode_detector_L(weights = torch.load(detector_weight_path, map_location = device))
-        self.descriptor = dedode_descriptor_G(weights = torch.load(self.descriptor_path, map_location = device))
+        self.detector = dedode_detector_L(weights = torch.load(detector_weight_path, map_location = device),device=device)
+        self.descriptor = dedode_descriptor_G(weights = torch.load(self.descriptor_path, map_location = device), device=device)
         self.matcher = DualSoftMaxMatcher()
     
     @staticmethod
@@ -106,7 +106,7 @@ from kornia.feature import DeDoDe
 import kornia
 from matching import get_version
 class DedodeKorniaMatcher(BaseMatcher):
-    def __init__(self, device="cpu", max_num_keypoints=2048, detector_weights='L-C4-v2',descriptor_weights='G-C4',*args, **kwargs):
+    def __init__(self, device="cpu", max_num_keypoints=2048, detector_weights='L-C4-v2',descriptor_weights='G-C4',match_thresh=0.05, *args, **kwargs):
         super().__init__(device, **kwargs)
         
         major, minor, patch = get_version(kornia)
@@ -119,6 +119,8 @@ class DedodeKorniaMatcher(BaseMatcher):
                                             amp_dtype=torch.float32 if device!='cuda' else torch.float16)
         self.model.to(device)
         self.matcher = DualSoftMaxMatcher()
+        
+        self.threshold = match_thresh
 
     def preprocess(self, img):
         if img.ndim == 3:

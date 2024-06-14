@@ -16,11 +16,12 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 available_models = ['loftr', 
                     'sift-lg','superpoint-lg','disk-lg','aliked-lg','doghardnet-lg',
                     'roma',
-                    'dedode', 'steerers','dedode-kornia'
+                    'dedode', 'steerers','dedode-kornia',
                     'sift-nn', 'orb-nn',
                     'patch2pix', 'patch2pix_superglue',
                     'superglue','r2d2','d2net',
-                    'duster','doghardnet-nn','xfeat',
+                    'duster','doghardnet-nn',
+                    'xfeat','xfeat-star',
                     'dedode-lg',
                     'gim-dkm', 'gim-lg',
                     'omniglue']
@@ -110,8 +111,9 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import matching_toolbox
         return matching_toolbox.DogAffHardNNMatcher(device,*args, **kwargs)
     
-    elif matcher_name == 'xfeat':
+    elif 'xfeat' in matcher_name:
         from matching import xfeat
+        kwargs['mode'] = 'semi-dense' if 'star' in matcher_name else 'sparse'
         return xfeat.xFeatMatcher(device, *args, **kwargs)
     
     elif matcher_name == 'dedode-lg':

@@ -52,6 +52,8 @@ def benchmark(matcher, num_iters=1, img_size=512, device='cuda'):
 
 if __name__ == '__main__':
     args = parse_args()
+    import warnings
+    warnings.filterwarnings('ignore')
     
     print(args)
     with open('runtime_results.txt', 'w') as f:
