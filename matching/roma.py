@@ -6,8 +6,8 @@ import torchvision.transforms as tfm
 import torch.nn.functional as F
 from kornia.augmentation import PadTo
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/RoMa')))
-from roma import roma_outdoor
+BASE_PATH = str(Path(__file__).parent.parent.joinpath('third_party/RoMa'))
+sys.path.insert(0, BASE_PATH) # due to some users potentially having roma from pip, need to insert rather than append this path to get priority in the namespace
 
 from matching.base_matcher import BaseMatcher, to_numpy
 

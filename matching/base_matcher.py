@@ -60,7 +60,7 @@ class BaseMatcher(torch.nn.Module):
         H, inliers_mask = self.find_homography(mkpts0, mkpts1, self.ransac_reproj_thresh, self.ransac_iters, self.ransac_conf)
         inlier_mkpts0 = mkpts0[inliers_mask]
         inlier_mkpts1 = mkpts1[inliers_mask]
-        num_inliers = inliers_mask.sum()
+        num_inliers = int(inliers_mask.sum())
 
         return num_inliers, H, inlier_mkpts0, inlier_mkpts1
     
