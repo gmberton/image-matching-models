@@ -8,6 +8,7 @@ from kornia.augmentation import PadTo
 
 BASE_PATH = str(Path(__file__).parent.parent.joinpath('third_party/RoMa'))
 sys.path.insert(0, BASE_PATH) # due to some users potentially having roma from pip, need to insert rather than append this path to get priority in the namespace
+from roma import roma_outdoor, tiny_roma_v1_outdoor
 
 from matching.base_matcher import BaseMatcher, to_numpy
 
@@ -103,6 +104,46 @@ class RomaMatcher(BaseMatcher):
         matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(
             matches, upsample_res, upsample_res, upsample_res, upsample_res
+        )
+
+        # process_matches is implemented by the parent BaseMatcher, it is the
+        # same for all methods, given the matched keypoints
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+
+        return {'num_inliers':num_inliers,
+                'H': H,
+                'mkpts0':mkpts0, 'mkpts1':mkpts1,
+                'inliers0':inliers0, 'inliers1':inliers1,
+                'kpts0':None, 'kpts1':None, # dense matcher, no kpts / descs
+                'desc0':None,'desc1': None}
+
+class TinyRomaMatcher(BaseMatcher):
+    
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
+        super().__init__(device, **kwargs)
+        self.roma_model = tiny_roma_v1_outdoor(device=device)
+        self.max_keypoints = max_num_keypoints
+        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.roma_model.train(False)
+        
+    def _forward(self, img0, img1):
+        _, h0, w0 = img0.shape
+        _, h1, w1 = img1.shape
+
+        # assert h == w, 'We currently only support square images for RoMA.'
+        # assert img0.shape == img1.shape
+
+        img0 = self.normalize(img0).unsqueeze(0)
+        img1 = self.normalize(img1).unsqueeze(0)
+
+        # batch = {"im_A": img0.to(self.device), "im_B": img1.to(self.device)}
+        
+        warp, certainty  = self.roma_model.match(img0.to(self.device), img1.to(self.device), batched=False)
+                
+        matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
+        mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(
+            matches, h0, w0, h1, w1
         )
 
         # process_matches is implemented by the parent BaseMatcher, it is the

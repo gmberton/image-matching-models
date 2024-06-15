@@ -58,7 +58,7 @@ img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
 img1 = matcher.image_loader('path/to/img1.png', resize=img_size)
 
 result = matcher(img0, img1)
-num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['mkpts0'], result['mkpts1']
+num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inliers0'], result['inliers1']
 # result.keys() = ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
 ```
 

@@ -15,10 +15,10 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 
 available_models = ['loftr', 
                     'sift-lg','superpoint-lg','disk-lg','aliked-lg','doghardnet-lg',
-                    'roma',
+                    'roma','tiny-roma',
                     'dedode', 'steerers','dedode-kornia',
                     'sift-nn', 'orb-nn',
-                    'patch2pix', 'patch2pix_superglue',
+                    # 'patch2pix', 'patch2pix_superglue', # not available until model weights provided
                     'superglue','r2d2','d2net',
                     'duster','doghardnet-nn',
                     'xfeat','xfeat-star',
@@ -59,9 +59,12 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
         from matching import lightglue
         return lightglue.DognetLightGlue(device, max_num_keypoints,*args, **kwargs)
     
-    elif matcher_name == 'roma':
+    elif 'roma' in matcher_name:
         from matching import roma
-        return roma.RomaMatcher(device, max_num_keypoints,*args, **kwargs)
+        if 'tiny' in matcher_name:
+            return roma.TinyRomaMatcher(device, max_num_keypoints, *args, **kwargs)
+        else:
+            return roma.RomaMatcher(device, max_num_keypoints,*args, **kwargs)
     
     elif matcher_name == 'dedode':
         from matching import dedode
