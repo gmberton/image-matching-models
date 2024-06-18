@@ -19,9 +19,6 @@
 [submodule "third_party/accelerated_features"]
 	path = third_party/accelerated_features
 	url = https://github.com/verlab/accelerated_features.git
-[submodule "third_party/gim"]
-	path = third_party/gim
-	url = https://github.com/xuelunshen/gim.git
 [submodule "third_party/omniglue"]
 	path = third_party/omniglue
 	url = https://github.com/google-research/omniglue.git
