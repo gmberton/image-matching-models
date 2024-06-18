@@ -5,6 +5,8 @@ from matching import WEIGHTS_DIR
 import torch
 import sys
 from pathlib import Path
+import py3_wget
+
 import gdown
 import urllib
 from PIL import Image
@@ -21,11 +23,13 @@ class GIM_DKM(BaseMatcher):
 
     weights_src = 'https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view'
     
-    def __init__(self, device="cpu", **kwargs):
+    def __init__(self, device="cpu",max_num_keypoints=5000, **kwargs):
         super().__init__(device, **kwargs)
         self.ckpt_path = WEIGHTS_DIR / 'gim_dkm_100h.ckpt'
         
-        self.model = DKMv3(weights=None, h=672, w=896)   
+        self.model = DKMv3(weights=None, h=672, w=896)  
+        
+        self.max_num_keypoints = max_num_keypoints 
         
         self.download_weights()
         self.load_weights()
@@ -51,7 +55,10 @@ class GIM_DKM(BaseMatcher):
 
     def preprocess(self, img):
         # this version of DKM requires PIL images as input
-        return Image.fromarray(np.uint8(255*tensor_to_image(img)))       
+        # return Image.fromarray(np.uint8(255*tensor_to_image(img))) 
+        if img.ndim < 4:
+            img = img.unsqueeze(0)
+        return img
         
     def _forward(self, img0, img1):
         height0, width0 = img0.shape[-2:]
@@ -62,7 +69,7 @@ class GIM_DKM(BaseMatcher):
         dense_matches, dense_certainty = self.model.match(img0, img1, device=self.device)
         torch.cuda.empty_cache()
         # sample matching keypoints from dense warp
-        sparse_matches, mconf = self.model.sample(dense_matches, dense_certainty, 5000)
+        sparse_matches, mconf = self.model.sample(dense_matches, dense_certainty, self.max_num_keypoints)
         torch.cuda.empty_cache()
         mkpts0 = sparse_matches[:, :2]
         mkpts1 = sparse_matches[:, 2:]
@@ -84,13 +91,17 @@ class GIM_DKM(BaseMatcher):
 class GIM_LG(BaseMatcher):
 
     weights_src = 'https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt'
-    
+    superpoint_v1_weight_src = 'https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superpoint_v1.pth'
+
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
         from gluefactory.superpoint import SuperPoint
         from gluefactory.models.matchers.lightglue import LightGlue
 
         self.ckpt_path = BASE_PATH / 'weights' / 'gim_lightglue_100h.ckpt'
+        self.superpoint_v1_path = BASE_PATH / 'weights' / 'superpoint_v1.pth'
+        
+        self.download_weights()
         
         self.detector = SuperPoint({
             'max_num_keypoints': max_keypoints,
@@ -106,14 +117,17 @@ class GIM_LG(BaseMatcher):
             'checkpointed': True,
         })
         
-        self.download_weights()
         self.load_weights()
 
         
     def download_weights(self):
         if not self.ckpt_path.exists():
             print(f"Downloading {self.ckpt_path.name}")
-            urllib.request.urlretrieve(GIM_LG.weights_src, self.ckpt_path) 
+            py3_wget.download_file(GIM_LG.weights_src, self.ckpt_path) 
+        if not self.superpoint_v1_path.exists():
+            print(f"Downloading {self.superpoint_v1_path.name}")
+            py3_wget.download_file(GIM_LG.superpoint_v1_weight_src, self.superpoint_v1_path) 
+            
 
     def load_weights(self):
         state_dict = torch.load(self.ckpt_path, map_location='cpu')
@@ -143,7 +157,7 @@ class GIM_LG(BaseMatcher):
         
     def _forward(self, img0, img1):
         img0 = self.preprocess(img0)
-        img0 = self.preprocess(img1)
+        img1 = self.preprocess(img1)
 
         data = dict(image0=img0, image1=img1)
 
@@ -151,7 +165,7 @@ class GIM_LG(BaseMatcher):
         scale1 = torch.tensor([1.0, 1.0]).to(self.device)[None]
 
         size0 = torch.tensor(data["image0"].shape[-2:][::-1])[None]
-        size1 = torch.tensor(data["image0"].shape[-2:][::-1])[None]
+        size1 = torch.tensor(data["image1"].shape[-2:][::-1])[None]
 
         data.update(dict(size0=size0, size1=size1))
         data.update(dict(scale0=scale0, scale1=scale1))
@@ -162,7 +176,7 @@ class GIM_LG(BaseMatcher):
                                             "image_size": data["size0"],
                                             }).items()})
         pred.update({k + '1': v for k, v in self.detector({
-                                            "image": data["image0"],
+                                            "image": data["image1"],
                                             "image_size": data["size1"],
                                         }).items()})
         

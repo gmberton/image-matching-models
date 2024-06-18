@@ -125,7 +125,7 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
     
     elif matcher_name == 'gim-dkm':
         from matching import gim
-        return gim.GIM_DKM(device, *args, **kwargs)
+        return gim.GIM_DKM(device, max_num_keypoints, *args, **kwargs)
     
     elif matcher_name == 'gim-lg':
         from matching import gim
