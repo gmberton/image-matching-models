@@ -36,9 +36,8 @@ class DusterMatcher(BaseMatcher):
             py3_wget.download_file(url, DusterMatcher.model_path)
 
     def preprocess(self, img):
-        # the super-class already makes sure that img0,img1 have 
-        # same resolution and that h == w
-        _, h, _ = img.shape
+        _, h, w = img.shape
+        orig_shape = h, w
         imsize = h
         if not ((h % self.vit_patch_size) == 0):
             imsize = int(self.vit_patch_size*round(h / self.vit_patch_size, 0))            
@@ -51,13 +50,12 @@ class DusterMatcher(BaseMatcher):
 
         img = self.normalize(img).unsqueeze(0)
 
-        return img
+        return img, orig_shape
 
     def _forward(self, img0, img1):
-        
-        img0 = self.preprocess(img0)
-        img1 = self.preprocess(img1)
-
+        img0, img0_shape = self.preprocess(img0)
+        img1, img1_shape = self.preprocess(img1)
+         
         images = [{'img': img0, 'idx': 0, 'instance': 0}, {'img': img1, 'idx': 1, 'instance': 1}]
         pairs = make_pairs(images, scene_graph='complete', prefilter=None, symmetrize=True)
         output = inference(pairs, self.model, self.device, batch_size=1)
@@ -68,14 +66,15 @@ class DusterMatcher(BaseMatcher):
         pts3d = scene.get_pts3d()
         imgs = scene.imgs
         pts2d_list, pts3d_list = [], []
+
         for i in range(2):
             conf_i = confidence_masks[i].cpu().numpy()
             pts2d_list.append(xy_grid(*imgs[i].shape[:2][::-1])[conf_i])  # imgs[i].shape[:2] = (H, W)
             pts3d_list.append(pts3d[i].detach().cpu().numpy()[conf_i])
         reciprocal_in_P2, nn2_in_P1, _ = find_reciprocal_matches(*pts3d_list)
 
-        mkpts0 = pts2d_list[1][reciprocal_in_P2]
-        mkpts1 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
+        mkpts1 = pts2d_list[1][reciprocal_in_P2]
+        mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
