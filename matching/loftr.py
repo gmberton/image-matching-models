@@ -9,12 +9,14 @@ class LoftrMatcher(BaseMatcher):
 
         self.model = LoFTR(pretrained='outdoor').to(self.device)
     
+    def preprocess(self, img):
+        return tfm.Grayscale()(img).unsqueeze(0).to(self.device)
+        
     def _forward(self, img0, img1):
-        
-        img0 = tfm.Grayscale()(img0).unsqueeze(0).to(self.device)
-        img1 = tfm.Grayscale()(img1).unsqueeze(0).to(self.device)
-        
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)        
         batch = {'image0': img0, 'image1': img1}
+        
         output = self.model(batch)
         mkpts0, mkpts1 = output["keypoints0"], output["keypoints1"]
 

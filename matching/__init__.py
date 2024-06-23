@@ -13,7 +13,7 @@ from lightglue import viz2d # for quick import later 'from matching import viz2d
 WEIGHTS_DIR = Path(__file__).parent.parent.joinpath('model_weights')
 WEIGHTS_DIR.mkdir(exist_ok=True)
 
-available_models = ['loftr', 
+available_models = ['loftr', 'eloftr', 
                     'sift-lg','superpoint-lg','disk-lg','aliked-lg','doghardnet-lg',
                     'roma','tiny-roma',
                     'dedode', 'steerers','dedode-kornia',
@@ -38,6 +38,10 @@ def get_matcher(matcher_name='sift-lg', device='cpu', max_num_keypoints=2048, *a
     if matcher_name == 'loftr':
         from matching import loftr
         return loftr.LoftrMatcher(device, *args, **kwargs)
+    
+    if matcher_name == 'eloftr':
+        from matching import efficient_loftr
+        return efficient_loftr.EfficientLoFTRMatcher(device, *args, **kwargs)
     
     elif matcher_name == 'sift-lg':
         from matching import lightglue
