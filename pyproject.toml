@@ -44,3 +44,5 @@ silk = [
 
 omniglue = ["tensorflow"
             ] 
+
+duster = ['huggingface_hub"]
