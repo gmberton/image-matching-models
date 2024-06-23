@@ -7,7 +7,9 @@ import py3_wget
 
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/duster')))
-from dust3r.inference import inference, load_model
+from dust3r.inference import inference
+from dust3r.model import AsymmetricCroCo3DStereo
+from dust3r.utils.image import load_images
 from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
@@ -22,9 +24,11 @@ class DusterMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        
+        self.verbose = False
 
         self.download_weights()
-        self.model = load_model(self.model_path, device)
+        self.model = AsymmetricCroCo3DStereo.from_pretrained(self.model_path).to(device)
 
     @staticmethod
     def download_weights():
@@ -58,9 +62,9 @@ class DusterMatcher(BaseMatcher):
          
         images = [{'img': img0, 'idx': 0, 'instance': 0}, {'img': img1, 'idx': 1, 'instance': 1}]
         pairs = make_pairs(images, scene_graph='complete', prefilter=None, symmetrize=True)
-        output = inference(pairs, self.model, self.device, batch_size=1)
+        output = inference(pairs, self.model, self.device, batch_size=1, verbose=self.verbose)
 
-        scene = global_aligner(output, device=self.device, mode=GlobalAlignerMode.PairViewer)
+        scene = global_aligner(output, device=self.device, mode=GlobalAlignerMode.PairViewer, verbose=self.verbose)
         # retrieve useful values from scene:
         confidence_masks = scene.get_masks()
         pts3d = scene.get_pts3d()
