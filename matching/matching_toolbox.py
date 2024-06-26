@@ -5,39 +5,47 @@ import urllib.request
 import cv2
 import numpy as np
 import os
-from os.path import join
 import shutil
 import torchvision.transforms as tfm
+import gdown
 
-BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
+BASE_PATH = Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox"
 sys.path.append(str(Path(BASE_PATH)))
 import immatch
 from matching.base_matcher import BaseMatcher, to_numpy
+from . import WEIGHTS_DIR
 
 
 class Patch2pixMatcher(BaseMatcher):
-    url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
+    # url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
+    pretrained_src = 'https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view'
     url2 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth'
+    
+    model_path = WEIGHTS_DIR.joinpath('patch2pix_pretrained.pth')
+    
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
         
-        with open(join(BASE_PATH, 'configs/patch2pix.yml'), 'r') as f:
+        with open(BASE_PATH.joinpath('configs/patch2pix.yml'), 'r') as f:
             args = yaml.load(f, Loader=yaml.FullLoader)['sat']
         
-        args['ckpt'] = join(BASE_PATH, args['ckpt'])
-        args['ncn_ckpt'] = join(BASE_PATH, args['ncn_ckpt'])
-        if not os.path.isfile(args['ckpt']):
-            self.download_weights(args['ckpt'], args['ncn_ckpt'])
+        if not Patch2pixMatcher.model_path.is_file():
+            self.download_weights()
 
+        args['ckpt'] = str(Patch2pixMatcher.model_path)
+        print(args)
         self.matcher = immatch.__dict__[args['class']](args)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     @staticmethod
-    def download_weights(ckpt, ncn_ckpt):
+    def download_weights():
         print("Downloading Patch2Pix model weights...")
-        os.makedirs(os.path.dirname(ckpt), exist_ok=True)
-        urllib.request.urlretrieve(Patch2pixMatcher.url1, ckpt)
-        urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
+        WEIGHTS_DIR.mkdir(exist_ok=True)
+        gdown.download(Patch2pixMatcher.pretrained_src,
+                       output=str(Patch2pixMatcher.model_path),
+                        fuzzy=True)
+        # urllib.request.urlretrieve(Patch2pixMatcher.pretrained_src, ckpt)
+        # urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
     def _forward(self, img0, img1):
 

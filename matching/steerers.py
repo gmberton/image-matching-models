@@ -6,7 +6,7 @@ from pathlib import Path
 import torch
 import os
 import torchvision.transforms as tfm
-
+import py3_wget
 from matching.base_matcher import BaseMatcher, to_numpy
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
@@ -16,63 +16,26 @@ sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/Steerers'
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
 from rotation_steerers.matchers.max_similarity import MaxSimilarityMatcher, ContinuousMaxSimilarityMatcher
 
-
+from . import WEIGHTS_DIR
 
 class SteererMatcher(BaseMatcher):
-    detector_path_L = 'model_weights/dedode_detector_L.pth'
+    detector_path_L = WEIGHTS_DIR.joinpath('dedode_detector_L.pth')
 
-    descriptor_path_G = 'model_weights/dedode_descriptor_G.pth'
-    descriptor_path_B_C4 = 'model_weights/B_C4_Perm_descriptor_setting_C.pth'
-    descriptor_path_B_SO2 = 'model_weights/B_SO2_Spread_descriptor_setting_B.pth'
+    descriptor_path_G = WEIGHTS_DIR.joinpath('dedode_descriptor_G.pth')
+    descriptor_path_B_C4 = WEIGHTS_DIR.joinpath('B_C4_Perm_descriptor_setting_C.pth')
+    descriptor_path_B_SO2 = WEIGHTS_DIR.joinpath('B_SO2_Spread_descriptor_setting_B.pth')
 
-    steerer_path_C = 'model_weights/B_C4_Perm_steerer_setting_C.pth'
-    steerer_path_B = 'model_weights/B_SO2_Spread_steerer_setting_B.pth'
+    steerer_path_C = WEIGHTS_DIR.joinpath('B_C4_Perm_steerer_setting_C.pth')
+    steerer_path_B = WEIGHTS_DIR.joinpath('B_SO2_Spread_steerer_setting_B.pth')
 
     dino_patch_size = 14
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, steerer_type='C8', *args, **kwargs):
         super().__init__(device, **kwargs)
-        
-        os.makedirs("model_weights", exist_ok=True)
+
+        WEIGHTS_DIR.mkdir(exist_ok=True)
         # download detector
-        if not os.path.isfile(self.detector_path_L):
-            print("Downloading dedode_detector_L.pth")
-            urllib.request.urlretrieve(
-                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
-                self.detector_path_L
-            )
-        # download descriptors
-        if not os.path.isfile(self.descriptor_path_G):
-            print("Downloading dedode_descriptor_G.pth")
-            urllib.request.urlretrieve(
-                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
-                self.descriptor_path_G
-            )
-        if not os.path.isfile(self.descriptor_path_B_C4):
-            print("Downloading dedode_descriptor_B_C4.pth")
-            urllib.request.urlretrieve(
-                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_descriptor_setting_C.pth',
-                self.descriptor_path_B_C4
-            )
-        if not os.path.isfile(self.descriptor_path_B_SO2):
-            print("Downloading dedode_descriptor_B_S02.pth")
-            urllib.request.urlretrieve(
-                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_descriptor_setting_B.pth',
-                self.descriptor_path_B_SO2
-            )
-        # download steerers
-        if not os.path.isfile(self.steerer_path_C):
-            print("Downloading B_C4_Perm_steerer_setting_C.pth")
-            urllib.request.urlretrieve(
-                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_steerer_setting_C.pth',
-                self.steerer_path_C
-            )
-        if not os.path.isfile(self.steerer_path_B):
-            print("Downloading B_SO2_Spread_steerer_setting_B.pth")
-            urllib.request.urlretrieve(
-                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_steerer_setting_B.pth',
-                self.steerer_path_B
-            )
+        self.download_weights()
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
@@ -81,6 +44,45 @@ class SteererMatcher(BaseMatcher):
 
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher(steerer_type, device=device)
 
+    def download_weights(self):
+        if not os.path.isfile(self.detector_path_L):
+            print("Downloading dedode_detector_L.pth")
+            py3_wget.download_file(
+                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth",
+                self.detector_path_L
+            )
+        # download descriptors
+        if not os.path.isfile(self.descriptor_path_G):
+            print("Downloading dedode_descriptor_G.pth")
+            py3_wget.download_file(
+                "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth",
+                self.descriptor_path_G
+            )
+        if not os.path.isfile(self.descriptor_path_B_C4):
+            print("Downloading dedode_descriptor_B_C4.pth")
+            py3_wget.download_file(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_descriptor_setting_C.pth',
+                self.descriptor_path_B_C4
+            )
+        if not os.path.isfile(self.descriptor_path_B_SO2):
+            print("Downloading dedode_descriptor_B_S02.pth")
+            py3_wget.download_file(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_descriptor_setting_B.pth',
+                self.descriptor_path_B_SO2
+            )
+        # download steerers
+        if not os.path.isfile(self.steerer_path_C):
+            print("Downloading B_C4_Perm_steerer_setting_C.pth")
+            py3_wget.download_file(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_steerer_setting_C.pth',
+                self.steerer_path_C
+            )
+        if not os.path.isfile(self.steerer_path_B):
+            print("Downloading B_SO2_Spread_steerer_setting_B.pth")
+            py3_wget.download_file(
+                'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_steerer_setting_B.pth',
+                self.steerer_path_B
+            )
 
     def build_matcher(self, steerer_type='C8', device='cpu'):
         if steerer_type == 'C4':
