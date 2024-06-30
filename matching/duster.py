@@ -1,4 +1,3 @@
-
 import sys
 from pathlib import Path
 import os
@@ -6,7 +5,7 @@ import torchvision.transforms as tfm
 import py3_wget
 
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/duster')))
+sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/duster")))
 from dust3r.inference import inference
 from dust3r.model import AsymmetricCroCo3DStereo
 from dust3r.utils.image import load_images
@@ -19,8 +18,9 @@ from matching.utils import to_numpy, resize_to_divisible
 
 from matching import WEIGHTS_DIR
 
+
 class DusterMatcher(BaseMatcher):
-    model_path = WEIGHTS_DIR.joinpath('duster_vit_large.pth')
+    model_path = WEIGHTS_DIR.joinpath("duster_vit_large.pth")
     vit_patch_size = 16
 
     def __init__(self, device="cpu", *args, **kwargs):
@@ -34,7 +34,7 @@ class DusterMatcher(BaseMatcher):
 
     @staticmethod
     def download_weights():
-        url = 'https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth'
+        url = "https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
 
         if not os.path.isfile(DusterMatcher.model_path):
             print("Downloading Duster(ViT large)... (takes a while)")
@@ -43,7 +43,7 @@ class DusterMatcher(BaseMatcher):
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
-        
+
         img = resize_to_divisible(img, self.vit_patch_size)
 
         img = self.normalize(img).unsqueeze(0)
@@ -53,12 +53,24 @@ class DusterMatcher(BaseMatcher):
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
-         
-        images = [{'img': img0, 'idx': 0, 'instance': 0}, {'img': img1, 'idx': 1, 'instance': 1}]
-        pairs = make_pairs(images, scene_graph='complete', prefilter=None, symmetrize=True)
-        output = inference(pairs, self.model, self.device, batch_size=1, verbose=self.verbose)
 
-        scene = global_aligner(output, device=self.device, mode=GlobalAlignerMode.PairViewer, verbose=self.verbose)
+        images = [
+            {"img": img0, "idx": 0, "instance": 0},
+            {"img": img1, "idx": 1, "instance": 1},
+        ]
+        pairs = make_pairs(
+            images, scene_graph="complete", prefilter=None, symmetrize=True
+        )
+        output = inference(
+            pairs, self.model, self.device, batch_size=1, verbose=self.verbose
+        )
+
+        scene = global_aligner(
+            output,
+            device=self.device,
+            mode=GlobalAlignerMode.PairViewer,
+            verbose=self.verbose,
+        )
         # retrieve useful values from scene:
         confidence_masks = scene.get_masks()
         pts3d = scene.get_pts3d()
@@ -67,17 +79,18 @@ class DusterMatcher(BaseMatcher):
 
         for i in range(2):
             conf_i = confidence_masks[i].cpu().numpy()
-            pts2d_list.append(xy_grid(*imgs[i].shape[:2][::-1])[conf_i])  # imgs[i].shape[:2] = (H, W)
+            pts2d_list.append(
+                xy_grid(*imgs[i].shape[:2][::-1])[conf_i]
+            )  # imgs[i].shape[:2] = (H, W)
             pts3d_list.append(pts3d[i].detach().cpu().numpy()[conf_i])
         reciprocal_in_P2, nn2_in_P1, _ = find_reciprocal_matches(*pts3d_list)
 
         mkpts1 = pts2d_list[1][reciprocal_in_P2]
         mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
 
-        
-        # duster sometimes requires reshaping an image to fit vit patch size evenly, so we need to 
+        # duster sometimes requires reshaping an image to fit vit patch size evenly, so we need to
         # rescale kpts to the original img
-        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:] 
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
@@ -85,9 +98,15 @@ class DusterMatcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0': None, 'kpts1':None, 
-                'desc0': None,'desc1': None}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": None,
+            "kpts1": None,
+            "desc0": None,
+            "desc1": None,
+        }

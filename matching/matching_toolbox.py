@@ -17,34 +17,43 @@ from matching.base_matcher import BaseMatcher
 from matching.utils import to_numpy
 from matching import WEIGHTS_DIR
 
+
 class Patch2pixMatcher(BaseMatcher):
     # url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
-    pretrained_src = 'https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view'
-    url2 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth'
-    
-    model_path = WEIGHTS_DIR.joinpath('patch2pix_pretrained.pth')
-    
+    pretrained_src = (
+        "https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view"
+    )
+    url2 = (
+        "https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth"
+    )
+
+    model_path = WEIGHTS_DIR.joinpath("patch2pix_pretrained.pth")
+
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
-        
-        with open(BASE_PATH.joinpath('configs/patch2pix.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        
+
+        with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
+
         if not Patch2pixMatcher.model_path.is_file():
             self.download_weights()
 
-        args['ckpt'] = str(Patch2pixMatcher.model_path)
+        args["ckpt"] = str(Patch2pixMatcher.model_path)
         print(args)
-        self.matcher = immatch.__dict__[args['class']](args)
-        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.matcher = immatch.__dict__[args["class"]](args)
+        self.normalize = tfm.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
 
     @staticmethod
     def download_weights():
         print("Downloading Patch2Pix model weights...")
         WEIGHTS_DIR.mkdir(exist_ok=True)
-        gdown.download(Patch2pixMatcher.pretrained_src,
-                       output=str(Patch2pixMatcher.model_path),
-                        fuzzy=True)
+        gdown.download(
+            Patch2pixMatcher.pretrained_src,
+            output=str(Patch2pixMatcher.model_path),
+            fuzzy=True,
+        )
         # urllib.request.urlretrieve(Patch2pixMatcher.pretrained_src, ckpt)
         # urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
@@ -80,34 +89,42 @@ class Patch2pixMatcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':None, 'kpts1':None, 
-                'desc0':None,'desc1': None}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": None,
+            "kpts1": None,
+            "desc0": None,
+            "desc1": None,
+        }
 
 
 class SuperGluePatch2pixMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.normalize = tfm.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
         self.to_gray = tfm.Grayscale()
 
-        with open(join(BASE_PATH, 'configs/patch2pix_superglue.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['coarse']['max_keypoints'] = max_num_keypoints        
-        args['ckpt'] = join(BASE_PATH, args['ckpt'])
-        args['ncn_ckpt'] = join(BASE_PATH, args['ncn_ckpt'])
-        
-        if not os.path.isfile(args['ckpt']):
-            Patch2pixMatcher.download_weights(args['ckpt'], args['ncn_ckpt'])
+        with open(join(BASE_PATH, "configs/patch2pix_superglue.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
+        args["coarse"]["max_keypoints"] = max_num_keypoints
+        args["ckpt"] = join(BASE_PATH, args["ckpt"])
+        args["ncn_ckpt"] = join(BASE_PATH, args["ncn_ckpt"])
 
-        self.matcher = immatch.__dict__[args['class']](args)
-        self.match_threshold = args['match_threshold']
+        if not os.path.isfile(args["ckpt"]):
+            Patch2pixMatcher.download_weights(args["ckpt"], args["ncn_ckpt"])
 
-        cargs = args['coarse']
-        self.cname = cargs['name']
+        self.matcher = immatch.__dict__[args["class"]](args)
+        self.match_threshold = args["match_threshold"]
+
+        cargs = args["coarse"]
+        self.cname = cargs["name"]
         self.coarse_matcher = immatch.__dict__[self.cname](cargs)
 
     def _forward(self, img0, img1):
@@ -117,7 +134,7 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         img1 = self.normalize(img1).unsqueeze(0).to(self.device)
 
         coarse_match_res = self.coarse_matcher.match_inputs_(img0_gray, img1_gray)
-        coarse_matches = coarse_match_res[0]        
+        coarse_matches = coarse_match_res[0]
         # Patch2Pix refinement
         refined_matches, _, _ = self.matcher.model.refine_matches(
             img0, img1, coarse_matches, io_thres=self.match_threshold
@@ -130,79 +147,96 @@ class SuperGluePatch2pixMatcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':None, 'kpts1':None, 
-                'desc0':None,'desc1': None}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": None,
+            "kpts1": None,
+            "desc0": None,
+            "desc1": None,
+        }
 
 
 class SuperGlueMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.to_gray = tfm.Grayscale()
-        
-        with open(join(BASE_PATH, 'configs/superglue.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['max_keypoints'] = max_num_keypoints        
 
-        self.matcher = immatch.__dict__[args['class']](args)
-        
+        with open(join(BASE_PATH, "configs/superglue.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
+        args["max_keypoints"] = max_num_keypoints
+
+        self.matcher = immatch.__dict__[args["class"]](args)
+
         # move models to proper device - immatch reads cuda available and defaults to GPU
-        self.matcher.model.to(device) # SG
-        self.matcher.detector.model.to(device) # SP
+        self.matcher.model.to(device)  # SG
+        self.matcher.detector.model.to(device)  # SP
 
-        self.match_threshold = args['match_threshold']
+        self.match_threshold = args["match_threshold"]
         # print(self.matcher.detector.model.config)
 
     def _forward(self, img0, img1):
-        
+
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
 
         matches, kpts0, kpts1, _ = self.matcher.match_inputs_(img0_gray, img1_gray)
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
-        
+
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':kpts0, 'kpts1':kpts1, 
-                'desc0':None,'desc1': None}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": kpts0,
+            "kpts1": kpts1,
+            "desc0": None,
+            "desc1": None,
+        }
 
 
 class R2D2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        
-        with open(join(BASE_PATH, 'configs/r2d2.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['ckpt'] = join(BASE_PATH, args['ckpt'])
-        args['top_k'] = max_num_keypoints
-        
-        self.get_model_weights(args['ckpt'])
-        self.model = immatch.__dict__[args['class']](args)
-        
+        self.normalize = tfm.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
+
+        with open(join(BASE_PATH, "configs/r2d2.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
+        args["ckpt"] = join(BASE_PATH, args["ckpt"])
+        args["top_k"] = max_num_keypoints
+
+        self.get_model_weights(args["ckpt"])
+        self.model = immatch.__dict__[args["class"]](args)
+
         # move models to proper device - immatch reads cuda available and defaults to GPU
         self.model.model.to(device)
-        
-        self.match_threshold = args['match_threshold']
+
+        self.match_threshold = args["match_threshold"]
 
     @staticmethod
     def get_model_weights(model_path):
         if not os.path.isfile(model_path):
-            print('Getting R2D2 model weights...')
-            shutil.copytree(Path(f'{BASE_PATH}/third_party/r2d2/models'), Path(f'{BASE_PATH}/pretrained/r2d2'))
+            print("Getting R2D2 model weights...")
+            shutil.copytree(
+                Path(f"{BASE_PATH}/third_party/r2d2/models"),
+                Path(f"{BASE_PATH}/pretrained/r2d2"),
+            )
 
     def _forward(self, img0, img1):
-        
+
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)
         img1 = self.normalize(img1).unsqueeze(0).to(self.device)
 
@@ -210,7 +244,9 @@ class R2D2Matcher(BaseMatcher):
         kpts1, desc1 = self.model.extract_features(img1)
 
         # NN Match
-        match_ids, scores = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
+        match_ids, scores = self.model.mutual_nn_match(
+            desc0, desc1, threshold=self.match_threshold
+        )
         mkpts0 = kpts0[match_ids[:, 0], :2].cpu().numpy()
         mkpts1 = kpts1[match_ids[:, 1], :2].cpu().numpy()
 
@@ -218,52 +254,62 @@ class R2D2Matcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':to_numpy(kpts0), 'kpts1':to_numpy(kpts1), 
-                'desc0':to_numpy(desc0),'desc1': to_numpy(desc1)}
-    
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": to_numpy(kpts0),
+            "kpts1": to_numpy(kpts1),
+            "desc0": to_numpy(desc0),
+            "desc1": to_numpy(desc1),
+        }
+
 
 class D2netMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
-        
-        with open(join(BASE_PATH, 'configs/d2net.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['sat']
-        args['ckpt'] = join(BASE_PATH, args['ckpt'])
-        
-        if not os.path.isfile(args['ckpt']):
+
+        with open(join(BASE_PATH, "configs/d2net.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
+        args["ckpt"] = join(BASE_PATH, args["ckpt"])
+
+        if not os.path.isfile(args["ckpt"]):
             print("Downloading D2Net model weights...")
-            os.makedirs(os.path.dirname(args['ckpt']), exist_ok=True)
-            py3_wget.download_file('https://dusmanu.com/files/d2-net/d2_tf.pth',args['ckpt'])
-            
-        self.model = immatch.__dict__[args['class']](args)
-        self.match_threshold = args['match_threshold']
+            os.makedirs(os.path.dirname(args["ckpt"]), exist_ok=True)
+            py3_wget.download_file(
+                "https://dusmanu.com/files/d2-net/d2_tf.pth", args["ckpt"]
+            )
+
+        self.model = immatch.__dict__[args["class"]](args)
+        self.match_threshold = args["match_threshold"]
 
     @staticmethod
     def preprocess(img_tensor):
         image = img_tensor.cpu().numpy().astype(np.float32)
         # convert to 0-255
-        image = (image *255).astype(int).astype(np.float32)
+        image = (image * 255).astype(int).astype(np.float32)
         # RGB -> BGR
-        image = image[:: -1, :, :]
+        image = image[::-1, :, :]
         # Zero-center by mean pixel
         mean = np.array([103.939, 116.779, 123.68])
         image = image - mean.reshape([3, 1, 1])
 
         return image
-    
+
     def _forward(self, img0, img1):
-        
+
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
 
-        kpts0, desc0 = self.model.extract_features(img0) 
+        kpts0, desc0 = self.model.extract_features(img0)
         kpts1, desc1 = self.model.extract_features(img1)
-        
-        match_ids, _ = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
+
+        match_ids, _ = self.model.mutual_nn_match(
+            desc0, desc1, threshold=self.match_threshold
+        )
         mkpts0 = kpts0[match_ids[:, 0], :2]
         mkpts1 = kpts1[match_ids[:, 1], :2]
 
@@ -271,30 +317,36 @@ class D2netMatcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':kpts0, 'kpts1':kpts1, 
-                'desc0':desc0,'desc1': desc1}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": kpts0,
+            "kpts1": kpts1,
+            "desc0": desc0,
+            "desc1": desc1,
+        }
 
 
 class DogAffHardNNMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        
-        with open(join(BASE_PATH, 'configs/dogaffnethardnet.yml'), 'r') as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)['example']
-        args['npts'] = max_num_keypoints
 
-        self.model = immatch.__dict__[args['class']](args)
+        with open(join(BASE_PATH, "configs/dogaffnethardnet.yml"), "r") as f:
+            args = yaml.load(f, Loader=yaml.FullLoader)["example"]
+        args["npts"] = max_num_keypoints
+
+        self.model = immatch.__dict__[args["class"]](args)
         self.to_gray = tfm.Grayscale()
 
     @staticmethod
     def tensor_to_numpy_int(im_tensor):
         im_arr = im_tensor.cpu().numpy().transpose(1, 2, 0)
         im = cv2.cvtColor(im_arr, cv2.COLOR_RGB2GRAY)
-        im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
+        im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype("uint8")
 
         return im
 
@@ -311,9 +363,15 @@ class DogAffHardNNMatcher(BaseMatcher):
         # same for all methods, given the matched keypoints
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {'num_inliers':num_inliers,
-                'H': H,
-                'mkpts0':mkpts0, 'mkpts1':mkpts1,
-                'inliers0':inliers0, 'inliers1':inliers1,
-                'kpts0':None, 'kpts1':None, 
-                'desc0':None,'desc1': None}
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": None,
+            "kpts1": None,
+            "desc0": None,
+            "desc1": None,
+        }
