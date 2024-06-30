@@ -10,11 +10,11 @@ import torchvision.transforms as tfm
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/EfficientLoFTR')))
 
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
+from . import WEIGHTS_DIR
 
 class EfficientLoFTRMatcher(BaseMatcher):
     weights_src = 'https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view'
-    model_path = 'model_weights/eloftr_outdoor.ckpt'
-    divisible_size = 32
+    model_path = WEIGHTS_DIR.joinpath('eloftr_outdoor.ckpt')
     
     def __init__(self, device="cpu", cfg='full', **kwargs):
         super().__init__(device, **kwargs)
@@ -25,7 +25,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
         
         self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg =='full' else opt_default_cfg))
         
-        self.matcher.load_state_dict(torch.load(self.model_path)['state_dict'])
+        self.matcher.load_state_dict(torch.load(self.model_path, map_location=torch.device('cpu'))['state_dict'])
         self.matcher = reparameter(self.matcher).to(self.device).eval()
        
     def get_precision(self):
@@ -37,7 +37,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
         if not Path(EfficientLoFTRMatcher.model_path).is_file():
             print("Downloading eLoFTR outdoor... (takes a while)")
             gdown.download(EfficientLoFTRMatcher.weights_src,
-                                output=EfficientLoFTRMatcher.model_path,
+                                output=str(EfficientLoFTRMatcher.model_path),
                                 fuzzy=True)
 
     def preprocess(self, img):

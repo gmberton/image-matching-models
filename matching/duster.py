@@ -17,15 +17,16 @@ from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
 from matching.base_matcher import BaseMatcher
 from matching.utils import to_numpy
 
+from . import WEIGHTS_DIR
 
 class DusterMatcher(BaseMatcher):
-    model_path = 'model_weights/duster_vit_large.pth'    
+    model_path = WEIGHTS_DIR.joinpath('duster_vit_large.pth')
     vit_patch_size = 16
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
         self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        
+
         self.verbose = False
 
         self.download_weights()
@@ -35,7 +36,6 @@ class DusterMatcher(BaseMatcher):
     def download_weights():
         url = 'https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth'
 
-        os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DusterMatcher.model_path):
             print("Downloading Duster(ViT large)... (takes a while)")
             py3_wget.download_file(url, DusterMatcher.model_path)
@@ -47,7 +47,7 @@ class DusterMatcher(BaseMatcher):
         if not ((h % self.vit_patch_size) == 0):
             imsize = int(self.vit_patch_size*round(h / self.vit_patch_size, 0))            
             img = tfm.functional.resize(img, imsize, antialias=True)
-            
+
         _, new_h, new_w = img.shape
         if not ((new_w % self.vit_patch_size) == 0):
             safe_w = int(self.vit_patch_size*round(new_w / self.vit_patch_size, 0))

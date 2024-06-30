@@ -18,7 +18,7 @@ available_models = ['loftr', 'eloftr',
                     'roma','tiny-roma',
                     'dedode', 'steerers','dedode-kornia',
                     'sift-nn', 'orb-nn',
-                    # 'patch2pix', 'patch2pix_superglue', # not available until model weights provided
+                    'patch2pix', #'patch2pix_superglue', # not available until model weights provided
                     'superglue','r2d2','d2net',
                     'duster','doghardnet-nn',
                     'xfeat','xfeat-star',
