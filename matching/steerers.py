@@ -1,4 +1,3 @@
-import py3_wget
 import sys
 from pathlib import Path
 import torch
@@ -11,8 +10,6 @@ from matching.utils import to_numpy, resize_to_divisible
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))
 from DeDoDe import (
     dedode_detector_L,
-    dedode_detector_B,
-    dedode_descriptor_G,
     dedode_descriptor_B,
 )
 

@@ -11,12 +11,12 @@ sys.path.append(str(OMNI_THIRD_PARTY_PATH))  # allow access to dinov2
 import omniglue
 
 import py3_wget
-import tarfile, zipfile
+import tarfile
+import zipfile
 from kornia import tensor_to_image
 import torch
 import numpy as np
 from skimage.util import img_as_ubyte
-import py3_wget
 
 from matching import WEIGHTS_DIR
 

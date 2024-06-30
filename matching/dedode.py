@@ -3,7 +3,6 @@ import sys
 import torch
 import py3_wget
 from pathlib import Path
-import torch.nn.functional as F
 import torchvision.transforms as tfm
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))

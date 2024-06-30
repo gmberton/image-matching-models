@@ -25,7 +25,7 @@ try:
     from scripts.examples.common import get_model
     from silk.backbones.silk.silk import from_feature_coords_to_image_coords
     from silk.models.silk import matcher
-except:
+except ModuleNotFoundError:
     setup_silk()
     from scripts.examples.common import get_model
     from silk.backbones.silk.silk import from_feature_coords_to_image_coords

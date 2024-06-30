@@ -1,9 +1,7 @@
 import sys
 from pathlib import Path
-import math
 import torch
 import torchvision.transforms as tfm
-import torch.nn.functional as F
 from kornia.augmentation import PadTo
 from kornia.utils import tensor_to_image
 

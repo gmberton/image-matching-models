@@ -38,7 +38,7 @@ def main(args):
         out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {num_inliers} inliers after RANSAC. "
 
         if not args.no_viz:
-            axes = viz2d.plot_images([image0, image1])
+            viz2d.plot_images([image0, image1])
             viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
             viz2d.add_text(0, f"{len(mkpts1)} matches", fs=20)
             viz_path = args.out_dir / f"output_{i}.jpg"

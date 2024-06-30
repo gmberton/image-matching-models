@@ -4,11 +4,9 @@ import os
 import torchvision.transforms as tfm
 import py3_wget
 
-
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/duster")))
 from dust3r.inference import inference
 from dust3r.model import AsymmetricCroCo3DStereo
-from dust3r.utils.image import load_images
 from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid

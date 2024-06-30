@@ -16,7 +16,7 @@ def get_image_pairs_paths(inputs):
     if inputs.is_file():
         with open(inputs) as file:
             lines = file.read().splitlines()
-        pairs_of_paths = [l.strip().split(" ") for l in lines]
+        pairs_of_paths = [line.strip().split(" ") for line in lines]
         for pair in pairs_of_paths:
             if len(pair) != 2:
                 raise RuntimeError(f"{pair} should be a pair of paths")

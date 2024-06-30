@@ -77,11 +77,11 @@ class Patch2pixMatcher(BaseMatcher):
         if len(pos_ids) > 0:
             coarse_matches = coarse_matches[pos_ids]
             matches = fine_matches[pos_ids]
-            scores = fine_scores[pos_ids]
+            # scores = fine_scores[pos_ids]
         else:
             # Simply take all matches for this case
             matches = fine_matches
-            scores = fine_scores
+            # scores = fine_scores
 
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
