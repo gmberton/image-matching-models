@@ -6,7 +6,8 @@ import torch
 import os
 import torchvision.transforms as tfm
 import py3_wget
-from matching.base_matcher import BaseMatcher, to_numpy
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy, resize_to_divisible
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/DeDoDe')))
 from DeDoDe import dedode_detector_L, dedode_detector_B, dedode_descriptor_G, dedode_descriptor_B
@@ -117,21 +118,12 @@ class SteererMatcher(BaseMatcher):
         # ensure that the img has the proper w/h to be compatible with patch sizes
         _, h, w = img.shape
         orig_shape = h, w
-        imsize = h
-        if not ((h % self.dino_patch_size) == 0):
-            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
-            img = tfm.functional.resize(img, imsize, antialias=True)
-        _, new_h, new_w = img.shape
-        if not ((new_w % self.dino_patch_size) == 0):
-            safe_w = int(self.dino_patch_size*round(new_w / self.dino_patch_size, 0))
-            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+        img = resize_to_divisible(img, self.dino_patch_size)
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, orig_shape
 
     def _forward(self, img0, img1):
-        # the super-class already makes sure that img0,img1 have same resolution
-        # and that h == w
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
 

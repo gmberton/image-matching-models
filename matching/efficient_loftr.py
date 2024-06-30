@@ -1,5 +1,5 @@
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
+from matching.utils import to_numpy, resize_to_divisible
 import torch
 from pathlib import Path
 import gdown
@@ -42,20 +42,15 @@ class EfficientLoFTRMatcher(BaseMatcher):
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
-        imsize = h
-        if not ((h % EfficientLoFTRMatcher.divisible_size) == 0):
-            imsize = int(EfficientLoFTRMatcher.divisible_size*round(h / EfficientLoFTRMatcher.divisible_size, 0))
-            img = tfm.functional.resize(img, imsize, antialias=True)
-        _, new_h, new_w = img.shape
-        if not ((new_w % EfficientLoFTRMatcher.divisible_size) == 0):
-            safe_w = int(EfficientLoFTRMatcher.divisible_size*round(new_w / EfficientLoFTRMatcher.divisible_size, 0))
-            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
-            
+        img = resize_to_divisible(img, self.divisible_size)            
         return tfm.Grayscale()(img).unsqueeze(0).to(self.device), orig_shape
         
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
+        
+        print(img0.shape, img0_orig_shape)
+        print(img1.shape, img1_orig_shape)
 
         batch = {'image0': img0, 'image1': img1}
         if self.precision == 'mp' and self.device == 'cuda':

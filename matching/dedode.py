@@ -12,7 +12,7 @@ from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
+from matching.utils import to_numpy, resize_to_divisible
 from matching import WEIGHTS_DIR
 
 class DedodeMatcher(BaseMatcher):
@@ -57,14 +57,7 @@ class DedodeMatcher(BaseMatcher):
         # ensure that the img has the proper w/h to be compatible with patch sizes
         _, h, w = img.shape
         orig_shape = h, w
-        imsize = h
-        if not ((h % self.dino_patch_size) == 0):
-            imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
-            img = tfm.functional.resize(img, imsize, antialias=True)
-        _, new_h, new_w = img.shape
-        if not ((new_w % self.dino_patch_size) == 0):
-            safe_w = int(self.dino_patch_size*round(new_w / self.dino_patch_size, 0))
-            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+        img = resize_to_divisible(img, self.dino_patch_size)
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
         return img, orig_shape

@@ -15,9 +15,9 @@ from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
 
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
+from matching.utils import to_numpy, resize_to_divisible
 
-from . import WEIGHTS_DIR
+from matching import WEIGHTS_DIR
 
 class DusterMatcher(BaseMatcher):
     model_path = WEIGHTS_DIR.joinpath('duster_vit_large.pth')
@@ -43,15 +43,8 @@ class DusterMatcher(BaseMatcher):
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
-        imsize = h
-        if not ((h % self.vit_patch_size) == 0):
-            imsize = int(self.vit_patch_size*round(h / self.vit_patch_size, 0))            
-            img = tfm.functional.resize(img, imsize, antialias=True)
-
-        _, new_h, new_w = img.shape
-        if not ((new_w % self.vit_patch_size) == 0):
-            safe_w = int(self.vit_patch_size*round(new_w / self.vit_patch_size, 0))
-            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+        
+        img = resize_to_divisible(img, self.vit_patch_size)
 
         img = self.normalize(img).unsqueeze(0)
 

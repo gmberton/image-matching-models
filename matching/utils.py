@@ -3,6 +3,7 @@ import logging
 from pathlib import Path
 import numpy as np
 import torch
+import torchvision.transforms as tfm
 
 logger = logging.getLogger()
 logger.setLevel(31)  # Avoid printing useless low-level logs
@@ -88,3 +89,22 @@ def to_px_coords(pts: np.ndarray | torch.Tensor, height: int, width: int) -> np.
     pts[:, 1] *= height
     
     return pts
+
+def resize_to_divisible(img:torch.Tensor, divisible_by:int=14) -> torch.Tensor:
+    """Resize to be divisible by a factor. Useful for ViT based models. 
+
+    Args:
+        img (torch.Tensor): img as tensor, in (*, H, W) order
+        divisible_by (int, optional): factor to make sure img is divisible by. Defaults to 14.
+
+    Returns:
+        torch.Tensor: img tensor with divisible shape
+    """
+    h, w = img.shape[-2:]
+    
+    divisible_h = round(h / divisible_by) * divisible_by
+    divisible_w = round(w / divisible_by) * divisible_by
+    img = tfm.functional.resize(img, [divisible_h, divisible_w], antialias=True)
+    
+    return img
+    

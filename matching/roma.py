@@ -80,11 +80,11 @@ class TinyRomaMatcher(BaseMatcher):
         return self.normalize(img).unsqueeze(0)
         
     def _forward(self, img0, img1):
-        _, h0, w0 = img0.shape
-        _, h1, w1 = img1.shape
-
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
+        
+        h0, w0 = img0.shape[-2:]
+        h1, w1 = img1.shape[-2:]
 
         # batch = {"im_A": img0.to(self.device), "im_B": img1.to(self.device)}
         warp, certainty  = self.roma_model.match(img0, img1, batched=False)
