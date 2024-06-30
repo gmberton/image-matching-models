@@ -63,7 +63,7 @@ def to_normalized_coords(pts: np.ndarray | torch.Tensor, height: int, width: int
     # normalize kpt coords from px space to [0,1]
     # assume pts are in x,y order
     assert pts.shape[-1] == 2, f'input to `to_normalized_coords` should be shape (N, 2), input is shape {pts.shape}'
-    pts = to_numpy(pts)
+    pts = to_numpy(pts).astype(float)
     pts[:, 0] /= width
     pts[:, 1] /= height
     

@@ -14,6 +14,7 @@ from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 class EfficientLoFTRMatcher(BaseMatcher):
     weights_src = 'https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view'
     model_path = 'model_weights/eloftr_outdoor.ckpt'
+    divisible_size = 32
     
     def __init__(self, device="cpu", cfg='full', **kwargs):
         super().__init__(device, **kwargs)
@@ -40,14 +41,25 @@ class EfficientLoFTRMatcher(BaseMatcher):
                                 fuzzy=True)
 
     def preprocess(self, img):
-        return tfm.Grayscale()(img).unsqueeze(0).to(self.device)
+        _, h, w = img.shape
+        orig_shape = h, w
+        imsize = h
+        if not ((h % EfficientLoFTRMatcher.divisible_size) == 0):
+            imsize = int(EfficientLoFTRMatcher.divisible_size*round(h / EfficientLoFTRMatcher.divisible_size, 0))
+            img = tfm.functional.resize(img, imsize, antialias=True)
+        _, new_h, new_w = img.shape
+        if not ((new_w % EfficientLoFTRMatcher.divisible_size) == 0):
+            safe_w = int(EfficientLoFTRMatcher.divisible_size*round(new_w / EfficientLoFTRMatcher.divisible_size, 0))
+            img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
+            
+        return tfm.Grayscale()(img).unsqueeze(0).to(self.device), orig_shape
         
     def _forward(self, img0, img1):
-        img0 = self.preprocess(img0)
-        img1 = self.preprocess(img1)
-        
+        img0, img0_orig_shape = self.preprocess(img0)
+        img1, img1_orig_shape = self.preprocess(img1)
+
         batch = {'image0': img0, 'image1': img1}
-        if self.precision == 'mp':
+        if self.precision == 'mp' and self.device == 'cuda':
             with torch.autocast(enabled=True, device_type='cuda'):
                 self.matcher(batch)
         else:
@@ -55,6 +67,11 @@ class EfficientLoFTRMatcher(BaseMatcher):
             
         mkpts0 = to_numpy(batch['mkpts0_f'])
         mkpts1 = to_numpy(batch['mkpts1_f'])
+        
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:] 
+        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
+        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
+
         
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
         return {'num_inliers':num_inliers,

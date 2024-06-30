@@ -58,8 +58,8 @@ class DusterMatcher(BaseMatcher):
         return img, orig_shape
 
     def _forward(self, img0, img1):
-        img0, img0_shape = self.preprocess(img0)
-        img1, img1_shape = self.preprocess(img1)
+        img0, img0_orig_shape = self.preprocess(img0)
+        img1, img1_orig_shape = self.preprocess(img1)
          
         images = [{'img': img0, 'idx': 0, 'instance': 0}, {'img': img1, 'idx': 1, 'instance': 1}]
         pairs = make_pairs(images, scene_graph='complete', prefilter=None, symmetrize=True)
@@ -80,6 +80,13 @@ class DusterMatcher(BaseMatcher):
 
         mkpts1 = pts2d_list[1][reciprocal_in_P2]
         mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
+
+        
+        # duster sometimes requires reshaping an image to fit vit patch size evenly, so we need to 
+        # rescale kpts to the original img
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:] 
+        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
+        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints

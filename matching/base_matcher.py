@@ -47,6 +47,21 @@ class BaseMatcher(torch.nn.Module):
         img = tfm.functional.rotate(img, rot_angle)
         return img
     
+    def rescale_coords(self, pts: np.ndarray | torch.Tensor, h_orig:int, w_orig:int, h_new:int, w_new:int) -> np.ndarray:
+        """Rescale kpts coordinates from one img size to another
+
+        Args:
+            pts (np.ndarray | torch.Tensor): (N,2) array of kpts
+            h_orig (int): height of original img
+            w_orig (int): width of original img
+            h_new (int): height of new img
+            w_new (int): width of new img
+
+        Returns:
+            np.ndarray: (N,2) array of kpts in new img coordinates
+        """
+        return to_px_coords(to_normalized_coords(pts, h_new, w_new), h_orig, w_orig)
+    
     @staticmethod
     def find_homography(points1: np.ndarray | torch.Tensor, points2: np.ndarray | torch.Tensor, reproj_thresh:int=DEFAULT_REPROJ_THRESH, num_iters:int=DEFAULT_RANSAC_ITERS, ransac_conf:float=DEFAULT_RANSAC_CONF):
         assert points1.shape == points2.shape

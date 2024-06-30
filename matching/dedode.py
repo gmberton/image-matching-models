@@ -56,6 +56,7 @@ class DedodeMatcher(BaseMatcher):
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes
         _, h, w = img.shape
+        orig_shape = h, w
         imsize = h
         if not ((h % self.dino_patch_size) == 0):
             imsize = int(self.dino_patch_size*round(h / self.dino_patch_size, 0))
@@ -66,12 +67,11 @@ class DedodeMatcher(BaseMatcher):
             img = tfm.functional.resize(img, (new_h, safe_w), antialias=True)
 
         img = self.normalize(img).unsqueeze(0).to(self.device)
-        return img, imsize
+        return img, orig_shape
     
-    @torch.inference_mode()
     def _forward(self, img0, img1):
-        img0, imsize = self.preprocess(img0)
-        img1, imsize = self.preprocess(img1)
+        img0, img0_orig_shape = self.preprocess(img0)
+        img1, img1_orig_shape = self.preprocess(img1)
         
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
@@ -90,7 +90,14 @@ class DedodeMatcher(BaseMatcher):
             P_A = P_0, P_B = P_1, normalize = True, inv_temp=20, 
             threshold = self.threshold # Increasing threshold -> fewer matches, fewer outliers
         )
-        mkpts0, mkpts1 = self.matcher.to_pixel_coords(matches_0, matches_1, imsize, imsize, imsize, imsize)
+        
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
+        mkpts0, mkpts1 = self.matcher.to_pixel_coords(matches_0, matches_1, H0, W0, H1, W1)
+
+        # dedode sometimes requires reshaping an image to fit vit patch size evenly, so we need to 
+        # rescale kpts to the original img
+        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
+        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints
