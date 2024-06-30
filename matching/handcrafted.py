@@ -1,8 +1,9 @@
 import cv2
 import numpy as np
+import torch
 
-from matching.base_matcher import BaseMatcher, to_numpy
-
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 
 class HandcraftedBaseMatcher(BaseMatcher):
     """
@@ -15,8 +16,9 @@ class HandcraftedBaseMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
     @staticmethod
-    def tensor_to_numpy_int(im_tensor):
-        im_arr = im_tensor.cpu().numpy().transpose(1, 2, 0)
+    def preprocess(im_tensor: torch.Tensor) -> np.ndarray:
+        # convert tensors to np 255-based for openCV
+        im_arr = to_numpy(im_tensor).transpose(1, 2, 0)
         im = cv2.cvtColor(im_arr, cv2.COLOR_RGB2GRAY)
         im = cv2.normalize(im, None, 0, 255, cv2.NORM_MINMAX).astype('uint8')
 
@@ -27,8 +29,8 @@ class HandcraftedBaseMatcher(BaseMatcher):
         "det_descr" is instantiated by the subclasses.
         """
         # convert tensors to numpy 255-based for OpenCV
-        img0 = self.tensor_to_numpy_int(img0)
-        img1 = self.tensor_to_numpy_int(img1)
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)
 
         # find the keypoints and descriptors with SIFT
         kp0, des0 = self.det_descr.detectAndCompute(img0, None)

@@ -1,4 +1,5 @@
-from matching.base_matcher import BaseMatcher, to_numpy
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 import torch
 from pathlib import Path
 import gdown
@@ -8,10 +9,7 @@ import torchvision.transforms as tfm
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/EfficientLoFTR')))
 
-
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
-
-
 
 class EfficientLoFTRMatcher(BaseMatcher):
     weights_src = 'https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view'

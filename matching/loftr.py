@@ -1,7 +1,7 @@
 from kornia.feature import LoFTR
 import torchvision.transforms as tfm
-from matching.base_matcher import BaseMatcher, to_numpy
-
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 
 class LoftrMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):

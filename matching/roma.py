@@ -34,7 +34,7 @@ class RomaMatcher(BaseMatcher):
         
         self.pad = PadTo((pad_dim, pad_dim), keepdim=True)
         
-    def preprocess(self, img, pad=False):
+    def preprocess(self, img:torch.Tensor, pad=False) ->Image:
         if isinstance(img, torch.Tensor) and img.dtype == (torch.float):
             img = torch.clamp(img, -1, 1)
         if pad:
@@ -76,21 +76,21 @@ class TinyRomaMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.roma_model.train(False)
         
+    def preprocess(self, img):
+        return self.normalize(img).unsqueeze(0)
+        
     def _forward(self, img0, img1):
         _, h0, w0 = img0.shape
         _, h1, w1 = img1.shape
 
-        img0 = self.normalize(img0).unsqueeze(0)
-        img1 = self.normalize(img1).unsqueeze(0)
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)
 
         # batch = {"im_A": img0.to(self.device), "im_B": img1.to(self.device)}
-        
-        warp, certainty  = self.roma_model.match(img0.to(self.device), img1.to(self.device), batched=False)
+        warp, certainty  = self.roma_model.match(img0, img1, batched=False)
                 
         matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
-        mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(
-            matches, h0, w0, h1, w1
-        )
+        mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
         # process_matches is implemented by the parent BaseMatcher, it is the
         # same for all methods, given the matched keypoints

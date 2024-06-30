@@ -14,7 +14,8 @@ from dust3r.image_pairs import make_pairs
 from dust3r.cloud_opt import global_aligner, GlobalAlignerMode
 from dust3r.utils.geometry import find_reciprocal_matches, xy_grid
 
-from matching.base_matcher import BaseMatcher, to_numpy
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 
 
 class DusterMatcher(BaseMatcher):

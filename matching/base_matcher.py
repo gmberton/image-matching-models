@@ -7,12 +7,7 @@ import torchvision.transforms as tfm
 from copy import deepcopy
 
 from matching import get_matcher
-
-def to_numpy(x):
-    if isinstance(x, torch.Tensor):
-        return x.cpu().numpy()
-    if isinstance(x, np.ndarray):
-        return x
+from matching.utils import to_normalized_coords, to_px_coords, to_numpy
 
 class BaseMatcher(torch.nn.Module):
     """

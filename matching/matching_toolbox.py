@@ -12,8 +12,8 @@ import torchvision.transforms as tfm
 BASE_PATH = str(Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox")
 sys.path.append(str(Path(BASE_PATH)))
 import immatch
-from matching.base_matcher import BaseMatcher, to_numpy
-
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 
 class Patch2pixMatcher(BaseMatcher):
     url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
@@ -36,13 +36,15 @@ class Patch2pixMatcher(BaseMatcher):
     def download_weights(ckpt, ncn_ckpt):
         print("Downloading Patch2Pix model weights...")
         os.makedirs(os.path.dirname(ckpt), exist_ok=True)
-        urllib.request.urlretrieve(Patch2pixMatcher.url1, ckpt)
-        urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
+        py3_wget.download_file(Patch2pixMatcher.url1, ckpt)
+        py3_wget.download_file(Patch2pixMatcher.url2, ncn_ckpt)
+        
+    def preprocess(self, img):
+        return self.normalize(img).unsqueeze(0)
 
     def _forward(self, img0, img1):
-
-        img0 = self.normalize(img0).unsqueeze(0).to(self.device)
-        img1 = self.normalize(img1).unsqueeze(0).to(self.device)
+        img0 = self.preprocess(img0)
+        img1 = self.preprocess(img1)
 
         # Fine matches
         fine_matches, fine_scores, coarse_matches = self.matcher.model.predict_fine(

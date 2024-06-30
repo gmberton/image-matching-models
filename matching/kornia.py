@@ -1,6 +1,7 @@
 from kornia.feature import DeDoDe, LightGlue
 
-from matching.base_matcher import BaseMatcher, to_numpy
+from matching.base_matcher import BaseMatcher
+from matching.utils import to_numpy
 from matching import get_version
 import torch
 import kornia
@@ -47,8 +48,8 @@ class DeDoDeLightGlue(BaseMatcher):
         matches = self.lg(match_input)
         
         matching_idxs = matches['matches'][0]  
-        mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]].cpu().numpy()
-        mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]].cpu().numpy()
+        mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]]
+        mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]]
         
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
