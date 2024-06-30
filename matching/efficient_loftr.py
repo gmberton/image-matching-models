@@ -10,11 +10,12 @@ import torchvision.transforms as tfm
 sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/EfficientLoFTR')))
 
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
-from . import WEIGHTS_DIR
+from matching import WEIGHTS_DIR
 
 class EfficientLoFTRMatcher(BaseMatcher):
     weights_src = 'https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view'
     model_path = WEIGHTS_DIR.joinpath('eloftr_outdoor.ckpt')
+    divisible_size = 32
     
     def __init__(self, device="cpu", cfg='full', **kwargs):
         super().__init__(device, **kwargs)
@@ -32,8 +33,6 @@ class EfficientLoFTRMatcher(BaseMatcher):
         return 'fp16'
      
     def download_weights(self):
-        model_dir = Path("model_weights")
-        model_dir.mkdir(exist_ok=True)
         if not Path(EfficientLoFTRMatcher.model_path).is_file():
             print("Downloading eLoFTR outdoor... (takes a while)")
             gdown.download(EfficientLoFTRMatcher.weights_src,

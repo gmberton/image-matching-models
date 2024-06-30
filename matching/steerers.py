@@ -15,7 +15,7 @@ sys.path.append(str(Path(__file__).parent.parent.joinpath('third_party/Steerers'
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
 from rotation_steerers.matchers.max_similarity import MaxSimilarityMatcher, ContinuousMaxSimilarityMatcher
 
-from . import WEIGHTS_DIR
+from matching import WEIGHTS_DIR
 
 class SteererMatcher(BaseMatcher):
     detector_path_L = WEIGHTS_DIR.joinpath('dedode_detector_L.pth')
@@ -60,13 +60,11 @@ class SteererMatcher(BaseMatcher):
         if not os.path.isfile(SteererMatcher.descriptor_path_B_C4):
             print("Downloading dedode_descriptor_B_C4.pth")
             py3_wget.download_file(
-            py3_wget.download_file(
                 'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_descriptor_setting_C.pth',
                 SteererMatcher.descriptor_path_B_C4
             )
         if not os.path.isfile(SteererMatcher.descriptor_path_B_SO2):
             print("Downloading dedode_descriptor_B_S02.pth")
-            py3_wget.download_file(
             py3_wget.download_file(
                 'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_descriptor_setting_B.pth',
                 SteererMatcher.descriptor_path_B_SO2
@@ -75,18 +73,15 @@ class SteererMatcher(BaseMatcher):
         if not os.path.isfile(SteererMatcher.steerer_path_C):
             print("Downloading B_C4_Perm_steerer_setting_C.pth")
             py3_wget.download_file(
-            py3_wget.download_file(
                 'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_C4_Perm_steerer_setting_C.pth',
                 SteererMatcher.steerer_path_C
             )
         if not os.path.isfile(SteererMatcher.steerer_path_B):
             print("Downloading B_SO2_Spread_steerer_setting_B.pth")
             py3_wget.download_file(
-            py3_wget.download_file(
                 'https://github.com/georg-bn/rotation-steerers/releases/download/release-2/B_SO2_Spread_steerer_setting_B.pth',
                 SteererMatcher.steerer_path_B
             )
-
 
     def build_matcher(self, steerer_type='C8', device='cpu'):
         if steerer_type == 'C4':

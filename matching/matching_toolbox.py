@@ -8,6 +8,7 @@ import os
 import shutil
 import torchvision.transforms as tfm
 import gdown
+from os.path import join
 
 BASE_PATH = Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox"
 sys.path.append(str(Path(BASE_PATH)))
