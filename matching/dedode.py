@@ -1,5 +1,4 @@
-
-import urllib.request
+import py3_wget
 
 import sys
 from pathlib import Path
@@ -43,15 +42,16 @@ class DedodeMatcher(BaseMatcher):
         os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DedodeMatcher.detector_path):
             print("Downloading dedode_detector_L.pth")
-            urllib.request.urlretrieve(detector_url, DedodeMatcher.detector_path)
+            py3_wget.download_file(detector_url, DedodeMatcher.detector_path)
 
         if not os.path.isfile(DedodeMatcher.detector_v2_path):
             print("Downloading dedode_descriptor_L-v2.pth")
-            urllib.request.urlretrieve(detector_v2_url, DedodeMatcher.detector_v2_path)
+            py3_wget.download_file(detector_v2_url, DedodeMatcher.detector_v2_path)
 
         if not os.path.isfile(DedodeMatcher.descriptor_path):
             print("Downloading dedode_descriptor_G.pth")
-            urllib.request.urlretrieve(descr_url, DedodeMatcher.descriptor_path)
+            py3_wget.download_file(descr_url, DedodeMatcher.descriptor_path)
+
             
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes

@@ -1,7 +1,7 @@
 
 import sys
 from pathlib import Path
-import urllib.request
+import py3_wget
 from matching.base_matcher import BaseMatcher, to_numpy
 from kornia.color import rgb_to_grayscale
 import shutil
@@ -55,7 +55,7 @@ class SilkMatcher(BaseMatcher):
         ckpt_path = SilkMatcher.CKPT_DIR.joinpath(ckpt_name)
         if not ckpt_path.exists():
             print(f"Downloading {ckpt_name}")
-            urllib.request.urlretrieve(SilkMatcher.CKPT_DOWNLOAD_SRC  + ckpt_name, ckpt_path)
+            py3_wget.download_file(SilkMatcher.CKPT_DOWNLOAD_SRC  + ckpt_name, ckpt_path)
 
     def preprocess(self, img):
         # expects float img (0-1) with channel dim

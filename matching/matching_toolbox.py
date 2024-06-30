@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 import yaml
-import urllib.request
+import py3_wget
 import cv2
 import numpy as np
 import os
@@ -228,9 +228,7 @@ class D2netMatcher(BaseMatcher):
         if not os.path.isfile(args['ckpt']):
             print("Downloading D2Net model weights...")
             os.makedirs(os.path.dirname(args['ckpt']), exist_ok=True)
-            urllib.request.urlretrieve(
-                'https://dusmanu.com/files/d2-net/d2_tf.pth',
-                args['ckpt'])
+            py3_wget.download_file('https://dusmanu.com/files/d2-net/d2_tf.pth',args['ckpt'])
             
         self.model = immatch.__dict__[args['class']](args)
         self.match_threshold = args['match_threshold']

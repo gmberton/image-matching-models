@@ -10,7 +10,7 @@ sys.path.append(str(OMNI_SRC_PATH))
 sys.path.append(str(OMNI_THIRD_PARTY_PATH)) #allow access to dinov2 
 import omniglue
 
-import urllib.request
+import py3_wget
 import tarfile, zipfile
 from kornia import tensor_to_image
 import torch
@@ -47,7 +47,7 @@ class OmniglueMatcher(BaseMatcher):
         if not OmniglueMatcher.OG_WEIGHTS_PATH.exists():
             # OmniglueMatcher.OG_WEIGHTS_PATH.mkdir(exist_ok=True)
             print('Downloading omniglue matcher weights...')
-            urllib.request.urlretrieve('https://storage.googleapis.com/omniglue/og_export.zip', OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix('.zip'))
+            py3_wget.download_file('https://storage.googleapis.com/omniglue/og_export.zip', OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix('.zip'))
             with zipfile.ZipFile(OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix('.zip')) as zip_f:
                 zip_f.extractall(path=WEIGHTS_DIR)
             
@@ -56,14 +56,14 @@ class OmniglueMatcher(BaseMatcher):
             # OmniglueMatcher.SP_WEIGHTS_PATH.mkdir(exist_ok=True)
             print('Downloading omniglue superpoint weights...')
        
-            urllib.request.urlretrieve('https://github.com/rpautrat/SuperPoint/raw/master/pretrained_models/sp_v6.tgz', OmniglueMatcher.SP_WEIGHTS_PATH.with_suffix('.tgz'))
+            py3_wget.download_file('https://github.com/rpautrat/SuperPoint/raw/master/pretrained_models/sp_v6.tgz', OmniglueMatcher.SP_WEIGHTS_PATH.with_suffix('.tgz'))
             tar = tarfile.open(OmniglueMatcher.SP_WEIGHTS_PATH.with_suffix('.tgz'))
             tar.extractall(path=WEIGHTS_DIR)
             tar.close()
         if not OmniglueMatcher.DINOv2_PATH.exists():
             print('Downloading omniglue DINOv2 weights...')
-
-            urllib.request.urlretrieve('https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth', OmniglueMatcher.DINOv2_PATH)
+            py3_wget.download_file('https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth', OmniglueMatcher.DINOv2_PATH)
+        
         return NotImplementedError
         
     def preprocess(self, img):
@@ -74,7 +74,6 @@ class OmniglueMatcher(BaseMatcher):
         return img_as_ubyte(np.clip(img, 0, 1))
     
     def _forward(self, img0, img1):
-        
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
         
