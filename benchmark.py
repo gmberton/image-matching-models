@@ -31,8 +31,8 @@ def benchmark(matcher, num_iters=1, img_size=512, device='cuda'):
     
     for _ in range(num_iters):
         for pair in get_img_pairs():
-            img0 = matcher.image_loader(pair[0], resize=img_size).to(device)
-            img1 = matcher.image_loader(pair[1], resize=img_size).to(device)
+            img0 = matcher.load_image(pair[0], resize=img_size).to(device)
+            img1 = matcher.load_image(pair[1], resize=img_size).to(device)
             
             start = time.time()
             result = matcher(img0, img1)

@@ -5,11 +5,8 @@ import argparse
 import matplotlib
 from pathlib import Path
 
-sys.path.append(str(Path('third_party/LightGlue')))
-from lightglue import viz2d
-
-from util import get_image_pairs_paths
-from matching import get_matcher
+from matching.utils import get_image_pairs_paths
+from matching import get_matcher, viz2d
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, 'ps1'):
@@ -27,8 +24,8 @@ def main(args):
     pairs_of_paths = get_image_pairs_paths(args.input)
     for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
         
-        image0 = matcher.image_loader(img0_path, resize=image_size).to(args.device)
-        image1 = matcher.image_loader(img1_path, resize=image_size).to(args.device)
+        image0 = matcher.load_image(img0_path, resize=image_size).to(args.device)
+        image1 = matcher.load_image(img1_path, resize=image_size).to(args.device)
         with torch.inference_mode():
             result = matcher(image0, image1)
             num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inliers0'], result['inliers1']

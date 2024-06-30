@@ -5,6 +5,9 @@ import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
 from copy import deepcopy
+import warnings
+from pathlib import Path
+from typing import Tuple
 
 from matching import get_matcher
 from matching.utils import to_normalized_coords, to_px_coords, to_numpy
@@ -30,15 +33,22 @@ class BaseMatcher(torch.nn.Module):
         self.ransac_reproj_thresh = kwargs.get('ransac_reproj_thresh', BaseMatcher.DEFAULT_REPROJ_THRESH)
 
     @staticmethod
-    def image_loader(path, resize, rot_angle=0):
+    def image_loader(path: str | Path, resize: int | Tuple, rot_angle:float=0):
+        warnings.warn('`image_loader` is replaced by `load_image` and will be removed in a future release.', DeprecationWarning)
+        return BaseMatcher.load_image(path, resize, rot_angle)
+    
+    @staticmethod
+    def load_image(path: str | Path, resize: int | Tuple = None, rot_angle:float=0)-> torch.Tensor:
         if isinstance(resize, int):
             resize = (resize, resize)
-        img = tfm.Resize(resize, antialias=True)(tfm.ToTensor()(Image.open(path).convert("RGB")))
+        img = tfm.ToTensor()(Image.open(path).convert("RGB"))
+        if resize is not None:
+            img = tfm.Resize(resize, antialias=True)(img)
         img = tfm.functional.rotate(img, rot_angle)
         return img
     
     @staticmethod
-    def find_homography(points1, points2, reproj_thresh=DEFAULT_REPROJ_THRESH, num_iters=DEFAULT_RANSAC_ITERS, ransac_conf=DEFAULT_RANSAC_CONF):
+    def find_homography(points1: np.ndarray | torch.Tensor, points2: np.ndarray | torch.Tensor, reproj_thresh:int=DEFAULT_REPROJ_THRESH, num_iters:int=DEFAULT_RANSAC_ITERS, ransac_conf:float=DEFAULT_RANSAC_CONF):
         assert points1.shape == points2.shape
         assert points1.shape[1] == 2
         points1, points2 = to_numpy(points1), to_numpy(points2)
@@ -48,7 +58,7 @@ class BaseMatcher(torch.nn.Module):
         inliers_mask = inliers_mask[:, 0]
         return H, inliers_mask.astype(bool)
     
-    def process_matches(self, mkpts0, mkpts1):
+    def process_matches(self, mkpts0: np.ndarray, mkpts1: np.ndarray):
         if len(mkpts0) < 5:
             return 0, None, mkpts0, mkpts1
 
@@ -59,22 +69,35 @@ class BaseMatcher(torch.nn.Module):
 
         return num_inliers, H, inlier_mkpts0, inlier_mkpts1
     
+    def preprocess(self, img: torch.Tensor) -> torch.Tensor:
+        """Image preprocessing for each matcher. Some matchers require grayscale, normalization, etc.
+        Applied to each input img independently
+        
+        Default preprocessing is none
+
+        Args:
+            img (torch.Tensor): input image (before preprocessing)
+
+        Returns:
+            img (torch.Tensor): img after preprocessing
+        """
+        return img
         
     @torch.inference_mode()
-    def forward(self, img0: torch.Tensor, img1:torch.Tensor):
+    def forward(self, img0: torch.Tensor | str | Path, img1:torch.Tensor | str | Path):
         """
         All sub-classes implement the following interface:
         
         Parameters
         ----------
-        img0 : torch.tensor (C x H x W)
-        img1 : torch.tensor (C x H x W)
+        img0 : torch.tensor (C x H x W) | str | Path
+        img1 : torch.tensor (C x H x W) | str | Path
 
         Returns
         -------
         dict with keys: ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
         
-        num_inliers : int, number of inliers after RANSAC, i.e. num(mkpts0)
+        num_inliers : int, number of inliers after RANSAC, i.e. num(inliers0)
         H : np.array (3 x 3), the homography matrix to map mkpts0 to mkpts1
         mkpts0 : np.ndarray (N x 2), keypoints from img0 that match mkpts1 (pre-RANSAC)
         mkpts1 : np.ndarray (N x 2), keypoints from img1 that match mkpts0 (pre-RANSAC)
@@ -86,13 +109,17 @@ class BaseMatcher(torch.nn.Module):
         desc1 : np.ndarray (N x 2), all descriptors from img1
         """
         # Take as input a pair of images (not a batch)
+        if isinstance(img0, (str, Path)):
+            img0 = BaseMatcher.load_image(img0)
+        if isinstance(img1, (str, Path)):
+            img1 = BaseMatcher.load_image(img1)
+            
         assert isinstance(img0, torch.Tensor)
         assert isinstance(img1, torch.Tensor)
         
         img0 = img0.to(self.device)
         img1 = img1.to(self.device)
         
-        # The _forward() is implemented by the children classes
         return self._forward(img0, img1)
 
 

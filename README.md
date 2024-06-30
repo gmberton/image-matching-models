@@ -54,8 +54,8 @@ device = 'cuda' # 'cpu'
 matcher = get_matcher('superglue', device=device)  # Choose any of our ~20 matchers listed below
 img_size = 512
 
-img0 = matcher.image_loader('path/to/img0.png', resize=img_size)
-img1 = matcher.image_loader('path/to/img1.png', resize=img_size)
+img0 = matcher.load_image('path/to/img0.png', resize=img_size)
+img1 = matcher.load_image('path/to/img1.png', resize=img_size)
 
 result = matcher(img0, img1)
 num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inliers0'], result['inliers1']
