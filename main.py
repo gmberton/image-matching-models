@@ -5,7 +5,7 @@ import matplotlib
 from pathlib import Path
 
 from matching.utils import get_image_pairs_paths
-from matching import get_matcher, viz2d
+from matching import get_matcher, viz2d, available_models
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, "ps1"):
@@ -65,7 +65,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Argument parser",
+        description="Image Matching Models",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     # Choose matcher
@@ -73,25 +73,7 @@ if __name__ == "__main__":
         "--matcher",
         type=str,
         default="sift-lg",
-        choices=[
-            "aliked-lg",
-            "d2net",
-            "dedode",
-            "disk-lg",
-            "doghardnet-lg",
-            "doghardnet-nn",
-            "duster",
-            "loftr",
-            "orb-nn",
-            "patch2pix",
-            "r2d2",
-            "roma",
-            "sift-lg",
-            "sift-nn",
-            "steerers",
-            "superglue",
-            "superpoint-lg",
-        ],
+        choices=available_models,
         help="choose your matcher",
     )
 
