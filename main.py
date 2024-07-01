@@ -84,7 +84,6 @@ if __name__ == "__main__":
             "loftr",
             "orb-nn",
             "patch2pix",
-            "patch2pix_superglue",
             "r2d2",
             "roma",
             "sift-lg",

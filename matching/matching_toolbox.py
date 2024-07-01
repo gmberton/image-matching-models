@@ -8,7 +8,6 @@ import os
 import shutil
 import torchvision.transforms as tfm
 import gdown
-from os.path import join
 
 BASE_PATH = Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox"
 sys.path.append(str(Path(BASE_PATH)))
@@ -103,70 +102,12 @@ class Patch2pixMatcher(BaseMatcher):
         }
 
 
-class SuperGluePatch2pixMatcher(BaseMatcher):
-    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
-        super().__init__(device, **kwargs)
-        self.normalize = tfm.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
-        self.to_gray = tfm.Grayscale()
-
-        with open(join(BASE_PATH, "configs/patch2pix_superglue.yml"), "r") as f:
-            args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
-        args["coarse"]["max_keypoints"] = max_num_keypoints
-        args["ckpt"] = join(BASE_PATH, args["ckpt"])
-        args["ncn_ckpt"] = join(BASE_PATH, args["ncn_ckpt"])
-
-        if not os.path.isfile(args["ckpt"]):
-            Patch2pixMatcher.download_weights(args["ckpt"], args["ncn_ckpt"])
-
-        self.matcher = immatch.__dict__[args["class"]](args)
-        self.match_threshold = args["match_threshold"]
-
-        cargs = args["coarse"]
-        self.cname = cargs["name"]
-        self.coarse_matcher = immatch.__dict__[self.cname](cargs)
-
-    def _forward(self, img0, img1):
-        img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
-        img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
-        img0 = self.normalize(img0).unsqueeze(0).to(self.device)
-        img1 = self.normalize(img1).unsqueeze(0).to(self.device)
-
-        coarse_match_res = self.coarse_matcher.match_inputs_(img0_gray, img1_gray)
-        coarse_matches = coarse_match_res[0]
-        # Patch2Pix refinement
-        refined_matches, _, _ = self.matcher.model.refine_matches(
-            img0, img1, coarse_matches, io_thres=self.match_threshold
-        )
-
-        mkpts0 = refined_matches[:, :2]
-        mkpts1 = refined_matches[:, 2:4]
-
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,
-            "desc0": None,
-            "desc1": None,
-        }
-
-
 class SuperGlueMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.to_gray = tfm.Grayscale()
 
-        with open(join(BASE_PATH, "configs/superglue.yml"), "r") as f:
+        with open(BASE_PATH.joinpath("configs/superglue.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
         args["max_keypoints"] = max_num_keypoints
 
@@ -213,9 +154,9 @@ class R2D2Matcher(BaseMatcher):
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )
 
-        with open(join(BASE_PATH, "configs/r2d2.yml"), "r") as f:
+        with open(BASE_PATH.joinpath("configs/r2d2.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
-        args["ckpt"] = join(BASE_PATH, args["ckpt"])
+        args["ckpt"] = BASE_PATH.joinpath(args["ckpt"])
         args["top_k"] = max_num_keypoints
 
         self.get_model_weights(args["ckpt"])
@@ -272,9 +213,9 @@ class D2netMatcher(BaseMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        with open(join(BASE_PATH, "configs/d2net.yml"), "r") as f:
+        with open(BASE_PATH.joinpath("configs/d2net.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
-        args["ckpt"] = join(BASE_PATH, args["ckpt"])
+        args["ckpt"] = BASE_PATH.joinpath(args["ckpt"])
 
         if not os.path.isfile(args["ckpt"]):
             print("Downloading D2Net model weights...")
@@ -335,7 +276,7 @@ class DogAffHardNNMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        with open(join(BASE_PATH, "configs/dogaffnethardnet.yml"), "r") as f:
+        with open(BASE_PATH.joinpath("configs/dogaffnethardnet.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["example"]
         args["npts"] = max_num_keypoints
 

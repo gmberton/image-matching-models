@@ -29,7 +29,7 @@ available_models = [
     "dedode-kornia",
     "sift-nn",
     "orb-nn",
-    "patch2pix",  #'patch2pix_superglue', # not available until model weights provided
+    "patch2pix",
     "superglue",
     "r2d2",
     "d2net",
@@ -129,13 +129,6 @@ def get_matcher(
         from matching import matching_toolbox
 
         return matching_toolbox.Patch2pixMatcher(device, *args, **kwargs)
-
-    elif matcher_name == "patch2pix_superglue":
-        from matching import matching_toolbox
-
-        return matching_toolbox.SuperGluePatch2pixMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
 
     elif matcher_name == "superglue":
         from matching import matching_toolbox
