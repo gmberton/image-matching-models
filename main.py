@@ -25,16 +25,15 @@ def main(args):
     pairs_of_paths = get_image_pairs_paths(args.input)
     for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
 
-        image0 = matcher.load_image(img0_path, resize=image_size).to(args.device)
-        image1 = matcher.load_image(img1_path, resize=image_size).to(args.device)
-        with torch.inference_mode():
-            result = matcher(image0, image1)
-            num_inliers, H, mkpts0, mkpts1 = (
-                result["num_inliers"],
-                result["H"],
-                result["inliers0"],
-                result["inliers1"],
-            )
+        image0 = matcher.load_image(img0_path, resize=image_size)
+        image1 = matcher.load_image(img1_path, resize=image_size)
+        result = matcher(image0, image1)
+        num_inliers, H, mkpts0, mkpts1 = (
+            result["num_inliers"],
+            result["H"],
+            result["inliers0"],
+            result["inliers1"],
+        )
         out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {num_inliers} inliers after RANSAC. "
 
         if not args.no_viz:
