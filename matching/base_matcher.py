@@ -98,6 +98,7 @@ class BaseMatcher(torch.nn.Module):
 
     def process_matches(self, mkpts0: np.ndarray, mkpts1: np.ndarray):
         if len(mkpts0) < 5:
+            # TODO should this be a 4 instead of 5?
             return 0, None, mkpts0, mkpts1
 
         H, inliers_mask = self.find_homography(

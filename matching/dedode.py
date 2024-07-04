@@ -121,7 +121,7 @@ class DedodeMatcher(BaseMatcher):
         return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1
 
 
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+# TODO why imports here?
 from kornia.feature import DeDoDe
 import kornia
 from matching import get_version
