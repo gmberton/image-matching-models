@@ -59,25 +59,10 @@ class HandcraftedBaseMatcher(BaseMatcher):
         mkpts0 = np.array(mkpts0, dtype=np.float32)
         mkpts1 = np.array(mkpts1, dtype=np.float32)
 
-        kp0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
-        kp1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
+        keypoints_0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
+        keypoints_1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": kp0,
-            "kpts1": kp1,
-            "desc0": des0,
-            "desc1": des1,
-        }
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, des0, des1
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):

@@ -164,7 +164,24 @@ class BaseMatcher(torch.nn.Module):
         img0 = img0.to(self.device)
         img1 = img1.to(self.device)
 
-        return self._forward(img0, img1)
+        # self._forward() is implemented by the children modules
+        mkpts0, mkpts1, keypoints_0, keypoints_1, descriptors_0, descriptors_1 = self._forward(img0, img1)
+
+        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
+        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+
+        return {
+            "num_inliers": num_inliers,
+            "H": H,
+            "mkpts0": mkpts0,
+            "mkpts1": mkpts1,
+            "inliers0": inliers0,
+            "inliers1": inliers1,
+            "kpts0": to_numpy(keypoints_0),
+            "kpts1": to_numpy(keypoints_1),
+            "desc0": to_numpy(descriptors_0),
+            "desc1": to_numpy(descriptors_1),
+        }
 
 
 class EnsembleMatcher(BaseMatcher):
@@ -178,23 +195,8 @@ class EnsembleMatcher(BaseMatcher):
     def _forward(self, img0, img1):
         all_mkpts0, all_mkpts1 = [], []
         for matcher in self.matchers:
-            result = matcher(img0, img1)
-            all_mkpts0.append(deepcopy(result["mkpts0"]))
-            all_mkpts1.append(deepcopy(result["mkpts1"]))
+            mkpts0, mkpts1, _, _, _, _ = matcher(img0, img1)
+            all_mkpts0.append(deepcopy(mkpts0))
+            all_mkpts1.append(deepcopy(mkpts1))
         all_mkpts0, all_mkpts1 = np.concatenate(all_mkpts0), np.concatenate(all_mkpts1)
-
-        num_inliers, H, inliers0, inliers1 = self.process_matches(
-            all_mkpts0, all_mkpts1
-        )
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": all_mkpts0,
-            "mkpts1": all_mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,
-            "desc0": None,
-            "desc1": None,
-        }
+        return all_mkpts0, all_mkpts1, None, None, None, None

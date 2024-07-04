@@ -84,22 +84,8 @@ class Patch2pixMatcher(BaseMatcher):
 
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,
-            "desc0": None,
-            "desc1": None,
-        }
+
+        return mkpts0, mkpts1, None, None, None, None
 
 
 class SuperGlueMatcher(BaseMatcher):
@@ -129,22 +115,7 @@ class SuperGlueMatcher(BaseMatcher):
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": kpts0,
-            "kpts1": kpts1,
-            "desc0": None,
-            "desc1": None,
-        }
+        return mkpts0, mkpts1, kpts0, kpts1, None, None
 
 
 class R2D2Matcher(BaseMatcher):
@@ -191,22 +162,7 @@ class R2D2Matcher(BaseMatcher):
         mkpts0 = kpts0[match_ids[:, 0], :2].cpu().numpy()
         mkpts1 = kpts1[match_ids[:, 1], :2].cpu().numpy()
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(kpts0),
-            "kpts1": to_numpy(kpts1),
-            "desc0": to_numpy(desc0),
-            "desc1": to_numpy(desc1),
-        }
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
 
 
 class D2netMatcher(BaseMatcher):
@@ -254,22 +210,7 @@ class D2netMatcher(BaseMatcher):
         mkpts0 = kpts0[match_ids[:, 0], :2]
         mkpts1 = kpts1[match_ids[:, 1], :2]
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": kpts0,
-            "kpts1": kpts1,
-            "desc0": desc0,
-            "desc1": desc1,
-        }
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
 
 
 class DogAffHardNNMatcher(BaseMatcher):
@@ -300,19 +241,4 @@ class DogAffHardNNMatcher(BaseMatcher):
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,
-            "desc0": None,
-            "desc1": None,
-        }
+        return mkpts0, mkpts1, None, None, None, None
