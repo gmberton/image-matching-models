@@ -4,6 +4,9 @@ import torch
 import py3_wget
 from pathlib import Path
 import torchvision.transforms as tfm
+from kornia.feature import DeDoDe
+import kornia
+from matching import get_version
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))
 
@@ -11,7 +14,7 @@ from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible
+from matching.utils import resize_to_divisible
 from matching import WEIGHTS_DIR
 
 
@@ -119,12 +122,6 @@ class DedodeMatcher(BaseMatcher):
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
         return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1
-
-
-# TODO why imports here?
-from kornia.feature import DeDoDe
-import kornia
-from matching import get_version
 
 
 class DedodeKorniaMatcher(BaseMatcher):

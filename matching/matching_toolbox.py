@@ -13,7 +13,7 @@ BASE_PATH = Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox
 sys.path.append(str(Path(BASE_PATH)))
 import immatch
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
+from matching.utils import to_numpy, resize_to_divisible
 from matching import WEIGHTS_DIR
 
 
@@ -27,6 +27,7 @@ class Patch2pixMatcher(BaseMatcher):
     )
 
     model_path = WEIGHTS_DIR.joinpath("patch2pix_pretrained.pth")
+    divisible_by = 32
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
@@ -57,6 +58,7 @@ class Patch2pixMatcher(BaseMatcher):
         # urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
 
     def preprocess(self, img):
+        img = resize_to_divisible(img, self.divisible_by)
         return self.normalize(img).unsqueeze(0)
 
     def _forward(self, img0, img1):
