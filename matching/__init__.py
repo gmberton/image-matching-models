@@ -6,6 +6,7 @@ warnings due to unused modules.
 
 import sys
 from pathlib import Path
+from .utils import supress_stdout
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 sys.path.append(str(Path(__file__).parent.parent / "third_party/LightGlue"))
@@ -49,7 +50,7 @@ def get_version(pkg):
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
-
+@supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):

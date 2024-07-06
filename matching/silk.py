@@ -101,17 +101,9 @@ class SilkMatcher(BaseMatcher):
         mkpts0 = mkpts0[:, [1, 0]]
         mkpts1 = mkpts1[:, [1, 0]]
 
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(sparse_positions_0[0][:, :2])[:, [1, 0]],
-            "kpts1": to_numpy(sparse_positions_1[0][:, :2])[:, [1, 0]],
-            "desc0": to_numpy(sparse_descriptors_0[0]),
-            "desc1": to_numpy(sparse_descriptors_1[0]),
-        }
+        kpts0 = to_numpy(sparse_positions_0[0][:, :2])[:, [1, 0]]
+        kpts1 = to_numpy(sparse_positions_1[0][:, :2])[:, [1, 0]]
+        desc0 = to_numpy(sparse_descriptors_0[0])
+        desc1 = to_numpy(sparse_descriptors_1[0])
+
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1

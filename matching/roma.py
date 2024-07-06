@@ -6,12 +6,10 @@ from kornia.augmentation import PadTo
 from kornia.utils import tensor_to_image
 
 BASE_PATH = str(Path(__file__).parent.parent.joinpath("third_party/RoMa"))
-sys.path.insert(
-    0, BASE_PATH
-)  # due to some users potentially having roma from pip, need to insert rather than append this path to get priority in the namespace
-from roma import roma_outdoor, tiny_roma_v1_outdoor
+sys.path.append(BASE_PATH)
+from romatch import roma_outdoor, tiny_roma_v1_outdoor
 
-from matching.base_matcher import BaseMatcher, to_numpy
+from matching.base_matcher import BaseMatcher
 from PIL import Image
 from skimage.util import img_as_ubyte
 
@@ -22,9 +20,7 @@ class RomaMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.roma_model = roma_outdoor(
-            device=device, amp_dtype=torch.float32 if device == "cpu" else torch.float16
-        )
+        self.roma_model = roma_outdoor(device=device)
         self.max_keypoints = max_num_keypoints
         self.normalize = tfm.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
@@ -54,29 +50,14 @@ class RomaMatcher(BaseMatcher):
         w0, h0 = img0.size
         w1, h1 = img1.size
 
-        warp, certainty = self.roma_model.match(img0, img1, batched=False)
+        warp, certainty = self.roma_model.match(img0, img1, batched=False, device=self.device)
 
         matches, certainty = self.roma_model.sample(
             warp, certainty, num=self.max_keypoints
         )
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,  # dense matcher, no kpts / descs
-            "desc0": None,
-            "desc1": None,
-        }
+        return mkpts0, mkpts1, None, None, None, None
 
 
 class TinyRomaMatcher(BaseMatcher):
@@ -108,20 +89,4 @@ class TinyRomaMatcher(BaseMatcher):
         )
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,  # dense matcher, no kpts / descs
-            "desc0": None,
-            "desc1": None,
-        }
+        return mkpts0, mkpts1, None, None, None, None

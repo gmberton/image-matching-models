@@ -85,20 +85,8 @@ class GIM_DKM(BaseMatcher):
         )
 
         # b_ids = torch.where(mconf[None])[0]
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,  # already returns matched kpts, so no raw kpt / descs
-            "desc0": None,
-            "desc1": None,
-        }
+
+        return mkpts0, mkpts1, None, None, None, None
 
 
 class GIM_LG(BaseMatcher):
@@ -243,17 +231,4 @@ class GIM_LG(BaseMatcher):
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         # mconf = torch.cat(pred['scores'])
 
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(kpts0),
-            "kpts1": to_numpy(kpts1),
-            "desc0": to_numpy(desc0),
-            "desc1": to_numpy(desc1),
-        }
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1

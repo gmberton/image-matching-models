@@ -4,6 +4,9 @@ import torch
 import py3_wget
 from pathlib import Path
 import torchvision.transforms as tfm
+from kornia.feature import DeDoDe
+import kornia
+from matching import get_version
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))
 
@@ -11,7 +14,7 @@ from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible
+from matching.utils import resize_to_divisible
 from matching import WEIGHTS_DIR
 
 
@@ -118,27 +121,7 @@ class DedodeMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(keypoints_0),
-            "kpts1": to_numpy(keypoints_1),
-            "desc0": to_numpy(description_0),
-            "desc1": to_numpy(description_1),
-        }
-
-
-from kornia.feature import DeDoDe
-import kornia
-from matching import get_version
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1
 
 
 class DedodeKorniaMatcher(BaseMatcher):
@@ -197,19 +180,4 @@ class DedodeKorniaMatcher(BaseMatcher):
             threshold=self.threshold,  # Increasing threshold -> fewer matches, fewer outliers
         )
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(keypoints_0),
-            "kpts1": to_numpy(keypoints_1),
-            "desc0": to_numpy(description_0),
-            "desc1": to_numpy(description_1),
-        }
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1

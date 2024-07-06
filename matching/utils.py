@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import torchvision.transforms as tfm
+import os, contextlib
 
 logger = logging.getLogger()
 logger.setLevel(31)  # Avoid printing useless low-level logs
@@ -116,3 +117,10 @@ def resize_to_divisible(img: torch.Tensor, divisible_by: int = 14) -> torch.Tens
     img = tfm.functional.resize(img, [divisible_h, divisible_w], antialias=True)
 
     return img
+
+def supress_stdout(func):
+    def wrapper(*a, **ka):
+        with open(os.devnull, 'w') as devnull:
+            with contextlib.redirect_stdout(devnull):
+                return func(*a, **ka)
+    return wrapper

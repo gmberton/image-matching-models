@@ -39,8 +39,8 @@ class HandcraftedBaseMatcher(BaseMatcher):
         kp1, des1 = self.det_descr.detectAndCompute(img1, None)
 
         # BFMatcher with default params
-        bf = cv2.BFMatcher()
-        raw_matches = bf.knnMatch(des0, des1, k=2)
+        
+        raw_matches = self.bf.knnMatch(des0, des1, k=self.k_neighbors)
 
         # Apply ratio test
         good = []
@@ -59,25 +59,10 @@ class HandcraftedBaseMatcher(BaseMatcher):
         mkpts0 = np.array(mkpts0, dtype=np.float32)
         mkpts1 = np.array(mkpts1, dtype=np.float32)
 
-        kp0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
-        kp1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
+        keypoints_0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
+        keypoints_1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
 
-        # process_matches is implemented by the parent BaseMatcher, it is the
-        # same for all methods, given the matched keypoints
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": kp0,
-            "kpts1": kp1,
-            "desc0": des0,
-            "desc1": des1,
-        }
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, des0, des1
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):
@@ -87,7 +72,9 @@ class SiftNNMatcher(HandcraftedBaseMatcher):
         super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.SIFT_create(max_num_keypoints)
-
+        
+        self.bf = cv2.BFMatcher()
+        self.k_neighbors = 2
 
 class OrbNNMatcher(HandcraftedBaseMatcher):
     def __init__(
@@ -96,3 +83,6 @@ class OrbNNMatcher(HandcraftedBaseMatcher):
         super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.ORB_create(max_num_keypoints)
+        self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
+        self.k_neighbors = 2
+
