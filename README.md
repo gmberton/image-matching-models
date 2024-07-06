@@ -64,14 +64,14 @@ num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inl
 
 You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
 
-```
+```bash
 python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
 ```
 
 Where `sift-lg` will use `SIFT + LightGlue`.
 
 **You can choose any of the following methods:
-loftr, [sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, roma, dedode, steerers, [sift, orb, doghardnet]-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, gim-dkm, xfeat, omniglue**
+loftr, [sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, roma, tiny-roma, dedode, steerers, [sift, orb, doghardnet]-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, gim-dkm, xfeat, xfeat-star, omniglue**
 
 The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
 
@@ -118,32 +118,7 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 <summary>
   
 ### Adding a new method
-    
-</summary>
-  
-To add a new method:
-1. Create a new file in the `matching` folder called `[method.py]`
-2. If the method requires external modules, add them to `./third_party` with `git submodule add`: for example, I've used this command to add the LightGlue module which is automatically downloaded when using `--recursive`
-
-```
-git submodule add https://github.com/cvg/LightGlue third_party/LightGlue
-```
-This command automatically modifies `.gitmodules` (and modifying it manually doesn't work).
-
-3. Add the method by subclassing `BaseMatcher` and implementing `_forward`, which takes two image tensors as input and returns a dict with keys ['num_inliers','H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', desc1']. The value of any key may be 0, if that model does not produce that output, but they key must exist. 
-<br></br>You may also want to implement `preprocess`, `download_weights`, and anything else necessary to make the model easy to run. 
-
-4. Open `__init__.py` and add the model name (all lowercase) to the `available_models` list.
-<br></br>Add an `elif` case to `get_matcher()` with this model name, following the template from the other matchers. 
-
-5. Test your model!
-
-Note: as authors update their model repos, consider updating the submodule reference here using the below:
-To update a submodule to the head of the remote, run 
-```
-git submodule update --remote third_party/[submodule_name]
-```
-</details>
+See [CONTRIBUTING.md] for details. 
 
 <details>
 <summary>

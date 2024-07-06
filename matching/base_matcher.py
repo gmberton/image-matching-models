@@ -97,8 +97,7 @@ class BaseMatcher(torch.nn.Module):
         return H, inliers_mask.astype(bool)
 
     def process_matches(self, mkpts0: np.ndarray, mkpts1: np.ndarray):
-        if len(mkpts0) < 5:
-            # TODO should this be a 4 instead of 5?
+        if len(mkpts0) < 4:
             return 0, None, mkpts0, mkpts1
 
         H, inliers_mask = self.find_homography(
@@ -129,7 +128,7 @@ class BaseMatcher(torch.nn.Module):
         return img
 
     @torch.inference_mode()
-    def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path):
+    def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path) -> dict:
         """
         All sub-classes implement the following interface:
 
@@ -166,7 +165,7 @@ class BaseMatcher(torch.nn.Module):
         img1 = img1.to(self.device)
 
         # self._forward() is implemented by the children modules
-        mkpts0, mkpts1, keypoints_0, keypoints_1, descriptors_0, descriptors_1 = self._forward(img0, img1)
+        mkpts0, mkpts1, keypoints0, keypoints1, descriptors0, descriptors1 = self._forward(img0, img1)
 
         mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
         num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
@@ -178,10 +177,10 @@ class BaseMatcher(torch.nn.Module):
             "mkpts1": mkpts1,
             "inliers0": inliers0,
             "inliers1": inliers1,
-            "kpts0": to_numpy(keypoints_0),
-            "kpts1": to_numpy(keypoints_1),
-            "desc0": to_numpy(descriptors_0),
-            "desc1": to_numpy(descriptors_1),
+            "kpts0": to_numpy(keypoints0),
+            "kpts1": to_numpy(keypoints1),
+            "desc0": to_numpy(descriptors0),
+            "desc1": to_numpy(descriptors1),
         }
 
 
@@ -196,8 +195,8 @@ class EnsembleMatcher(BaseMatcher):
     def _forward(self, img0, img1):
         all_mkpts0, all_mkpts1 = [], []
         for matcher in self.matchers:
-            mkpts0, mkpts1, _, _, _, _ = matcher(img0, img1)
-            all_mkpts0.append(deepcopy(mkpts0))
-            all_mkpts1.append(deepcopy(mkpts1))
+            mkpts0, mkpts1, _, _, _, _ = matcher._forward(img0, img1)
+            all_mkpts0.append(to_numpy(mkpts0))
+            all_mkpts1.append(to_numpy(mkpts1))
         all_mkpts0, all_mkpts1 = np.concatenate(all_mkpts0), np.concatenate(all_mkpts1)
         return all_mkpts0, all_mkpts1, None, None, None, None
