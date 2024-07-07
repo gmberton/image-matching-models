@@ -114,11 +114,9 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 
 \* LightGlue model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
 ##
-<details>
-<summary>
-  
+
 ### Adding a new method
-See [CONTRIBUTING.md] for details. 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details. 
 
 <details>
 <summary>
