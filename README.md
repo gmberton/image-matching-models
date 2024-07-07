@@ -51,7 +51,7 @@ You can use any of the matchers with
 from matching import get_matcher
 
 device = 'cuda' # 'cpu'
-matcher = get_matcher('superglue', device=device)  # Choose any of our ~20 matchers listed below
+matcher = get_matcher('superglue', device=device)  # Choose any of our ~20+ matchers listed below
 img_size = 512
 
 img0 = matcher.load_image('path/to/img0.png', resize=img_size)
@@ -67,13 +67,18 @@ You can also run this as a standalone script, which will perform inference on th
 ```bash
 python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
 ```
-
-Where `sift-lg` will use `SIFT + LightGlue`.
-
-**You can choose any of the following methods:
-loftr, [sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, roma, tiny-roma, dedode, steerers, [sift, orb, doghardnet]-nn, patch2pix, patch2pix_superglue, superglue, r2d2, d2net, duster, gim-dkm, xfeat, xfeat-star, omniglue**
+where `sift-lg` will use `SIFT + LightGlue`.
 
 The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
+
+---
+You can choose any of the following methods (input to `get_matcher()`):
+
+**Dense**: ```roma, tiny-roma, duster```
+
+**Semi-dense**: ```loftr, eloftr, xfeat-star```
+
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue```
 
 All the matchers can run on GPU, and most of them can run both on GPU or CPU. A few can't run on CPU.
 
@@ -85,7 +90,7 @@ To use on your images you have three options:
 2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
 3. import the matcher package into a script/notebook and use from there, as in the example above
 
-## Models
+## Model Details
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
@@ -98,15 +103,15 @@ To use on your images you have three options:
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218+(LG) | ❌ |
 | Steerers (arxiv '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
 | LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/pdf/2306.13643.pdf) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
-| SiLK (ICCV '23) | [Official](https://github.com/facebookresearch/silk) | [arxiv](https://arxiv.org/abs/2304.06194) | 0.694 | 3.733 |
 | LoFTR (CVPR '21) | [Official](https://github.com/zju3dv/LoFTR) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.LoFTR) | [arxiv](https://arxiv.org/pdf/2104.00680.pdf) | 0.722 | 2.36 | 
-| Patch2Pix (CVPR '21) | [Official](https://github.com/GrumpyZhou/patch2pix)  / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox) | [arxiv](https://arxiv.org/abs/2012.01909) | -- | -- | 
+| Patch2Pix (CVPR '21) | [Official](https://github.com/GrumpyZhou/patch2pix)  / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox) | [arxiv](https://arxiv.org/abs/2012.01909) | 0.145 | 4.97 | 
 | SuperGlue (CVPR '20) | [Official](https://github.com/magicleap/SuperGluePretrainedNetwork) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/superglue.py) | [arxiv](https://arxiv.org/abs/1911.11763)  | 0.0894 | 2.178 | 
 | R2D2 (NeurIPS '19) | [Official](https://github.com/naver/r2d2) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/r2d2.py) | [arxiv](https://arxiv.org/abs/1906.06195) | 0.429 | 6.79 | 
 | D2Net (CVPR '19) | [Official](https://github.com/mihaidusmanu/d2-net) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/d2net.py) | [arxiv](https://arxiv.org/abs/1905.03561) | 0.600 | 1.324 | 
 | SIFT- NN (IJCV '04)| [OpenCV](https://docs.opencv.org/4.x/d7/d60/classcv_1_1SIFT.html) | [pdf](https://www.cs.ubc.ca/~lowe/papers/ijcv04.pdf) |0.124 | 0.117 | 
 | ORB- NN (ICCV '11)| [OpenCV](https://docs.opencv.org/3.4/db/d95/classcv_1_1ORB.html) | [ResearchGate](https://www.researchgate.net/publication/221111151_ORB_an_efficient_alternative_to_SIFT_or_SURF) |0.088 | 0.092 |
 | DoGHardNet (NeurIPS '17) | [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/dogaffnethardnet.py) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.HardNet) | [arxiv](https://arxiv.org/abs/1705.10872v4) | 2.697 (+NN) / 0.526 +(LG) | 2.438(+NN) / 4.528 (+LG) |
+<!--| SiLK (ICCV '23) | [Official](https://github.com/facebookresearch/silk) | [arxiv](https://arxiv.org/abs/2304.06194) | 0.694 | 3.733 | -->
 
 Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are based on the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main) (IMT). LoFTR and DeDoDe-Lightglue are from [Kornia](https://github.com/kornia/kornia). Other models are based on the offical repos above.
 
@@ -137,11 +142,12 @@ This repo is not optimized for speed, but for usability. The idea is to use this
 </summary>
   
 Special thanks to the authors of the respective works that are included in this repo (see their papers above). Additional thanks to [@GrumpyZhou](https://github.com/GrumpyZhou) for developing and maintaining the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main), which we have wrapped in this repo, and the [maintainers](https://github.com/kornia/kornia?tab=readme-ov-file#community) of [Kornia](https://github.com/kornia/kornia).
+
   
 </details>
 
 ## Cite
-This repo was created as part of the EarthMatch paper.
+This repo was created as part of the EarthMatch paper. Please consider citing EarthMatch work if this repo is helpful to you!
 
 ```
 @InProceedings{Berton_2024_EarthMatch,
