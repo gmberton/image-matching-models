@@ -6,6 +6,7 @@ warnings due to unused modules.
 
 import sys
 from pathlib import Path
+from .utils import supress_stdout
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 sys.path.append(str(Path(__file__).parent.parent / "third_party/LightGlue"))

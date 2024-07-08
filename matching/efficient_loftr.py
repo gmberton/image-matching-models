@@ -60,9 +60,6 @@ class EfficientLoFTRMatcher(BaseMatcher):
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
 
-        print(img0.shape, img0_orig_shape)
-        print(img1.shape, img1_orig_shape)
-
         batch = {"image0": img0, "image1": img1}
         if self.precision == "mp" and self.device == "cuda":
             with torch.autocast(enabled=True, device_type="cuda"):
@@ -77,16 +74,4 @@ class EfficientLoFTRMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": None,
-            "kpts1": None,
-            "desc0": None,
-            "desc1": None,
-        }
+        return mkpts0, mkpts1, None, None, None, None

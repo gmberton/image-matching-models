@@ -1,6 +1,7 @@
 from matching import get_matcher, available_models
 from pathlib import Path
 from argparse import ArgumentParser
+import cv2
 import time
 from tqdm.auto import tqdm
 import torch
@@ -9,6 +10,7 @@ import numpy as np
 
 def parse_args():
     parser = ArgumentParser()
+    parser.add_argument("--task", type=str, default='benchmark', help='run benchmark or unit tests')
     parser.add_argument(
         "--models",
         type=str,
@@ -49,22 +51,47 @@ def get_img_pairs():
     return pairs
 
 
-def benchmark(matcher, num_iters=1, img_size=512, device="cuda"):
-    runtime = []
+def test_H_est(matcher, img_size=500):
+    """Given a matcher, compute a homography of two images with known ground
+    truth and its error. The error for sift-lg is 0.002 for img_size=500. So it
+    should roughly be below 0.01."""
+    
+    img0_path = "assets/example_test/warped.jpg"
+    img1_path = "assets/example_test/original.jpg"
+    ground_truth = np.array([[0.1500, 0.3500], [0.9500, 0.1500], [0.9000, 0.7000], [0.2500, 0.7000]])
+    
+    image0 = matcher.load_image(img0_path, resize=img_size)
+    image1 = matcher.load_image(img1_path, resize=img_size)
+    result = matcher(image0, image1)
+    
+    pred_homog = np.array([[0, 0], [img_size, 0], [img_size, img_size], [0, img_size]], dtype=np.float32)
+    pred_homog = np.reshape(pred_homog, (4, 1, 2))
+    prediction = cv2.perspectiveTransform(pred_homog, result["H"])[:, 0] / img_size
+    
+    max_error = np.abs(ground_truth - prediction).max()
+    return max_error
 
+
+def test(matcher, img_sizes=[500, 200], error_thresh=0.05):
+    passing = True
+    for img_size in img_sizes:
+        error = test_H_est(matcher, img_size=img_size)
+        if error > error_thresh:
+            passing = False
+            raise RuntimeError(f"Large homography error in matcher (size={img_size} px): {error}")
+    
+    return passing
+
+def benchmark(matcher, num_iters=1, img_size=512):
+    runtime = []
+    
     for _ in range(num_iters):
         for pair in get_img_pairs():
-            img0 = matcher.load_image(pair[0], resize=img_size).to(device)
-            img1 = matcher.load_image(pair[1], resize=img_size).to(device)
+            img0 = matcher.load_image(pair[0], resize=img_size)
+            img1 = matcher.load_image(pair[1], resize=img_size)
 
             start = time.time()
-            result = matcher(img0, img1)
-            for k, v in result.items():
-                if v is None:
-                    continue
-                if not isinstance(v, (np.ndarray, int, np.int32)):
-                    print(f"{k} is not an int or np array. is {type(v), v}")
-                    raise TypeError()
+            _ = matcher(img0, img1)
 
             duration = time.time() - start
 
@@ -73,12 +100,7 @@ def benchmark(matcher, num_iters=1, img_size=512, device="cuda"):
     return runtime, np.mean(runtime)
 
 
-if __name__ == "__main__":
-    args = parse_args()
-    import warnings
-
-    warnings.filterwarnings("ignore")
-
+def main(args):
     print(args)
     if args.task == 'benchmark':
         with open("runtime_results.txt", "w") as f:
@@ -86,7 +108,8 @@ if __name__ == "__main__":
                 try:
                     matcher = get_matcher(model, device=args.device)
                     runtimes, avg_runtime = benchmark(
-                        matcher, num_iters=1, img_size=args.img_size)
+                        matcher, num_iters=args.num_iters, img_size=args.img_size
+                    )
                     runtime_str = f"{model}, {avg_runtime}"
                     f.write(runtime_str + "\n")
                     tqdm.write(runtime_str)

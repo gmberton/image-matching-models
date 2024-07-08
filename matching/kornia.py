@@ -76,17 +76,4 @@ class DeDoDeLightGlue(BaseMatcher):
         mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]]
         mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]]
 
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
-        return {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(kpts0),
-            "kpts1": to_numpy(kpts1),
-            "desc0": to_numpy(desc1),
-            "desc1": to_numpy(desc1),
-        }
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
