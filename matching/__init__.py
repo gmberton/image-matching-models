@@ -17,6 +17,7 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 available_models = [
     "loftr",
     "eloftr",
+    "se2loftr",
     "sift-lg",
     "superpoint-lg",
     "disk-lg",
@@ -49,7 +50,7 @@ def get_version(pkg):
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
-
+@supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):
@@ -66,6 +67,11 @@ def get_matcher(
         from matching import efficient_loftr
 
         return efficient_loftr.EfficientLoFTRMatcher(device, *args, **kwargs)
+
+    if matcher_name == "se2loftr":
+        from matching import se2loftr
+
+        return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
 
     elif matcher_name == "sift-lg":
         from matching import lightglue

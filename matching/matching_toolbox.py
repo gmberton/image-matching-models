@@ -40,6 +40,7 @@ class Patch2pixMatcher(BaseMatcher):
         args["ckpt"] = str(Patch2pixMatcher.model_path)
         print(args)
         self.matcher = immatch.__dict__[args["class"]](args)
+        self.matcher.model.to(device)
         self.normalize = tfm.Normalize(
             mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
         )

@@ -36,11 +36,13 @@ packages = ["matching"]
 [project.optional-dependencies]
 silk = [
         "hydra-core",
-        "loguru",
         "pytorch-lightning==1.5.2",
         "jax",
         "jaxlib"
         ]
+
+loftrs = ["pytorch-lightning==1.5.2"
+            ]
 
 omniglue = ["tensorflow"
             ] 

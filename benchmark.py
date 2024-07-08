@@ -80,15 +80,41 @@ if __name__ == "__main__":
     warnings.filterwarnings("ignore")
 
     print(args)
-    with open("runtime_results.txt", "w") as f:
-        for model in tqdm(args.models):
-            try:
-                matcher = get_matcher(model, device=args.device)
-                runtimes, avg_runtime = benchmark(
-                    matcher, num_iters=1, img_size=args.img_size, device=args.device
-                )
-                runtime_str = f"{model}, {avg_runtime}"
-                f.write(runtime_str + "\n")
-                tqdm.write(runtime_str)
-            except Exception as e:
-                tqdm.write(f"Error with {model}: {e}")
+    if args.task == 'benchmark':
+        with open("runtime_results.txt", "w") as f:
+            for model in tqdm(args.models):
+                try:
+                    matcher = get_matcher(model, device=args.device)
+                    runtimes, avg_runtime = benchmark(
+                        matcher, num_iters=1, img_size=args.img_size)
+                    runtime_str = f"{model}, {avg_runtime}"
+                    f.write(runtime_str + "\n")
+                    tqdm.write(runtime_str)
+                except Exception as e:
+                    tqdm.write(f"Error with {model}: {e}")    
+
+    elif args.task == 'test':
+        with open("test_results.txt", 'w') as f:
+            test_str = 'Matcher, Passing Tests'
+            f.write(test_str + "\n")
+            tqdm.write(test_str)
+
+            for model in tqdm(args.models):
+                try:
+                    matcher = get_matcher(model, device=args.device)
+
+                    passing = test(matcher)
+                    test_str = f"{model}, {passing}"
+                    f.write(test_str + "\n")
+                    tqdm.write(test_str)
+                except Exception as e:
+                    tqdm.write(f"Error with {model}: {e}") 
+                    
+                       
+if __name__ == "__main__":
+    args = parse_args()
+    import warnings
+
+    warnings.filterwarnings("ignore")
+    print(f'Running with args: {args}')
+    main(args)

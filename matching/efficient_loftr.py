@@ -54,7 +54,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
         _, h, w = img.shape
         orig_shape = h, w
         img = resize_to_divisible(img, self.divisible_size)
-        return tfm.Grayscale()(img).unsqueeze(0).to(self.device), orig_shape
+        return tfm.Grayscale()(img).unsqueeze(0), orig_shape
 
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
