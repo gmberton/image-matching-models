@@ -17,7 +17,7 @@ from matching.utils import to_numpy, resize_to_divisible
 from matching import WEIGHTS_DIR
 
 
-class DusterMatcher(BaseMatcher):
+class Dust3rMatcher(BaseMatcher):
     model_path = WEIGHTS_DIR.joinpath("duster_vit_large.pth")
     vit_patch_size = 16
 
@@ -34,9 +34,9 @@ class DusterMatcher(BaseMatcher):
     def download_weights():
         url = "https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
 
-        if not os.path.isfile(DusterMatcher.model_path):
-            print("Downloading Duster(ViT large)... (takes a while)")
-            py3_wget.download_file(url, DusterMatcher.model_path)
+        if not os.path.isfile(Dust3rMatcher.model_path):
+            print("Downloading Dust3r(ViT large)... (takes a while)")
+            py3_wget.download_file(url, Dust3rMatcher.model_path)
 
     def preprocess(self, img):
         _, h, w = img.shape
