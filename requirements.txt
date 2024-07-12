@@ -25,3 +25,4 @@ tqdm
 py3_wget
 roma
 loguru
+timm

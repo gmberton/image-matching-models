@@ -28,3 +28,15 @@
 [submodule "third_party/EfficientLoFTR"]
 	path = third_party/EfficientLoFTR
 	url = https://github.com/zju3dv/EfficientLoFTR
+[submodule "third_party/Se2_LoFTR"]
+	path = third_party/Se2_LoFTR
+	url = https://github.com/alexstoken/se2-loftr.git
+[submodule "third_party/aspanformer"]
+	path = third_party/aspanformer
+	url = https://github.com/alexstoken/ml-aspanformer.git
+[submodule "third_party/MatchFormer"]
+	path = third_party/MatchFormer
+	url = https://github.com/jamycheung/MatchFormer.git
+[submodule "third_party/mast3r"]
+	path = third_party/mast3r
+	url = https://github.com/naver/mast3r.git

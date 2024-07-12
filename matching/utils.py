@@ -4,6 +4,7 @@ import numpy as np
 import torch
 import torchvision.transforms as tfm
 import os, contextlib
+from yacs.config import CfgNode as CN
 
 logger = logging.getLogger()
 logger.setLevel(31)  # Avoid printing useless low-level logs
@@ -124,3 +125,8 @@ def supress_stdout(func):
             with contextlib.redirect_stdout(devnull):
                 return func(*a, **ka)
     return wrapper
+
+def lower_config(yacs_cfg):
+    if not isinstance(yacs_cfg, CN):
+        return yacs_cfg
+    return {k.lower(): lower_config(v) for k, v in yacs_cfg.items()}

@@ -19,6 +19,8 @@ available_models = [
     "loftr",
     "eloftr",
     "se2loftr",
+    'aspanformer',
+    'matchformer', 
     "sift-lg",
     "superpoint-lg",
     "disk-lg",
@@ -74,6 +76,16 @@ def get_matcher(
 
         return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
 
+    elif matcher_name == 'aspanformer':
+        from matching import aspanformer
+        
+        return aspanformer.AspanformerMatcher(device, *args, **kwargs)
+    
+    elif matcher_name == 'matchformer':
+        from matching import matchformer
+        
+        return matchformer.MatchformerMatcher(device, *args, **kwargs)
+    
     elif matcher_name == "sift-lg":
         from matching import lightglue
 

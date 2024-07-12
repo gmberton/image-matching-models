@@ -73,7 +73,7 @@ class BaseMatcher(torch.nn.Module):
             w_new (int): width of new img
 
         Returns:
-            np.ndarray: (N,2) array of kpts in new img coordinates
+            np.ndarray: (N,2) array of kpts in original img coordinates
         """
         return to_px_coords(to_normalized_coords(pts, h_new, w_new), h_orig, w_orig)
 

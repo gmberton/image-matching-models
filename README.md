@@ -76,7 +76,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Dense**: ```roma, tiny-roma, duster```
 
-**Semi-dense**: ```loftr, eloftr, xfeat-star```
+**Semi-dense**: ```loftr, eloftr, aspanformer, matchformer, xfeat-star```
 
 **Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue```
 
@@ -103,6 +103,8 @@ To use on your images you have three options:
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218+(LG) | ❌ |
 | Steerers (arxiv '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
 | LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/pdf/2306.13643.pdf) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
+| Aspanformer (ECCV '22) | [Official](https://github.com/apple/ml-aspanformer) | [arxiv](https://arxiv.org/abs/2208.14201) | -- | -- | 
+| Matchformer (ACCV '22) | [Official](https://github.com/jamycheung/MatchFormer) | [arxiv](https://arxiv.org/abs/2203.09645) | -- | -- | 
 | LoFTR (CVPR '21) | [Official](https://github.com/zju3dv/LoFTR) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.LoFTR) | [arxiv](https://arxiv.org/pdf/2104.00680.pdf) | 0.722 | 2.36 | 
 | Patch2Pix (CVPR '21) | [Official](https://github.com/GrumpyZhou/patch2pix)  / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox) | [arxiv](https://arxiv.org/abs/2012.01909) | 0.145 | 4.97 | 
 | SuperGlue (CVPR '20) | [Official](https://github.com/magicleap/SuperGluePretrainedNetwork) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/superglue.py) | [arxiv](https://arxiv.org/abs/1911.11763)  | 0.0894 | 2.178 | 
