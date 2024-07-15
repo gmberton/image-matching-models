@@ -4,6 +4,8 @@ A unified API for quickly and easily trying 29 (and growing!) image matching mod
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
 
+Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model/Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
+
 ### Example Results
 Compare matching models across various scenes. For example, we show SIFT-LightGlue and LoFTR matches on pairs: 
 <p>(1) outdoor, (2) indoor, (3) satellite remote sensing, (4) paintings, and (5) a false positive. </p>
@@ -71,7 +73,14 @@ where `sift-lg` will use `SIFT + LightGlue`.
 
 The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
 
----
+### Use on your own images
+
+To use on your images you have three options:
+1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
+2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
+3. import the matcher package into a script/notebook and use from there, as in the example above
+
+## Available Models
 You can choose any of the following methods (input to `get_matcher()`):
 
 **Dense**: ```roma, tiny-roma, dust3r, mast3r```
@@ -84,14 +93,6 @@ You can choose any of the following methods (input to `get_matcher()`):
 > You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints. 
 
 All the matchers can run on GPU, and most of them can run both on GPU or CPU. A few can't run on CPU.
-
-
-### Use on your own images
-
-To use on your images you have three options:
-1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
-2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
-3. import the matcher package into a script/notebook and use from there, as in the example above
 
 ## Model Details
 > [!IMPORTANT]
@@ -108,11 +109,11 @@ To use on your images you have three options:
 | DUSt3R (CVPR '24) | [Official](https://github.com/naver/dust3r) | [arxiv](https://arxiv.org/abs/2312.14132) | 3.639 |  26.813 |
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218 (+LG) | ❌ |
 | Steerers (CVPR '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
-| LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/pdf/2306.13643.pdf) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
+| LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/abs/2306.13643) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
 | SE2-LoFTR (CVPRW '22) | [Official](https://github.com/georg-bn/se2-loftr) | [arxiv](https://arxiv.org/abs/2204.10144) | 0.133 | 2.378 | 
 | Aspanformer (ECCV '22) | [Official](https://github.com/apple/ml-aspanformer) | [arxiv](https://arxiv.org/abs/2208.14201) | 0.384 | 11.73 | 
 | Matchformer (ACCV '22) | [Official](https://github.com/jamycheung/MatchFormer) | [arxiv](https://arxiv.org/abs/2203.09645) | 0.232 | 6.101 | 
-| LoFTR (CVPR '21) | [Official](https://github.com/zju3dv/LoFTR) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.LoFTR) | [arxiv](https://arxiv.org/pdf/2104.00680.pdf) | 0.722 | 2.36 | 
+| LoFTR (CVPR '21) | [Official](https://github.com/zju3dv/LoFTR) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.LoFTR) | [arxiv](https://arxiv.org/abs/2104.00680) | 0.722 | 2.36 | 
 | Patch2Pix (CVPR '21) | [Official](https://github.com/GrumpyZhou/patch2pix)  / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox) | [arxiv](https://arxiv.org/abs/2012.01909) | 0.145 | 4.97 | 
 | SuperGlue (CVPR '20) | [Official](https://github.com/magicleap/SuperGluePretrainedNetwork) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/superglue.py) | [arxiv](https://arxiv.org/abs/1911.11763)  | 0.0894 | 2.178 | 
 | R2D2 (NeurIPS '19) | [Official](https://github.com/naver/r2d2) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/r2d2.py) | [arxiv](https://arxiv.org/abs/1906.06195) | 0.429 | 6.79 | 
