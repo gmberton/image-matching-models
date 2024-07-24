@@ -54,6 +54,23 @@ def to_numpy(x: torch.Tensor | np.ndarray | dict | list) -> np.ndarray:
     if isinstance(x, np.ndarray):
         return x
 
+def to_tensor(x: np.ndarray | torch.Tensor, device: str =None)-> torch.Tensor:
+    """Convert to tensor and place on device
+
+    Args:
+        x (np.ndarray | torch.Tensor): item to convert to tensor
+        device (str, optional): device to place tensor on. Defaults to None.
+
+    Returns:
+        torch.Tensor: tensor with data from `x` on device `device`
+    """
+    if isinstance(x, torch.Tensor):
+        pass
+    elif isinstance(x, np.ndarray):
+        x = torch.from_numpy(x)
+
+    if device is not None:
+        return x.to(device)
 
 def to_normalized_coords(pts: np.ndarray | torch.Tensor, height: int, width: int):
     """normalize kpt coords from px space to [0,1]

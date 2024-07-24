@@ -1,11 +1,11 @@
 import sys
 from pathlib import Path
+import torch
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/LightGlue")))
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
 
 
 class LightGlueBase(BaseMatcher):

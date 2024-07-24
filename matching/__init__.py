@@ -59,7 +59,7 @@ def get_version(pkg):
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
-# @supress_stdout
+@supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):
