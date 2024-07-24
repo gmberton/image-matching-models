@@ -42,10 +42,15 @@ available_models = [
     "doghardnet-nn",
     "xfeat",
     "xfeat-star",
+    "xfeat-lg",
     "dedode-lg",
     "gim-dkm",
     "gim-lg",
     "omniglue",
+    "xfeat-subpx",
+    "dedode-subpx",
+    "splg-subpx",
+    "aliked-subpx",
 ]
 
 
@@ -54,7 +59,7 @@ def get_version(pkg):
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
-@supress_stdout
+# @supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):
@@ -62,6 +67,13 @@ def get_matcher(
         from matching.base_matcher import EnsembleMatcher
 
         return EnsembleMatcher(matcher_name, device, *args, **kwargs)
+    if 'subpx' in matcher_name:
+        from matching import keypt2subpx
+        
+        detector_name = matcher_name.removesuffix('-subpx')
+        
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
+    
     if matcher_name == "loftr":
         from matching import loftr
 
@@ -186,6 +198,9 @@ def get_matcher(
         from matching import xfeat
 
         kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
+        
+        if matcher_name.removeprefix("xfeat").removeprefix('-') in ["lg", "lightglue", "lighterglue"]:
+            kwargs['mode'] = "lighterglue"
         return xfeat.xFeatMatcher(device, *args, **kwargs)
 
     elif matcher_name == "dedode-lg":

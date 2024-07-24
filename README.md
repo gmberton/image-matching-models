@@ -87,7 +87,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, aspanformer, matchformer, xfeat-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue```
 
 > [!TIP]
 > You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints. 
