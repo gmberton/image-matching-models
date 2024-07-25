@@ -110,11 +110,11 @@ def main(args):
                     runtimes, avg_runtime = benchmark(
                         matcher, num_iters=args.num_iters, img_size=args.img_size
                     )
-                    runtime_str = f"{model}, {avg_runtime}"
+                    runtime_str = f"{model: <15} OK {avg_runtime=:.3f}"
                     f.write(runtime_str + "\n")
                     tqdm.write(runtime_str)
                 except Exception as e:
-                    tqdm.write(f"Error with {model}: {e}")    
+                    tqdm.write(f"{model: <15} NOT OK - exception: {e}")    
 
     elif args.task == 'test':
         with open("test_results.txt", 'w') as f:

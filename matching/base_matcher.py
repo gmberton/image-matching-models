@@ -3,7 +3,6 @@ import torch
 import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
-from copy import deepcopy
 import warnings
 from pathlib import Path
 from typing import Tuple

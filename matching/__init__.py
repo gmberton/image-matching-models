@@ -20,7 +20,7 @@ available_models = [
     "eloftr",
     "se2loftr",
     'aspanformer',
-    'matchformer', 
+    'matchformer',
     "sift-lg",
     "superpoint-lg",
     "disk-lg",
@@ -47,7 +47,7 @@ available_models = [
     "gim-dkm",
     "gim-lg",
     "omniglue",
-    "xfeat-subpx"
+    "xfeat-subpx",
     "xfeat-lg-subpx",
     "dedode-subpx",
     # "splg-subpx",
