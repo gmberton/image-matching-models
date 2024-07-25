@@ -53,7 +53,7 @@ class xFeatMatcher(BaseMatcher):
 
                 mkpts0, mkpts1 = self.model.match_lighterglue(output0, output1)
             else: # sparse
-                idxs0, idxs1 = self.model.match(output0['descriptors'], output1['descriptors'])
+                idxs0, idxs1 = self.model.match(output0['descriptors'], output1['descriptors'], min_cossim=-1)
                 mkpts0, mkpts1 = output0['keypoints'][idxs0], output1['keypoints'][idxs1]
         else:
             raise ValueError(

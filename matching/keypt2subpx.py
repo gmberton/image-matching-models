@@ -47,12 +47,12 @@ class Keypt2SubpxMatcher(BaseMatcher):
     def _forward(self, img0, img1):
         mkpts0, mkpts1, keypoints0, keypoints1, descriptors0, descriptors1 = self.matcher._forward(img0, img1)
 
-        # print(mkpts0, keypoints0)
-        matching_idxs0, matching_idxs1 = self.get_match_idxs(mkpts0, keypoints0), self.get_match_idxs(mkpts1, keypoints1)
-        mdesc0, mdesc1 = descriptors0[matching_idxs0], descriptors1[matching_idxs1]
+        if len(mkpts0): #only run subpx refinement if kpts are found
+            matching_idxs0, matching_idxs1 = self.get_match_idxs(mkpts0, keypoints0), self.get_match_idxs(mkpts1, keypoints1)
+            mdesc0, mdesc1 = descriptors0[matching_idxs0], descriptors1[matching_idxs1]
 
-        scores0, scores1 = self.get_scoremap(img0), self.get_scoremap(img1)
-        mkpts0, mkpts1 = self.keypt2subpx(to_tensor(mkpts0, self.device), to_tensor(mkpts1, self.device), img0, img1, mdesc0, mdesc1, scores0, scores1)
+            scores0, scores1 = self.get_scoremap(img0), self.get_scoremap(img1)
+            mkpts0, mkpts1 = self.keypt2subpx(to_tensor(mkpts0, self.device), to_tensor(mkpts1, self.device), img0, img1, mdesc0, mdesc1, scores0, scores1)
         return mkpts0, mkpts1, keypoints0, keypoints1, descriptors0, descriptors1
 
     
