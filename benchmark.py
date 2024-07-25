@@ -80,7 +80,7 @@ def test(matcher, img_sizes=[500, 200], error_thresh=0.05):
             passing = False
             raise RuntimeError(f"Large homography error in matcher (size={img_size} px): {error}")
     
-    return passing
+    return passing, error
 
 def benchmark(matcher, num_iters=1, img_size=512):
     runtime = []
@@ -118,7 +118,7 @@ def main(args):
 
     elif args.task == 'test':
         with open("test_results.txt", 'w') as f:
-            test_str = 'Matcher, Passing Tests'
+            test_str = 'Matcher, Passing Tests, Error (px)'
             f.write(test_str + "\n")
             tqdm.write(test_str)
 
@@ -126,8 +126,8 @@ def main(args):
                 try:
                     matcher = get_matcher(model, device=args.device)
 
-                    passing = test(matcher)
-                    test_str = f"{model}, {passing}"
+                    passing, error_val = test(matcher)
+                    test_str = f"{model}, {passing}, {error_val}"
                     f.write(test_str + "\n")
                     tqdm.write(test_str)
                 except Exception as e:

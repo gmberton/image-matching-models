@@ -47,9 +47,10 @@ available_models = [
     "gim-dkm",
     "gim-lg",
     "omniglue",
-    "xfeat-subpx",
+    "xfeat-subpx"
+    "xfeat-lg-subpx",
     "dedode-subpx",
-    "splg-subpx",
+    # "splg-subpx",
     "aliked-subpx",
 ]
 
@@ -192,7 +193,7 @@ def get_matcher(
     elif matcher_name == "doghardnet-nn":
         from matching import matching_toolbox
 
-        return matching_toolbox.DogAffHardNNMatcher(device, *args, **kwargs)
+        return matching_toolbox.DogAffHardNNMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif "xfeat" in matcher_name:
         from matching import xfeat
@@ -201,7 +202,7 @@ def get_matcher(
         
         if matcher_name.removeprefix("xfeat").removeprefix('-') in ["lg", "lightglue", "lighterglue"]:
             kwargs['mode'] = "lighterglue"
-        return xfeat.xFeatMatcher(device, *args, **kwargs)
+        return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode-lg":
         from matching import kornia
