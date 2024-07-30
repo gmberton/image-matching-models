@@ -24,30 +24,16 @@ class DedodeMatcher(BaseMatcher):
     descriptor_path = WEIGHTS_DIR.joinpath("dedode_descriptor_G.pth")
     dino_patch_size = 14
 
-    def __init__(
-        self,
-        device="cpu",
-        max_num_keypoints=2048,
-        dedode_thresh=0.05,
-        detector_version=2,
-        *args,
-        **kwargs
-    ):
+    def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
-        self.normalize = tfm.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         self.download_weights()
 
-        detector_weight_path = (
-            self.detector_path if detector_version == 1 else self.detector_v2_path
-        )
-        self.detector = dedode_detector_L(
-            weights=torch.load(detector_weight_path, map_location=device), device=device
-        )
+        detector_weight_path = self.detector_path if detector_version == 1 else self.detector_v2_path
+        self.detector = dedode_detector_L(weights=torch.load(detector_weight_path, map_location=device), device=device)
         self.descriptor = dedode_descriptor_G(
             weights=torch.load(self.descriptor_path, map_location=device), device=device
         )
@@ -55,9 +41,13 @@ class DedodeMatcher(BaseMatcher):
 
     @staticmethod
     def download_weights():
-        detector_url = "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth"
+        detector_url = (
+            "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth"
+        )
         detector_v2_url = "https://github.com/Parskatt/DeDoDe/releases/download/v2/dedode_detector_L_v2.pth"
-        descr_url = "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth"
+        descr_url = (
+            "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth"
+        )
         os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DedodeMatcher.detector_path):
             print("Downloading dedode_detector_L.pth")
@@ -92,12 +82,8 @@ class DedodeMatcher(BaseMatcher):
         detections_1 = self.detector.detect(batch_1, num_keypoints=self.max_keypoints)
         keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
 
-        description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)[
-            "descriptions"
-        ]
-        description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)[
-            "descriptions"
-        ]
+        description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
+        description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]
 
         matches_0, matches_1, _ = self.matcher.match(
             keypoints_0,
@@ -110,24 +96,21 @@ class DedodeMatcher(BaseMatcher):
             inv_temp=20,
             threshold=self.threshold,  # Increasing threshold -> fewer matches, fewer outliers
         )
-        
+
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
-        mkpts0, mkpts1 = self.matcher.to_pixel_coords(
-            matches_0, matches_1, H0, W0, H1, W1
-        )
-                
+        mkpts0, mkpts1 = self.matcher.to_pixel_coords(matches_0, matches_1, H0, W0, H1, W1)
+
         keypoints_0, keypoints_1 = self.matcher.to_pixel_coords(
             keypoints_0.squeeze(0), keypoints_1.squeeze(0), H0, W0, H1, W1
         )
-             
+
         # dedode sometimes requires reshaping an image to fit vit patch size evenly, so we need to
         # rescale kpts to the original img
         keypoints_0 = self.rescale_coords(keypoints_0, *img0_orig_shape, H0, W0)
         keypoints_1 = self.rescale_coords(keypoints_1, *img1_orig_shape, H1, W1)
-        
+
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
-        
 
         return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0.squeeze(0), description_1.squeeze(0)
 

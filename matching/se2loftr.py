@@ -23,15 +23,15 @@ class Se2LoFTRMatcher(BaseMatcher):
         "rot8": rot8_cfg,
         "big": big_cfg,
         "dense": e2dense_cfg,
-        'rot4':e2_cfg,
+        "rot4": e2_cfg,
         # 'loftr': baseline_cfg
     }
 
     weights = {
         "rot8": "se2loftr_rot8.pt",
         "big": "se2loftr_rot4_big.pt",
-        'dense':'se2loftr_rot4_dense.pt',
-        'rot4':'se2loftr_rot4.pt'
+        "dense": "se2loftr_rot4_dense.pt",
+        "rot4": "se2loftr_rot4.pt",
         #    'loftr': 'baseline.ckpt'
     }
 
@@ -39,8 +39,8 @@ class Se2LoFTRMatcher(BaseMatcher):
         # weight files (.pt) only
         "rot8": "https://drive.google.com/file/d/1ulaJE25hMOYYxZsnPgLQXPqGFQv_06-O/view",
         "big": "https://drive.google.com/file/d/145i4KqbyCg6J1JdJTa0A05jVp_7ckebq/view",
-        'dense':'https://drive.google.com/file/d/1QMDgOzhIB5zjm-K5Sltcpq7wF94ZpwE7/view',
-        'rot4': "https://drive.google.com/file/d/19c00PuTtbQO4KxVod3G0FBr_MWrqts4c/view"
+        "dense": "https://drive.google.com/file/d/1QMDgOzhIB5zjm-K5Sltcpq7wF94ZpwE7/view",
+        "rot4": "https://drive.google.com/file/d/19c00PuTtbQO4KxVod3G0FBr_MWrqts4c/view",
         # original ckpts (requires pytorch lightning to load)
         # "rot8": "https://drive.google.com/file/d/1jPtOTxmwo1Z_YYP2YMS6efOevDaNiJR4/view",
         # "big": "https://drive.google.com/file/d/1AE_EmmhQLfArIP-zokSlleY2YiSgBV3m/view",
@@ -48,24 +48,20 @@ class Se2LoFTRMatcher(BaseMatcher):
         # 'rot4': 'https://drive.google.com/file/d/17vxdnVtjVuq2m8qJsOG1JFfJjAqcgr4j/view'
         # 'loftr': 'https://drive.google.com/file/d/1OylPSrbjzRJgvLHM3qJPAVpW3BEQeuFS/view'
     }
-    
+
     divisible_size = 32
 
-    def __init__(
-        self, device="cpu", max_num_keypoints=0, loftr_config="rot8", *args, **kwargs
-    ) -> None:
+    def __init__(self, device="cpu", max_num_keypoints=0, loftr_config="rot8", *args, **kwargs) -> None:
         super().__init__(device)
-        assert loftr_config in self.configs.keys(), f'Config not found. Must choose from {self.configs.keys()}'
+        assert loftr_config in self.configs.keys(), f"Config not found. Must choose from {self.configs.keys()}"
         self.loftr_config = loftr_config
-        
-        self.weights_path = WEIGHTS_DIR.joinpath(
-            Se2LoFTRMatcher.weights[self.loftr_config]
-        )
+
+        self.weights_path = WEIGHTS_DIR.joinpath(Se2LoFTRMatcher.weights[self.loftr_config])
 
         self.download_weights()
 
         self.model = self.load_model(self.loftr_config, device)
-        
+
     def download_weights(self):
         if not os.path.isfile(self.weights_path):
             print(f"Downloading {Se2LoFTRMatcher.weights_url[self.loftr_config]}")
@@ -76,9 +72,7 @@ class Se2LoFTRMatcher(BaseMatcher):
             )
 
     def load_model(self, config, device="cpu"):
-        model = LoFTR(config=lower_config(Se2LoFTRMatcher.configs[config])["loftr"]).to(
-            self.device
-        )
+        model = LoFTR(config=lower_config(Se2LoFTRMatcher.configs[config])["loftr"]).to(self.device)
         # model.load_state_dict(
         #     {
         #         k.replace("matcher.", ""): v
@@ -90,7 +84,7 @@ class Se2LoFTRMatcher(BaseMatcher):
         print(str(self.weights_path))
         model.load_state_dict(torch.load(str(self.weights_path), map_location=device))
         return model.eval()
-    
+
     def preprocess(self, img):
         # loftr requires grayscale imgs divisible by 32
         _, h, w = img.shape
@@ -103,14 +97,12 @@ class Se2LoFTRMatcher(BaseMatcher):
         img1, img1_orig_shape = self.preprocess(img1)
 
         batch = {"image0": img0, "image1": img1}
-        self.model(
-            batch
-        )  # loftr does not return anything, instead stores results in batch dict
+        self.model(batch)  # loftr does not return anything, instead stores results in batch dict
         # batch now has keys: ['mkpts0_f', 'mkpts1_f', 'expec_f','mkpts0_c', 'mkpts1_c', 'mconf', 'm_bids','gt_mask']
 
         mkpts0 = to_numpy(batch["mkpts0_f"])
         mkpts1 = to_numpy(batch["mkpts1_f"])
-        
+
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)

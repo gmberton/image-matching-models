@@ -51,16 +51,12 @@ class SilkMatcher(BaseMatcher):
 
         self.download_weights()
 
-        self.model = get_model(
-            device=device, default_outputs=("sparse_positions", "sparse_descriptors")
-        )
+        self.model = get_model(device=device, default_outputs=("sparse_positions", "sparse_descriptors"))
 
         assert (
             matcher_post_processing in SilkMatcher.MATCHER_POSTPROCESS_OPTIONS
         ), f"Matcher postprocessing must be one of {SilkMatcher.MATCHER_POSTPROCESS_OPTIONS}"
-        self.matcher = matcher(
-            postprocessing=matcher_post_processing, threshold=matcher_thresh
-        )
+        self.matcher = matcher(postprocessing=matcher_post_processing, threshold=matcher_thresh)
 
     def download_weights(self):
         ckpt_name = "coco-rgb-aug.ckpt"
@@ -83,12 +79,8 @@ class SilkMatcher(BaseMatcher):
         sparse_positions_1, sparse_descriptors_1 = self.model(img1)
 
         # x, y, conf
-        sparse_positions_0 = from_feature_coords_to_image_coords(
-            self.model, sparse_positions_0
-        )
-        sparse_positions_1 = from_feature_coords_to_image_coords(
-            self.model, sparse_positions_1
-        )
+        sparse_positions_0 = from_feature_coords_to_image_coords(self.model, sparse_positions_0)
+        sparse_positions_1 = from_feature_coords_to_image_coords(self.model, sparse_positions_1)
 
         # get matches
         matches = self.matcher(sparse_descriptors_0[0], sparse_descriptors_1[0])

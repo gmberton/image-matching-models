@@ -16,9 +16,7 @@ from dkm.models.model_zoo.DKMv3 import DKMv3
 
 class GIM_DKM(BaseMatcher):
 
-    weights_src = (
-        "https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view"
-    )
+    weights_src = "https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view"
 
     def __init__(self, device="cpu", max_num_keypoints=5000, **kwargs):
         super().__init__(device, **kwargs)
@@ -62,14 +60,10 @@ class GIM_DKM(BaseMatcher):
 
         img0 = self.preprocess(img0)  # now as PIL img
         img1 = self.preprocess(img1)  # now as PIL img
-        dense_matches, dense_certainty = self.model.match(
-            img0, img1, device=self.device
-        )
+        dense_matches, dense_certainty = self.model.match(img0, img1, device=self.device)
         torch.cuda.empty_cache()
         # sample matching keypoints from dense warp
-        sparse_matches, mconf = self.model.sample(
-            dense_matches, dense_certainty, self.max_num_keypoints
-        )
+        sparse_matches, mconf = self.model.sample(dense_matches, dense_certainty, self.max_num_keypoints)
         torch.cuda.empty_cache()
         mkpts0 = sparse_matches[:, :2]
         mkpts1 = sparse_matches[:, 2:]
@@ -91,10 +85,10 @@ class GIM_DKM(BaseMatcher):
 
 class GIM_LG(BaseMatcher):
 
-    weights_src = (
-        "https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt"
+    weights_src = "https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt"
+    superpoint_v1_weight_src = (
+        "https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superpoint_v1.pth"
     )
-    superpoint_v1_weight_src = "https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superpoint_v1.pth"
 
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
@@ -132,9 +126,7 @@ class GIM_LG(BaseMatcher):
             py3_wget.download_file(GIM_LG.weights_src, self.ckpt_path)
         if not self.superpoint_v1_path.exists():
             print(f"Downloading {self.superpoint_v1_path.name}")
-            py3_wget.download_file(
-                GIM_LG.superpoint_v1_weight_src, self.superpoint_v1_path
-            )
+            py3_wget.download_file(GIM_LG.superpoint_v1_weight_src, self.superpoint_v1_path)
 
     def load_weights(self):
         state_dict = torch.load(self.ckpt_path, map_location="cpu")
@@ -203,18 +195,10 @@ class GIM_LG(BaseMatcher):
             }
         )
 
-        pred.update(
-            self.model(
-                {**pred, **data, **{"resize0": data["size0"], "resize1": data["size1"]}}
-            )
-        )
+        pred.update(self.model({**pred, **data, **{"resize0": data["size0"], "resize1": data["size1"]}}))
 
-        kpts0 = torch.cat(
-            [kp * s for kp, s in zip(pred["keypoints0"], data["scale0"][:, None])]
-        )
-        kpts1 = torch.cat(
-            [kp * s for kp, s in zip(pred["keypoints1"], data["scale1"][:, None])]
-        )
+        kpts0 = torch.cat([kp * s for kp, s in zip(pred["keypoints0"], data["scale0"][:, None])])
+        kpts1 = torch.cat([kp * s for kp, s in zip(pred["keypoints1"], data["scale1"][:, None])])
 
         desc0, desc1 = pred["descriptors0"], pred["descriptors1"]
 
@@ -222,12 +206,8 @@ class GIM_LG(BaseMatcher):
         matches = pred["matches"]
         bs = data["image0"].size(0)
 
-        mkpts0 = torch.cat(
-            [kpts0[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)]
-        )
-        mkpts1 = torch.cat(
-            [kpts1[m_bids == b_id][matches[b_id][..., 1]] for b_id in range(bs)]
-        )
+        mkpts0 = torch.cat([kpts0[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
+        mkpts1 = torch.cat([kpts1[m_bids == b_id][matches[b_id][..., 1]] for b_id in range(bs)])
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         # mconf = torch.cat(pred['scores'])
 

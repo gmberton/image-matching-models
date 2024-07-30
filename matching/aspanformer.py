@@ -12,14 +12,13 @@ from matching.utils import to_numpy, resize_to_divisible, lower_config
 BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/aspanformer")
 sys.path.append(str(BASE_PATH))
 
-from src.ASpanFormer.aspanformer import ASpanFormer 
+from src.ASpanFormer.aspanformer import ASpanFormer
 from src.config.default import get_cfg_defaults as aspan_cfg_defaults
 
+
 class AspanformerMatcher(BaseMatcher):
-    weights_src = (
-       "https://drive.google.com/file/d/1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k/view"
-    )
-    weights_path = WEIGHTS_DIR.joinpath("aspanformer", 'weights', 'outdoor.ckpt')
+    weights_src = "https://drive.google.com/file/d/1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k/view"
+    weights_path = WEIGHTS_DIR.joinpath("aspanformer", "weights", "outdoor.ckpt")
     divisible_size = 32
 
     def __init__(self, device="cpu", **kwargs):
@@ -28,14 +27,13 @@ class AspanformerMatcher(BaseMatcher):
         self.download_weights()
 
         config = aspan_cfg_defaults()
-        config.merge_from_file(BASE_PATH.joinpath('configs', 'aspan', 'outdoor', 'aspan_test.py'))
-        self.matcher = ASpanFormer(config=lower_config(config)['aspan'])
+        config.merge_from_file(BASE_PATH.joinpath("configs", "aspan", "outdoor", "aspan_test.py"))
+        self.matcher = ASpanFormer(config=lower_config(config)["aspan"])
 
         self.matcher.load_state_dict(
-            torch.load(self.weights_path, map_location=self.device)["state_dict"],
-            strict=False
+            torch.load(self.weights_path, map_location=self.device)["state_dict"], strict=False
         )
-        
+
         self.matcher = self.matcher.to(device).eval()
 
     def download_weights(self):
@@ -43,11 +41,11 @@ class AspanformerMatcher(BaseMatcher):
             print("Downloading Aspanformer outdoor... (takes a while)")
             gdown.download(
                 self.weights_src,
-                output=str(WEIGHTS_DIR.joinpath('weights_aspanformer.tar')),
+                output=str(WEIGHTS_DIR.joinpath("weights_aspanformer.tar")),
                 fuzzy=True,
             )
-        tar = tarfile.open(WEIGHTS_DIR.joinpath('weights_aspanformer.tar'))
-        weights_subdir = WEIGHTS_DIR.joinpath('aspanformer')
+        tar = tarfile.open(WEIGHTS_DIR.joinpath("weights_aspanformer.tar"))
+        weights_subdir = WEIGHTS_DIR.joinpath("aspanformer")
         weights_subdir.mkdir(exist_ok=True)
         tar.extractall(weights_subdir)
         tar.close()

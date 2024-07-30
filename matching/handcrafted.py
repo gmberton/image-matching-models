@@ -39,7 +39,7 @@ class HandcraftedBaseMatcher(BaseMatcher):
         kp1, des1 = self.det_descr.detectAndCompute(img1, None)
 
         # BFMatcher with default params
-        
+
         raw_matches = self.bf.knnMatch(des0, des1, k=self.k_neighbors)
 
         # Apply ratio test
@@ -66,23 +66,19 @@ class HandcraftedBaseMatcher(BaseMatcher):
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):
-    def __init__(
-        self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs
-    ):
+    def __init__(self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.SIFT_create(max_num_keypoints)
-        
+
         self.bf = cv2.BFMatcher()
         self.k_neighbors = 2
 
+
 class OrbNNMatcher(HandcraftedBaseMatcher):
-    def __init__(
-        self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs
-    ):
+    def __init__(self, device="cpu", max_num_keypoints=2048, lowe_thresh=0.75, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.threshold = lowe_thresh
         self.det_descr = cv2.ORB_create(max_num_keypoints)
         self.bf = cv2.BFMatcher(cv2.NORM_HAMMING)
         self.k_neighbors = 2
-
