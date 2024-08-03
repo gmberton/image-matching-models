@@ -26,3 +26,4 @@ py3_wget
 roma
 loguru
 timm
+omegaconf
