@@ -98,8 +98,16 @@ class GIM_LG(BaseMatcher):
 
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
-        from gluefactory.superpoint import SuperPoint
-        from gluefactory.models.matchers.lightglue import LightGlue
+        # load the altered version of gluefactory
+        import importlib
+        module_name = 'gluefactory_gim'
+        spec = importlib.util.spec_from_file_location(module_name, BASE_PATH.joinpath('gluefactory/__init__.py'))
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module
+        spec.loader.exec_module(module)
+        
+        from gluefactory_gim.superpoint import SuperPoint
+        from gluefactory_gim.models.matchers.lightglue import LightGlue
 
         self.ckpt_path = BASE_PATH / "weights" / "gim_lightglue_100h.ckpt"
         self.superpoint_v1_path = BASE_PATH / "weights" / "superpoint_v1.pth"

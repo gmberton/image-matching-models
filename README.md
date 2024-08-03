@@ -130,7 +130,7 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 
 \* LightGlue model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
 
-\* Keypt2Subpx model runtimes are listed in the order: aliked-lg, xfeat, dedode
+\* Keypt2Subpx model runtimes are listed in the order: superpoint-lg, aliked-lg, xfeat, dedode
 ##
 
 ### Adding a new method
