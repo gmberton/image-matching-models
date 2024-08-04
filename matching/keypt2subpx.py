@@ -5,21 +5,15 @@ import numpy as np
 
 from matching.base_matcher import BaseMatcher
 from matching import get_matcher
-from matching.utils import to_numpy, to_tensor
+from matching.utils import to_numpy, to_tensor, load_module
 
 from omegaconf import OmegaConf
 import torchvision.transforms as tfm
 
 BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/keypt2subpx")
 sys.path.append(str(BASE_PATH))
-
-import importlib
-# load gluefactory into namespace
-module_name = 'gluefactory'
-spec = importlib.util.spec_from_file_location(module_name, BASE_PATH.joinpath('submodules/glue_factory/gluefactory/__init__.py'))
-module = importlib.util.module_from_spec(spec)
-sys.modules[module_name] = module
-spec.loader.exec_module(module)
+    
+load_module('gluefactory', BASE_PATH.joinpath('submodules/glue_factory/gluefactory/__init__.py'))
 from dataprocess.superpoint_densescore import *
 
 sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/LightGlue")))

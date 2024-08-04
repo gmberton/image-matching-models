@@ -1,5 +1,5 @@
 from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy
+from matching.utils import load_module
 from matching import WEIGHTS_DIR
 import torch
 import sys
@@ -99,12 +99,7 @@ class GIM_LG(BaseMatcher):
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
         # load the altered version of gluefactory
-        import importlib
-        module_name = 'gluefactory_gim'
-        spec = importlib.util.spec_from_file_location(module_name, BASE_PATH.joinpath('gluefactory/__init__.py'))
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module
-        spec.loader.exec_module(module)
+        load_module('gluefactory_gim', BASE_PATH.joinpath('gluefactory/__init__.py'))
         
         from gluefactory_gim.superpoint import SuperPoint
         from gluefactory_gim.models.matchers.lightglue import LightGlue
