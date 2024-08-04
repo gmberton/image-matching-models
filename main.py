@@ -18,9 +18,7 @@ def main(args):
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
     # Choose a matcher
-    matcher = get_matcher(
-        args.matcher, device=args.device, max_num_keypoints=args.n_kpts
-    )
+    matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
 
     pairs_of_paths = get_image_pairs_paths(args.input)
     for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
@@ -77,9 +75,7 @@ if __name__ == "__main__":
     )
 
     # Hyperparameters shared by all methods:
-    parser.add_argument(
-        "--im_size", type=int, default=512, help="resize img to im_size x im_size"
-    )
+    parser.add_argument("--im_size", type=int, default=512, help="resize img to im_size x im_size")
     parser.add_argument("--n_kpts", type=int, default=2048, help="max num keypoints")
     parser.add_argument("--device", type=str, default="cuda", choices=["cpu", "cuda"])
     parser.add_argument(
@@ -94,9 +90,7 @@ if __name__ == "__main__":
         default="assets/example_pairs",
         help="path to either (1) dir with dirs with pairs or (2) txt file with two img paths per line",
     )
-    parser.add_argument(
-        "--out_dir", type=str, default=None, help="path where outputs are saved"
-    )
+    parser.add_argument("--out_dir", type=str, default=None, help="path where outputs are saved")
 
     args = parser.parse_args()
 

@@ -15,7 +15,13 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 4. Open `__init__.py` and add the model name (all lowercase) to the `available_models` list.
 <br></br>Add an `elif` case to `get_matcher()` with this model name, following the template from the other matchers. 
 
-5. Test your model and submit a PR!
+5. Format the code with [Black](https://github.com/psf/black), like this
+```
+pip3 install black
+cd image-matching-models && black --line-length 120 ./
+```
+
+6. Test your model and submit a PR!
 
 Note: as authors update their model repos, consider updating the submodule reference here using the below:
 To update a submodule to the head of the remote, run 

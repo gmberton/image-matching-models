@@ -7,18 +7,14 @@ import sys
 from copy import deepcopy
 import torchvision.transforms as tfm
 
-sys.path.append(
-    str(Path(__file__).parent.parent.joinpath("third_party/EfficientLoFTR"))
-)
+sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/EfficientLoFTR")))
 
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 from matching import WEIGHTS_DIR
 
 
 class EfficientLoFTRMatcher(BaseMatcher):
-    weights_src = (
-        "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
-    )
+    weights_src = "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
     model_path = WEIGHTS_DIR.joinpath("eloftr_outdoor.ckpt")
     divisible_size = 32
 
@@ -29,13 +25,9 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         self.download_weights()
 
-        self.matcher = LoFTR(
-            config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg)
-        )
+        self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg))
 
-        self.matcher.load_state_dict(
-            torch.load(self.model_path, map_location=torch.device("cpu"))["state_dict"]
-        )
+        self.matcher.load_state_dict(torch.load(self.model_path, map_location=torch.device("cpu"))["state_dict"])
         self.matcher = reparameter(self.matcher).to(self.device).eval()
 
     def get_precision(self):

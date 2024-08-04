@@ -49,9 +49,7 @@ class OmniglueMatcher(BaseMatcher):
                 "https://storage.googleapis.com/omniglue/og_export.zip",
                 OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix(".zip"),
             )
-            with zipfile.ZipFile(
-                OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix(".zip")
-            ) as zip_f:
+            with zipfile.ZipFile(OmniglueMatcher.OG_WEIGHTS_PATH.with_suffix(".zip")) as zip_f:
                 zip_f.extractall(path=WEIGHTS_DIR)
 
         if not OmniglueMatcher.SP_WEIGHTS_PATH.exists():

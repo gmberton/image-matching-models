@@ -57,16 +57,12 @@ class DeDoDeLightGlue(BaseMatcher):
             "image0": {
                 "keypoints": kpts0,
                 "descriptors": desc0,
-                "image_size": torch.tensor(img0.shape[-2:][::-1])
-                .view(1, 2)
-                .to(self.device),
+                "image_size": torch.tensor(img0.shape[-2:][::-1]).view(1, 2).to(self.device),
             },
             "image1": {
                 "keypoints": kpts1,
                 "descriptors": desc1,
-                "image_size": torch.tensor(img1.shape[-2:][::-1])
-                .view(1, 2)
-                .to(self.device),
+                "image_size": torch.tensor(img1.shape[-2:][::-1]).view(1, 2).to(self.device),
             },
         }
 

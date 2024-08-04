@@ -19,12 +19,8 @@ from matching import WEIGHTS_DIR
 
 class Patch2pixMatcher(BaseMatcher):
     # url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
-    pretrained_src = (
-        "https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view"
-    )
-    url2 = (
-        "https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth"
-    )
+    pretrained_src = "https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view"
+    url2 = "https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth"
 
     model_path = WEIGHTS_DIR.joinpath("patch2pix_pretrained.pth")
     divisible_by = 32
@@ -42,9 +38,7 @@ class Patch2pixMatcher(BaseMatcher):
         print(args)
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model.to(device)
-        self.normalize = tfm.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     @staticmethod
     def download_weights():
@@ -124,9 +118,7 @@ class SuperGlueMatcher(BaseMatcher):
 class R2D2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.normalize = tfm.Normalize(
-            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
-        )
+        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         with open(BASE_PATH.joinpath("configs/r2d2.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
@@ -159,9 +151,7 @@ class R2D2Matcher(BaseMatcher):
         kpts1, desc1 = self.model.extract_features(img1)
 
         # NN Match
-        match_ids, scores = self.model.mutual_nn_match(
-            desc0, desc1, threshold=self.match_threshold
-        )
+        match_ids, scores = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
         mkpts0 = kpts0[match_ids[:, 0], :2].cpu().numpy()
         mkpts1 = kpts1[match_ids[:, 1], :2].cpu().numpy()
 
@@ -179,9 +169,7 @@ class D2netMatcher(BaseMatcher):
         if not os.path.isfile(args["ckpt"]):
             print("Downloading D2Net model weights...")
             os.makedirs(os.path.dirname(args["ckpt"]), exist_ok=True)
-            py3_wget.download_file(
-                "https://dusmanu.com/files/d2-net/d2_tf.pth", args["ckpt"]
-            )
+            py3_wget.download_file("https://dusmanu.com/files/d2-net/d2_tf.pth", args["ckpt"])
 
         self.model = immatch.__dict__[args["class"]](args)
         self.match_threshold = args["match_threshold"]
@@ -207,9 +195,7 @@ class D2netMatcher(BaseMatcher):
         kpts0, desc0 = self.model.extract_features(img0)
         kpts1, desc1 = self.model.extract_features(img1)
 
-        match_ids, _ = self.model.mutual_nn_match(
-            desc0, desc1, threshold=self.match_threshold
-        )
+        match_ids, _ = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
         mkpts0 = kpts0[match_ids[:, 0], :2]
         mkpts1 = kpts1[match_ids[:, 1], :2]
 

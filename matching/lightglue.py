@@ -24,9 +24,7 @@ class LightGlueBase(BaseMatcher):
         """
         "extractor" and "matcher" are instantiated by the subclasses.
         """
-        feats0, feats1, matches01 = match_pair(
-            self.extractor, self.matcher, img0, img1, device=self.device
-        )
+        feats0, feats1, matches01 = match_pair(self.extractor, self.matcher, img0, img1, device=self.device)
         kpts0, kpts1, matches = (
             feats0["keypoints"],
             feats1["keypoints"],
@@ -44,53 +42,33 @@ class LightGlueBase(BaseMatcher):
 class SiftLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.extractor = (
-            SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
-        self.matcher = LightGlue(
-            features="sift", depth_confidence=-1, width_confidence=-1
-        ).to(self.device)
+        self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = LightGlue(features="sift", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class SuperpointLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.extractor = (
-            SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
-        self.matcher = LightGlue(
-            features="superpoint", depth_confidence=-1, width_confidence=-1
-        ).to(self.device)
+        self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = LightGlue(features="superpoint", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class DiskLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.extractor = (
-            DISK(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
-        self.matcher = LightGlue(
-            features="disk", depth_confidence=-1, width_confidence=-1
-        ).to(self.device)
+        self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = LightGlue(features="disk", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class AlikedLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.extractor = (
-            ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
-        self.matcher = LightGlue(
-            features="aliked", depth_confidence=-1, width_confidence=-1
-        ).to(self.device)
+        self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = LightGlue(features="aliked", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
 class DognetLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.extractor = (
-            DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
-        self.matcher = LightGlue(
-            features="doghardnet", depth_confidence=-1, width_confidence=-1
-        ).to(self.device)
+        self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = LightGlue(features="doghardnet", depth_confidence=-1, width_confidence=-1).to(self.device)

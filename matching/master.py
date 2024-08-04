@@ -55,28 +55,37 @@ class Mast3rMatcher(BaseMatcher):
         img1, img1_orig_shape = self.preprocess(img1)
 
         img_pair = [
-            {"img": img0, "idx": 0, "instance": 0, "true_shape":np.int32([img0.shape[-2:]])},
-            {"img": img1, "idx": 1, "instance": 1, "true_shape":np.int32([img1.shape[-2:]])},
+            {"img": img0, "idx": 0, "instance": 0, "true_shape": np.int32([img0.shape[-2:]])},
+            {"img": img1, "idx": 1, "instance": 1, "true_shape": np.int32([img1.shape[-2:]])},
         ]
         output = inference([tuple(img_pair)], self.model, self.device, batch_size=1, verbose=False)
         # at this stage, you have the raw dust3r predictions
-        view1, pred1 = output['view1'], output['pred1']
-        view2, pred2 = output['view2'], output['pred2']
+        view1, pred1 = output["view1"], output["pred1"]
+        view2, pred2 = output["view2"], output["pred2"]
 
-        desc1, desc2 = pred1['desc'].squeeze(0).detach(), pred2['desc'].squeeze(0).detach()
+        desc1, desc2 = pred1["desc"].squeeze(0).detach(), pred2["desc"].squeeze(0).detach()
 
         # find 2D-2D matches between the two images
-        matches_im0, matches_im1 = fast_reciprocal_NNs(desc1, desc2, subsample_or_initxy1=8,
-                                                    device=self.device, dist='dot', block_size=2**13)
+        matches_im0, matches_im1 = fast_reciprocal_NNs(
+            desc1, desc2, subsample_or_initxy1=8, device=self.device, dist="dot", block_size=2**13
+        )
 
         # ignore small border around the edge
-        H0, W0 = view1['true_shape'][0]
-        valid_matches_im0 = (matches_im0[:, 0] >= 3) & (matches_im0[:, 0] < int(W0) - 3) & (
-            matches_im0[:, 1] >= 3) & (matches_im0[:, 1] < int(H0) - 3)
+        H0, W0 = view1["true_shape"][0]
+        valid_matches_im0 = (
+            (matches_im0[:, 0] >= 3)
+            & (matches_im0[:, 0] < int(W0) - 3)
+            & (matches_im0[:, 1] >= 3)
+            & (matches_im0[:, 1] < int(H0) - 3)
+        )
 
-        H1, W1 = view2['true_shape'][0]
-        valid_matches_im1 = (matches_im1[:, 0] >= 3) & (matches_im1[:, 0] < int(W1) - 3) & (
-            matches_im1[:, 1] >= 3) & (matches_im1[:, 1] < int(H1) - 3)
+        H1, W1 = view2["true_shape"][0]
+        valid_matches_im1 = (
+            (matches_im1[:, 0] >= 3)
+            & (matches_im1[:, 0] < int(W1) - 3)
+            & (matches_im1[:, 1] >= 3)
+            & (matches_im1[:, 1] < int(H1) - 3)
+        )
 
         valid_matches = valid_matches_im0 & valid_matches_im1
         mkpts0, mkpts1 = matches_im0[valid_matches], matches_im1[valid_matches]

@@ -19,8 +19,8 @@ available_models = [
     "loftr",
     "eloftr",
     "se2loftr",
-    'aspanformer',
-    'matchformer',
+    "aspanformer",
+    "matchformer",
     "sift-lg",
     "superpoint-lg",
     "disk-lg",
@@ -60,21 +60,20 @@ def get_version(pkg):
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
+
 @supress_stdout
-def get_matcher(
-    matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
-):
+def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
         from matching.base_matcher import EnsembleMatcher
 
         return EnsembleMatcher(matcher_name, device, *args, **kwargs)
-    if 'subpx' in matcher_name:
+    if "subpx" in matcher_name:
         from matching import keypt2subpx
-        
-        detector_name = matcher_name.removesuffix('-subpx')
-        
+
+        detector_name = matcher_name.removesuffix("-subpx")
+
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
-    
+
     if matcher_name == "loftr":
         from matching import loftr
 
@@ -90,16 +89,16 @@ def get_matcher(
 
         return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
 
-    elif matcher_name == 'aspanformer':
+    elif matcher_name == "aspanformer":
         from matching import aspanformer
-        
+
         return aspanformer.AspanformerMatcher(device, *args, **kwargs)
-    
-    elif matcher_name == 'matchformer':
+
+    elif matcher_name == "matchformer":
         from matching import matchformer
-        
+
         return matchformer.MatchformerMatcher(device, *args, **kwargs)
-    
+
     elif matcher_name == "sift-lg":
         from matching import lightglue
 
@@ -166,9 +165,7 @@ def get_matcher(
     elif matcher_name == "superglue":
         from matching import matching_toolbox
 
-        return matching_toolbox.SuperGlueMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "r2d2":
         from matching import matching_toolbox
@@ -199,9 +196,9 @@ def get_matcher(
         from matching import xfeat
 
         kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
-        
-        if matcher_name.removeprefix("xfeat").removeprefix('-') in ["lg", "lightglue", "lighterglue"]:
-            kwargs['mode'] = "lighterglue"
+
+        if matcher_name.removeprefix("xfeat").removeprefix("-") in ["lg", "lightglue", "lighterglue"]:
+            kwargs["mode"] = "lighterglue"
         return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode-lg":
