@@ -47,7 +47,7 @@ def get_img_pairs():
     return pairs
 
 
-def test_H_est(matcher, img_size=500):
+def test_H_est(matcher, img_size=512):
     """Given a matcher, compute a homography of two images with known ground
     truth and its error. The error for sift-lg is 0.002 for img_size=500. So it
     should roughly be below 0.01."""
@@ -68,7 +68,7 @@ def test_H_est(matcher, img_size=500):
     return max_error
 
 
-def test(matcher, img_sizes=[500, 200], error_thresh=0.05):
+def test(matcher, img_sizes=[512, 256], error_thresh=0.05):
     passing = True
     for img_size in img_sizes:
         error = test_H_est(matcher, img_size=img_size)

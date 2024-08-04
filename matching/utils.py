@@ -5,6 +5,7 @@ import torch
 import torchvision.transforms as tfm
 import os, contextlib
 from yacs.config import CfgNode as CN
+import sys
 
 logger = logging.getLogger()
 logger.setLevel(31)  # Avoid printing useless low-level logs
@@ -145,3 +146,20 @@ def lower_config(yacs_cfg):
     if not isinstance(yacs_cfg, CN):
         return yacs_cfg
     return {k.lower(): lower_config(v) for k, v in yacs_cfg.items()}
+
+def load_module(module_name: str, module_path: Path | str) -> None:
+    """Load module from `module_path` into the interpreter with the namespace given by module_name.
+    
+    Note that `module_path` is usually the path to an `__init__.py` file.
+
+    Args:
+        module_name (str): module name (will be used to import from later, as in `from module_name import my_function`)
+        module_path (Path | str): path to module (usually an __init__.py file)
+    """
+    import importlib
+    # load gluefactory into namespace
+    # module_name = 'gluefactory'
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)

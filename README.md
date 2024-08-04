@@ -100,7 +100,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
-| Keypt2Subpx* (ECCV '24) | [Official](https://github.com/KimSinjeong/keypt2subpx) | [arxiv](https://arxiv.org/abs/2407.11668)| 0.164 / 0.033 / 0.291  | -- |
+| Keypt2Subpx* (ECCV '24) | [Official](https://github.com/KimSinjeong/keypt2subpx) | [arxiv](https://arxiv.org/abs/2407.11668)| 0.055 /0.164 / 0.033 / 0.291  | -- |
 | MASt3R (ArXiv '24) | [Official](https://github.com/naver/mast3r?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2406.09756) | 0.699 | -- |
 | Efficient-LoFTR (CVPR '24) | [Official](https://github.com/zju3dv/efficientloftr) | [pdf](https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf) | 0.1026 | 2.117 |
 | OmniGlue (CVPR '24) | [Official](https://github.com/google-research/omniglue) | [arxiv](https://arxiv.org/abs/2405.12979) | ❌ | 6.351 |
@@ -128,9 +128,9 @@ Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are base
 
 Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in the `assets/example_pairs` folder at image size 512x512. Benchmark is done using `benchmark.py` on an NVIDIA RTX A4000 GPU. Results rounded to the hundredths place.
 
-\* LightGlue model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
+\* `LightGlue` model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
 
-\* Keypt2Subpx model runtimes are listed in the order: aliked-lg, xfeat, dedode
+\* `Keypt2Subpx` model runtimes are listed in the order: superpoint-lg, aliked-lg, xfeat, dedode
 ##
 
 ### Adding a new method
