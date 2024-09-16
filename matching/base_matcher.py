@@ -89,22 +89,21 @@ class BaseMatcher(torch.nn.Module):
         inliers_mask = inliers_mask[:, 0]
         return H, inliers_mask.astype(bool)
 
-    def process_matches(self, mkpts0: np.ndarray, mkpts1: np.ndarray):
-        if len(mkpts0) < 4:
-            return 0, None, mkpts0, mkpts1
+    def process_matches(self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray):
+        if len(matched_kpts0) < 4:
+            return 0, None, matched_kpts0, matched_kpts1
 
         H, inliers_mask = self.find_homography(
-            mkpts0,
-            mkpts1,
+            matched_kpts0,
+            matched_kpts1,
             self.ransac_reproj_thresh,
             self.ransac_iters,
             self.ransac_conf,
         )
-        inlier_mkpts0 = mkpts0[inliers_mask]
-        inlier_mkpts1 = mkpts1[inliers_mask]
-        num_inliers = int(inliers_mask.sum())
+        inlier_kpts0 = matched_kpts0[inliers_mask]
+        inlier_kpts1 = matched_kpts1[inliers_mask]
 
-        return num_inliers, H, inlier_mkpts0, inlier_mkpts1
+        return H, inlier_kpts0, inlier_kpts1
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
         """Image preprocessing for each matcher. Some matchers require grayscale, normalization, etc.
@@ -132,18 +131,19 @@ class BaseMatcher(torch.nn.Module):
 
         Returns
         -------
-        dict with keys: ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
+        dict with keys: ['num_inliers', 'H', 'all_kpts0', 'all_kpts1', 'all_desc0', 'all_desc1',
+                         'matched_kpts0', 'matched_kpts1', 'inlier_kpts0', 'inlier_kpts1']
 
-        num_inliers : int, number of inliers after RANSAC, i.e. num(inliers0)
-        H : np.array (3 x 3), the homography matrix to map mkpts0 to mkpts1
-        mkpts0 : np.ndarray (N x 2), keypoints from img0 that match mkpts1 (pre-RANSAC)
-        mkpts1 : np.ndarray (N x 2), keypoints from img1 that match mkpts0 (pre-RANSAC)
-        inliers0 : np.ndarray (N x 2), filtered mkpts0 that fit the H model (post-RANSAC mkpts)
-        inliers1 : np.ndarray (N x 2), filtered mkpts1 that fit the H model (post-RANSAC mkpts)
-        kpts0 : np.ndarray (N x 2), all detected keypoints from img0
-        kpts1 : np.ndarray (N x 2), all detected keypoints from img1
-        desc0 : np.ndarray (N x 2), all descriptors from img0
-        desc1 : np.ndarray (N x 2), all descriptors from img1
+        num_inliers : int, number of inliers after RANSAC, i.e. len(inlier_kpts0)
+        H : np.array (3 x 3), the homography matrix to map matched_kpts0 to matched_kpts1
+        all_kpts0 : np.ndarray (N0 x 2), all detected keypoints from img0
+        all_kpts1 : np.ndarray (N1 x 2), all detected keypoints from img1
+        all_desc0 : np.ndarray (N0 x D), all descriptors from img0
+        all_desc1 : np.ndarray (N1 x D), all descriptors from img1
+        matched_kpts0 : np.ndarray (N2 x 2), keypoints from img0 that match matched_kpts1 (pre-RANSAC)
+        matched_kpts1 : np.ndarray (N2 x 2), keypoints from img1 that match matched_kpts0 (pre-RANSAC)
+        inlier_kpts0 : np.ndarray (N3 x 2), filtered matched_kpts0 that fit the H model (post-RANSAC matched_kpts)
+        inlier_kpts1 : np.ndarray (N3 x 2), filtered matched_kpts1 that fit the H model (post-RANSAC matched_kpts)
         """
         # Take as input a pair of images (not a batch)
         if isinstance(img0, (str, Path)):
@@ -158,22 +158,22 @@ class BaseMatcher(torch.nn.Module):
         img1 = img1.to(self.device)
 
         # self._forward() is implemented by the children modules
-        mkpts0, mkpts1, keypoints0, keypoints1, descriptors0, descriptors1 = self._forward(img0, img1)
+        matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1 = self._forward(img0, img1)
 
-        mkpts0, mkpts1 = to_numpy(mkpts0), to_numpy(mkpts1)
-        num_inliers, H, inliers0, inliers1 = self.process_matches(mkpts0, mkpts1)
+        matched_kpts0, matched_kpts1 = to_numpy(matched_kpts0), to_numpy(matched_kpts1)
+        H, inlier_kpts0, inlier_kpts1 = self.process_matches(matched_kpts0, matched_kpts1)
 
         return {
-            "num_inliers": num_inliers,
+            "num_inliers": len(inlier_kpts0),
             "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "inliers0": inliers0,
-            "inliers1": inliers1,
-            "kpts0": to_numpy(keypoints0),
-            "kpts1": to_numpy(keypoints1),
-            "desc0": to_numpy(descriptors0),
-            "desc1": to_numpy(descriptors1),
+            "all_kpts0": to_numpy(all_kpts0),
+            "all_kpts1": to_numpy(all_kpts1),
+            "all_desc0": to_numpy(all_desc0),
+            "all_desc1": to_numpy(all_desc1),
+            "matched_kpts0": matched_kpts0,
+            "matched_kpts1": matched_kpts1,
+            "inlier_kpts0": inlier_kpts0,
+            "inlier_kpts1": inlier_kpts1,
         }
 
 
@@ -184,10 +184,10 @@ class EnsembleMatcher(BaseMatcher):
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
 
     def _forward(self, img0, img1):
-        all_mkpts0, all_mkpts1 = [], []
+        all_matched_kpts0, all_matched_kpts1 = [], []
         for matcher in self.matchers:
-            mkpts0, mkpts1, _, _, _, _ = matcher._forward(img0, img1)
-            all_mkpts0.append(to_numpy(mkpts0))
-            all_mkpts1.append(to_numpy(mkpts1))
-        all_mkpts0, all_mkpts1 = np.concatenate(all_mkpts0), np.concatenate(all_mkpts1)
-        return all_mkpts0, all_mkpts1, None, None, None, None
+            matched_kpts0, matched_kpts1, _, _, _, _ = matcher._forward(img0, img1)
+            all_matched_kpts0.append(to_numpy(matched_kpts0))
+            all_matched_kpts1.append(to_numpy(matched_kpts1))
+        all_matched_kpts0, all_matched_kpts1 = np.concatenate(all_matched_kpts0), np.concatenate(all_matched_kpts1)
+        return all_matched_kpts0, all_matched_kpts1, None, None, None, None

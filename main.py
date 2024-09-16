@@ -26,35 +26,25 @@ def main(args):
         image0 = matcher.load_image(img0_path, resize=image_size)
         image1 = matcher.load_image(img1_path, resize=image_size)
         result = matcher(image0, image1)
-        num_inliers, H, mkpts0, mkpts1 = (
-            result["num_inliers"],
-            result["H"],
-            result["inliers0"],
-            result["inliers1"],
-        )
-        out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {num_inliers} inliers after RANSAC. "
+
+        out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {result['num_inliers']} inliers after RANSAC. "
 
         if not args.no_viz:
             viz2d.plot_images([image0, image1])
-            viz2d.plot_matches(mkpts0, mkpts1, color="lime", lw=0.2)
-            viz2d.add_text(0, f"{len(mkpts1)} matches", fs=20)
+            viz2d.plot_matches(result["inlier_kpts0"], result["inlier_kpts1"], color="lime", lw=0.2)
+            viz2d.add_text(0, f"{len(result['inlier_kpts1'])} matches after RANSAC", fs=20)
             viz_path = args.out_dir / f"output_{i}.jpg"
             viz2d.save_plot(viz_path)
             out_str += f"Viz saved in {viz_path}. "
 
+        result["img0_path"] = img0_path
+        result["img1_path"] = img1_path
+        result["matcher"] = args.matcher
+        result["n_kpts"] = args.n_kpts
+        result["im_size"] = args.im_size
+
         dict_path = args.out_dir / f"output_{i}.torch"
-        output_dict = {
-            "num_inliers": num_inliers,
-            "H": H,
-            "mkpts0": mkpts0,
-            "mkpts1": mkpts1,
-            "img0_path": img0_path,
-            "img1_path": img1_path,
-            "matcher": args.matcher,
-            "n_kpts": args.n_kpts,
-            "im_size": args.im_size,
-        }
-        torch.save(output_dict, dict_path)
+        torch.save(result, dict_path)
         out_str += f"Output saved in {dict_path}"
 
         print(out_str)
