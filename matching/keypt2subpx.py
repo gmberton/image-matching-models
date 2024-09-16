@@ -32,7 +32,7 @@ class Keypt2SubpxMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", detector_name: str | None = None, **kwargs):
         super().__init__(device, **kwargs)
-        
+
         matcher_name = self.detector_name2matcher_name[detector_name]
         self.detector_name = detector_name
         if detector_name == "splg":
