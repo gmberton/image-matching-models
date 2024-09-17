@@ -56,18 +56,18 @@ device = 'cuda' # 'cpu'
 matcher = get_matcher('superglue', device=device)  # Choose any of our ~20+ matchers listed below
 img_size = 512
 
-img0 = matcher.load_image('path/to/img0.png', resize=img_size)
-img1 = matcher.load_image('path/to/img1.png', resize=img_size)
+img0 = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
+img1 = matcher.load_image('assets/example_pairs/outdoor/montmartre_far.jpg', resize=img_size)
 
 result = matcher(img0, img1)
-num_inliers, H, mkpts0, mkpts1 = result['num_inliers'], result['H'], result['inliers0'], result['inliers1']
-# result.keys() = ['num_inliers', 'H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', 'desc1']
+num_inliers, H, inlier_kpts0, inlier_kpts1 = result['num_inliers'], result['H'], result['inlier_kpts0'], result['inlier_kpts1']
+# result.keys() = ['num_inliers', 'H', 'all_kpts0', 'all_kpts1', 'all_desc0', 'all_desc1', 'matched_kpts0', 'matched_kpts1', 'inlier_kpts0', 'inlier_kpts1']
 ```
 
 You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. It is possible to specify also resolution and num_keypoints. This will take a few seconds also on a laptop's CPU, and will produce the same images that you see above.
 
 ```bash
-python main.py --matcher sift-lg --device cpu --log_dir output_sift-lg
+python main_matcher.py --matcher sift-lg --device cpu --out_dir output_sift-lg
 ```
 where `sift-lg` will use `SIFT + LightGlue`.
 
@@ -76,8 +76,8 @@ The script will generate an image with the matching keypoints for each pair, und
 ### Use on your own images
 
 To use on your images you have three options:
-1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main.py --input path/to/dir`
-2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main.py --input path/to/file.txt`
+1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main_matcher.py --input path/to/dir`
+2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main_matcher.py --input path/to/file.txt`
 3. import the matcher package into a script/notebook and use from there, as in the example above
 
 ## Available Models
@@ -141,17 +141,11 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 > [!Note]  
 > This repo is not optimized for speed, but for usability. The idea is to use this repo to find the matcher that best suits your needs, and then use the original code to get the best out of it.
 
-<details>
-<summary>
     
 ### Acknowledgements
-    
-</summary>
   
 Special thanks to the authors of the respective works that are included in this repo (see their papers above). Additional thanks to [@GrumpyZhou](https://github.com/GrumpyZhou) for developing and maintaining the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main), which we have wrapped in this repo, and the [maintainers](https://github.com/kornia/kornia?tab=readme-ov-file#community) of [Kornia](https://github.com/kornia/kornia).
 
-  
-</details>
 
 ## Cite
 This repo was created as part of the EarthMatch paper. Please consider citing EarthMatch work if this repo is helpful to you!
