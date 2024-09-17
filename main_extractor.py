@@ -1,10 +1,16 @@
+"""
+This script extracts keypoints from all images in a specified directory using a chosen extractor/matcher model.
+The extracted keypoints are visualized and saved to the output directory. Under the hood, it performs image matching,
+but the matches are not used or displayed. This approach allows us to use the same matching functions
+for keypoint extraction without implementing separate functions for each method.
+"""
+
 import sys
-import torch
 import argparse
 import matplotlib
+from glob import glob
 from pathlib import Path
 
-from matching.utils import get_image_pairs_paths
 from matching import get_matcher, viz2d, available_models
 
 # This is to be able to use matplotlib also without a GUI
@@ -20,39 +26,37 @@ def main(args):
     # Choose a matcher
     matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
 
-    pairs_of_paths = get_image_pairs_paths(args.input)
-    for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
+    # Find all jpg, jpeg and png images within args.input_dir
+    images_paths = (
+        glob(f"{args.input_dir}/**/*.jpg", recursive=True)
+        + glob(f"{args.input_dir}/**/*.jpeg", recursive=True)
+        + glob(f"{args.input_dir}/**/*.png", recursive=True)
+    )
+    for i, img_path in enumerate(images_paths):
 
-        image0 = matcher.load_image(img0_path, resize=image_size)
-        image1 = matcher.load_image(img1_path, resize=image_size)
-        result = matcher(image0, image1)
+        image = matcher.load_image(img_path, resize=image_size)
+        result = matcher(image, image)
 
-        out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {result['num_inliers']} inliers after RANSAC. "
+        if result["all_kpts0"] is None:
+            print(f"Matcher {args.matcher} does not extract keypoints")
+            continue
+
+        out_str = f"Path: {img_path}. Found {len(result['all_kpts0'])} keypoints. "
 
         if not args.no_viz:
-            viz2d.plot_images([image0, image1])
-            viz2d.plot_matches(result["inlier_kpts0"], result["inlier_kpts1"], color="lime", lw=0.2)
-            viz2d.add_text(0, f"{len(result['inlier_kpts1'])} matches after RANSAC", fs=20)
+            viz2d.plot_images([image])
+            viz2d.plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
+            viz2d.add_text(0, f"{len(result['all_kpts0'])} keypoints", fs=20)
             viz_path = args.out_dir / f"output_{i}.jpg"
             viz2d.save_plot(viz_path)
             out_str += f"Viz saved in {viz_path}. "
-
-        result["img0_path"] = img0_path
-        result["img1_path"] = img1_path
-        result["matcher"] = args.matcher
-        result["n_kpts"] = args.n_kpts
-        result["im_size"] = args.im_size
-
-        dict_path = args.out_dir / f"output_{i}.torch"
-        torch.save(result, dict_path)
-        out_str += f"Output saved in {dict_path}"
 
         print(out_str)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Image Matching Models",
+        description="Keypoint Extraction Models",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     # Choose matcher
@@ -68,17 +72,12 @@ if __name__ == "__main__":
     parser.add_argument("--im_size", type=int, default=512, help="resize img to im_size x im_size")
     parser.add_argument("--n_kpts", type=int, default=2048, help="max num keypoints")
     parser.add_argument("--device", type=str, default="cuda", choices=["cpu", "cuda"])
+    parser.add_argument("--no_viz", action="store_true", help="avoid saving visualizations")
     parser.add_argument(
-        "--no_viz",
-        action="store_true",
-        help="pass --no_viz to avoid saving visualizations",
-    )
-
-    parser.add_argument(
-        "--input",
+        "--input_dir",
         type=str,
         default="assets/example_pairs",
-        help="path to either (1) dir with dirs with pairs or (2) txt file with two img paths per line",
+        help="path to directory with images (the search is recursive over jpg and png images)",
     )
     parser.add_argument("--out_dir", type=str, default=None, help="path where outputs are saved")
 
