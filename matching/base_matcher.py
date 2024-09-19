@@ -91,7 +91,7 @@ class BaseMatcher(torch.nn.Module):
 
     def process_matches(self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray):
         if len(matched_kpts0) < 4:
-            return 0, None, matched_kpts0, matched_kpts1
+            return None, matched_kpts0, matched_kpts1
 
         H, inliers_mask = self.find_homography(
             matched_kpts0,
