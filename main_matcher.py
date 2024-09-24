@@ -11,7 +11,8 @@ import matplotlib
 from pathlib import Path
 
 from matching.utils import get_image_pairs_paths
-from matching import get_matcher, viz2d, available_models
+from matching import get_matcher, available_models
+from matching.viz import plot_matches
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, "ps1"):
@@ -19,7 +20,6 @@ if not hasattr(sys, "ps1"):
 
 
 def main(args):
-
     image_size = [args.im_size, args.im_size]
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -36,11 +36,8 @@ def main(args):
         out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {result['num_inliers']} inliers after RANSAC. "
 
         if not args.no_viz:
-            viz2d.plot_images([image0, image1])
-            viz2d.plot_matches(result["inlier_kpts0"], result["inlier_kpts1"], color="lime", lw=0.2)
-            viz2d.add_text(0, f"{len(result['inlier_kpts1'])} matches after RANSAC", fs=20)
             viz_path = args.out_dir / f"output_{i}.jpg"
-            viz2d.save_plot(viz_path)
+            plot_matches(image0, image1, result, save_path=viz_path)
             out_str += f"Viz saved in {viz_path}. "
 
         result["img0_path"] = img0_path
@@ -56,7 +53,7 @@ def main(args):
         print(out_str)
 
 
-if __name__ == "__main__":
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Image Matching Models",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -82,12 +79,16 @@ if __name__ == "__main__":
         default="assets/example_pairs",
         help="path to either (1) dir with dirs with image pairs or (2) txt file with two image paths per line",
     )
-    parser.add_argument("--out_dir", type=str, default=None, help="path where outputs are saved")
+    parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
 
     args = parser.parse_args()
 
     if args.out_dir is None:
         args.out_dir = Path(f"outputs_{args.matcher}")
-    args.out_dir = Path(args.out_dir)
 
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
     main(args)

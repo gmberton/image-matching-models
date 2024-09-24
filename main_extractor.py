@@ -11,7 +11,8 @@ import matplotlib
 from glob import glob
 from pathlib import Path
 
-from matching import get_matcher, viz2d, available_models
+from matching import get_matcher, available_models
+from matching.viz import plot_kpts
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, "ps1"):
@@ -19,7 +20,6 @@ if not hasattr(sys, "ps1"):
 
 
 def main(args):
-
     image_size = [args.im_size, args.im_size]
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -35,26 +35,23 @@ def main(args):
     for i, img_path in enumerate(images_paths):
 
         image = matcher.load_image(img_path, resize=image_size)
-        result = matcher(image, image)
+        result = matcher.extract(image)
 
         if result["all_kpts0"] is None:
             print(f"Matcher {args.matcher} does not extract keypoints")
-            continue
+            break
 
         out_str = f"Path: {img_path}. Found {len(result['all_kpts0'])} keypoints. "
 
         if not args.no_viz:
-            viz2d.plot_images([image])
-            viz2d.plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
-            viz2d.add_text(0, f"{len(result['all_kpts0'])} keypoints", fs=20)
             viz_path = args.out_dir / f"output_{i}.jpg"
-            viz2d.save_plot(viz_path)
+            plot_kpts(image, result)
             out_str += f"Viz saved in {viz_path}. "
 
         print(out_str)
 
 
-if __name__ == "__main__":
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Keypoint Extraction Models",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -79,12 +76,16 @@ if __name__ == "__main__":
         default="assets/example_pairs",
         help="path to directory with images (the search is recursive over jpg and png images)",
     )
-    parser.add_argument("--out_dir", type=str, default=None, help="path where outputs are saved")
+    parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
 
     args = parser.parse_args()
 
     if args.out_dir is None:
         args.out_dir = Path(f"outputs_{args.matcher}")
-    args.out_dir = Path(args.out_dir)
 
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args()
     main(args)
