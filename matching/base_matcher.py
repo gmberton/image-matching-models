@@ -33,7 +33,7 @@ class BaseMatcher(torch.nn.Module):
         self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", BaseMatcher.DEFAULT_REPROJ_THRESH)
 
     @staticmethod
-    def image_loader(path: str | Path, resize: int | Tuple, rot_angle: float = 0):
+    def image_loader(path: str | Path, resize: int | Tuple, rot_angle: float = 0) -> torch.Tensor:
         warnings.warn(
             "`image_loader` is replaced by `load_image` and will be removed in a future release.",
             DeprecationWarning,
@@ -89,7 +89,18 @@ class BaseMatcher(torch.nn.Module):
         inliers_mask = inliers_mask[:, 0]
         return H, inliers_mask.astype(bool)
 
-    def process_matches(self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray):
+    def process_matches(
+        self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Process matches into inliers and the respective Homography using RANSAC.
+
+        Args:
+            matched_kpts0 (np.ndarray): matching kpts from img0
+            matched_kpts1 (np.ndarray): matching kpts from img1
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray, np.ndarray]: Homography matrix from img0 to img1, inlier kpts in img0, inlier kpts in img1
+        """
         if len(matched_kpts0) < 4:
             return None, matched_kpts0, matched_kpts1
 
@@ -176,6 +187,21 @@ class BaseMatcher(torch.nn.Module):
             "inlier_kpts1": inlier_kpts1,
         }
 
+    def extract(self, img: str | Path | torch.Tensor) -> dict:
+        # Take as input a pair of images (not a batch)
+        if isinstance(img, (str, Path)):
+            img = BaseMatcher.load_image(img)
+
+        assert isinstance(img, torch.Tensor)
+
+        img = img.to(self.device)
+
+        matched_kpts0, _, all_kpts0, _, all_desc0, _ = self._forward(img, img)
+
+        kpts = matched_kpts0 if isinstance(self, EnsembleMatcher) else all_kpts0
+
+        return {"all_kpts0": to_numpy(kpts), "all_desc0": to_numpy(all_desc0)}
+
 
 class EnsembleMatcher(BaseMatcher):
     def __init__(self, matcher_names=[], device="cpu", **kwargs):
@@ -183,7 +209,7 @@ class EnsembleMatcher(BaseMatcher):
 
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
 
-    def _forward(self, img0, img1):
+    def _forward(self, img0: torch.Tensor, img1: torch.Tensor) -> Tuple[np.ndarray, np.ndarray, None, None, None, None]:
         all_matched_kpts0, all_matched_kpts1 = [], []
         for matcher in self.matchers:
             matched_kpts0, matched_kpts1, _, _, _, _ = matcher._forward(img0, img1)
