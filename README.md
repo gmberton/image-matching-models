@@ -94,8 +94,8 @@ To use on your images you have three options:
 2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main_matcher.py --input path/to/file.txt`
 3. import the matcher package into a script/notebook and use from there, as in the example above
 
-### Feature Extraction and Description
-To extract features and descriptions (when available) from a single image, use the `extract()` method.
+### Keypoint Extraction and Description
+To extract keypoints and descriptions (when available) from a single image, use the `extract()` method.
 
 ```python
 from matching import get_matcher
