@@ -6,18 +6,18 @@ A unified API for quickly and easily trying 29 (and growing!) image matching mod
 
 Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model/Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
 
-### Example Results
-Compare matching models across various scenes. For example, we show SIFT-LightGlue and LoFTR matches on pairs: 
+### Matching Examples
+Compare matching models across various scenes. For example, we show `SIFT-LightGlue` and `LoFTR` matches on pairs: 
 <p>(1) outdoor, (2) indoor, (3) satellite remote sensing, (4) paintings, and (5) a false positive. </p>
 <details open><summary>
 SIFT-LightGlue
 </summary>
 <p float="left">
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_3.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_2.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_4.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_1.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/example_sift-lg/output_0.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_3_matches.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_2_matches.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_4_matches.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_1_matches.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_0_matches.jpg" width="195" />
 </p>
 </details>
 
@@ -25,11 +25,24 @@ SIFT-LightGlue
 LoFTR
 </summary>
 <p float="left">
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_3.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_2.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_4.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_1.jpg" width="195" />
-  <img src="https://github.com/gmberton/image-matching-models/blob/29b6c2ba42e3d7b235029a7bf75ddf7a1780cafa/assets/examples_loftr/output_0.jpg" width="195" />
+  <img src="assets/example_loftr/output_3_matches.jpg" width="195" />
+  <img src="assets/example_loftr/output_2_matches.jpg" width="195" />
+  <img src="assets/example_loftr/output_4_matches.jpg" width="195" />
+  <img src="assets/example_loftr/output_1_matches.jpg" width="195" />
+  <img src="assets/example_loftr/output_0_matches.jpg" width="195" />
+</p>
+</details>
+
+### Extraction Examples
+You can also extract keypoints and associated descriptors. 
+<details open><summary>
+SIFT and DeDoDe
+</summary>
+<p float="left">
+  <img src="assets/example_sift-lg/output_8_kpts.jpg" width="195" />
+  <img src="assets/example_dedode/output_8_kpts.jpg" width="195" />
+  <img src="assets/example_sift-lg/output_0_kpts.jpg" width="195" />
+  <img src="assets/example_dedode/output_0_kpts.jpg" width="195" />
 </p>
 </details>
 
@@ -96,6 +109,11 @@ img = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', re
 result = matcher.extract(img)
 # result.keys() = ['all_kpts0', 'all_desc0']
 plot_kpts(img, result)
+```
+
+As with matching, you can also run extraction from the command line
+```bash
+python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg --n_kpts 2048
 ```
 
 

@@ -36,7 +36,7 @@ def main(args):
         out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {result['num_inliers']} inliers after RANSAC. "
 
         if not args.no_viz:
-            viz_path = args.out_dir / f"output_{i}.jpg"
+            viz_path = args.out_dir / f"output_{i}_matches.jpg"
             plot_matches(image0, image1, result, save_path=viz_path)
             out_str += f"Viz saved in {viz_path}. "
 
@@ -46,7 +46,7 @@ def main(args):
         result["n_kpts"] = args.n_kpts
         result["im_size"] = args.im_size
 
-        dict_path = args.out_dir / f"output_{i}.torch"
+        dict_path = args.out_dir / f"output_{i}_result.torch"
         torch.save(result, dict_path)
         out_str += f"Output saved in {dict_path}"
 

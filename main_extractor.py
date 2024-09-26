@@ -44,8 +44,8 @@ def main(args):
         out_str = f"Path: {img_path}. Found {len(result['all_kpts0'])} keypoints. "
 
         if not args.no_viz:
-            viz_path = args.out_dir / f"output_{i}.jpg"
-            plot_kpts(image, result)
+            viz_path = args.out_dir / f"output_{i}_kpts.jpg"
+            plot_kpts(image, result, model_name=args.matcher, save_path=viz_path)
             out_str += f"Viz saved in {viz_path}. "
 
         print(out_str)
