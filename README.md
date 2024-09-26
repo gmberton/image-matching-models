@@ -1,4 +1,4 @@
-# Image Matching Models
+# Image Matching Models (IMM)
 
 A unified API for quickly and easily trying 29 (and growing!) image matching models.
 
