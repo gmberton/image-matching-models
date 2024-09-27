@@ -56,7 +56,8 @@ git clone --recursive https://github.com/gmberton/image-matching-models
 You can install this package for use in other scripts/notebooks with the following
 ```bash
 cd image-matching-models
-python -m pip install .
+pip install -r requirements.txt 
+python -m pip install -e .
 ```
 ## Use
 
