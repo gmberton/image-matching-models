@@ -39,7 +39,7 @@ dependencies = [
 "tables",
 "imageio",
 "vispy",
-"xformers;os.name != 'nt'"
+"xformers;os.name != 'nt'",
 "pyglet==1.5.28",
 "tensorboard",
 "scipy",
