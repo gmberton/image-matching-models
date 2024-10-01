@@ -16,11 +16,42 @@ maintainers = [
   {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
 ]
-
+requires-python = ">= 3.10"
+license = {file = "LICENSE"}
 keywords = ["image matching"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
+]
+
+dependencies = [
+"torch>=2.2.0",
+"torchvision",
+"opencv-python",
+"matplotlib",
+"kornia",
+"einops",
+"transforms3d",
+"h5py",
+"kornia_moons",
+"yacs",
+"gdown>=5.1.0",
+"tables",
+"imageio",
+"vispy",
+"xformers;os.name != 'nt'"
+"pyglet==1.5.28",
+"tensorboard",
+"scipy",
+"trimesh",
+"e2cnn",
+"scikit-learn",
+"tqdm",
+"py3_wget",
+"roma",
+"loguru",
+"timm",
+"omegaconf",
 ]
 
 [project.urls]

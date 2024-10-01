@@ -1,6 +1,5 @@
 # usage: pip install -r requirements.txt
-#torch
-# torch==2.2.0
+torch>=2.2.0
 torchvision
 opencv-python
 matplotlib
@@ -14,7 +13,7 @@ gdown>=5.1.0
 tables
 imageio
 vispy
-xformers
+xformers; os.name != 'nt'
 pyglet==1.5.28
 tensorboard
 scipy
