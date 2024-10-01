@@ -62,7 +62,7 @@ Repository = "https://github.com/gmberton/image-matching-models"
 # Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
 [tool.setuptools]
-packages = ["matching", third_party/*]
+packages = ["matching", "third_party/*"]
 
 [project.optional-dependencies]
 silk = [
