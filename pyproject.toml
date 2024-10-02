@@ -57,3 +57,4 @@ omniglue = ["tensorflow"
             ] 
 
 duster = ["huggingface_hub"]
+all = ["image-matching-models[loftrs, omniglue, duster]"]

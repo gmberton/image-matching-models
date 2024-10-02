@@ -47,18 +47,28 @@ SIFT and DeDoDe
 </details>
 
 ## Install
-
-You can install this repo directly to your package directory with 
-```bash
-pip install git+https://github.com/gmberton/image-matching-models.git
-```
-
-If you want to to install from source (easiest to edit, use `test.py` and `benchmark.py`), 
+### [Recommended] From Source
+If you want to to install from source (easiest to edit, use `test.py` and `benchmark.py`, `demo.ipynb`), 
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
-pip install -e .
+pip install .
 ```
+Some models (`omniglue`, LoFTR family) require one-off dependencies (`tensorflow`, `pytorch-lightning`), which are not included in the default list. To install these, use 
+```
+pip install .[all]
+```
+This will install all dependencies needed to run all models.
+
+### As package (simplest)
+You can install directly to your package directory with 
+```bash
+pip install git+https://github.com/gmberton/image-matching-models.git
+# or
+pip install git+https://github.com/gmberton/image-matching-models.git[all]
+```
+Similar to the above, to get all optional dependencies, use the `[all]` addendum.
+
 ## Use
 
 You can use any of the matchers with 
