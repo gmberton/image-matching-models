@@ -47,7 +47,7 @@ SIFT and DeDoDe
 </details>
 
 ## Install
-### [Recommended] From Source
+### From Source [Recommended]
 If you want to to install from source (easiest to edit, use `test.py` and `benchmark.py`, `demo.ipynb`), 
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
@@ -64,10 +64,11 @@ This will install all dependencies needed to run all models.
 You can install directly to your package directory with 
 ```bash
 pip install git+https://github.com/gmberton/image-matching-models.git
-# or
-pip install git+https://github.com/gmberton/image-matching-models.git[all]
 ```
-Similar to the above, to get all optional dependencies, use the `[all]` addendum.
+Similar to the above, to get all optional dependencies, use the `[all]` addendum:
+```bash
+pip install "image-matching-models[all] @ git+https://github.com/gmberton/image-matching-models.git"
+```
 
 ## Use
 
