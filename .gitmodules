@@ -1,6 +1,6 @@
 [submodule "matching/third_party/LightGlue"]
 	path = matching/third_party/LightGlue
-	url = https://github.com/cvg/LightGlue
+	url = https://github.com/cvg/LightGlue.git
 [submodule "matching/third_party/RoMa"]
 	path = matching/third_party/RoMa
 	url = https://github.com/Parskatt/RoMa
