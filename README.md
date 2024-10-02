@@ -48,15 +48,16 @@ SIFT and DeDoDe
 
 ## Install
 
-To install this repo run
+You can install this repo directly to your package directory with 
+```bash
+pip install git+https://github.com/gmberton/image-matching-models.git
+```
 
+If you want to to install from source (easiest to edit, use `test.py` and `benchmark.py`), 
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
-```
-You can install this package for use in other scripts/notebooks with the following
-```bash
 cd image-matching-models
-python -m pip install .
+pip install -e .
 ```
 ## Use
 
