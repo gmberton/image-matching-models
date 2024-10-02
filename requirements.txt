@@ -20,6 +20,7 @@ scipy
 trimesh
 e2cnn
 scikit-learn
+scikit-image
 tqdm
 py3_wget
 roma

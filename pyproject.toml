@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "image-matching-models"
-version = "1.0"
 readme = "README.md"
 description = "Easily test and apply pairwise image matching models"
 authors = [
@@ -23,36 +22,9 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
+dynamic = ["version",
+            "dependencies"]
 
-dependencies = [
-"torch>=2.2.0",
-"torchvision",
-"opencv-python",
-"matplotlib",
-"kornia",
-"einops",
-"transforms3d",
-"h5py",
-"kornia_moons",
-"yacs",
-"gdown>=5.1.0",
-"tables",
-"imageio",
-"vispy",
-"xformers;os.name != 'nt'",
-"pyglet==1.5.28",
-"tensorboard",
-"scipy",
-"trimesh",
-"e2cnn",
-"scikit-learn",
-"tqdm",
-"py3_wget",
-"roma",
-"loguru",
-"timm",
-"omegaconf",
-]
 
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
@@ -61,8 +33,14 @@ Repository = "https://github.com/gmberton/image-matching-models"
 # "Bug Tracker" = "https://github.com/me/spam/issues"
 # Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
-[tool.setuptools]
-packages = ["matching"]
+[tool.setuptools.dynamic]
+dependencies = { file = [
+  "./requirements.txt",
+] }
+version = { attr = "matching.__version__" }
+
+[tool.setuptools.packages]
+find = {}
 
 [project.optional-dependencies]
 silk = [
