@@ -1,10 +1,9 @@
-import sys
-from pathlib import Path
 from torch import Tensor
 
-from matching.base_matcher import BaseMatcher
+from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import add_to_path
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/accelerated_features")))
+add_to_path(THIRD_PARTY_DIR.joinpath("accelerated_features"))
 from modules.xfeat import XFeat
 
 

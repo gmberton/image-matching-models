@@ -1,21 +1,18 @@
 import os
-import sys
 import torch
 import py3_wget
 from pathlib import Path
 import torchvision.transforms as tfm
 from kornia.feature import DeDoDe
 import kornia
-from matching import get_version
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))
+from matching import get_version, THIRD_PARTY_DIR, WEIGHTS_DIR, BaseMatcher
+from matching.utils import add_to_path, resize_to_divisible
+
+add_to_path(THIRD_PARTY_DIR.joinpath('DeDoDe'))
 
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
-
-from matching.base_matcher import BaseMatcher
-from matching.utils import resize_to_divisible
-from matching import WEIGHTS_DIR
 
 
 class DedodeMatcher(BaseMatcher):

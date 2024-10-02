@@ -1,18 +1,17 @@
-import sys
-from pathlib import Path
 import torch
 import torchvision.transforms as tfm
 from kornia.augmentation import PadTo
 from kornia.utils import tensor_to_image
 
-BASE_PATH = str(Path(__file__).parent.parent.joinpath("third_party/RoMa"))
-sys.path.append(BASE_PATH)
+
+from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import add_to_path
+
+add_to_path(THIRD_PARTY_DIR.joinpath('RoMa'))
 from romatch import roma_outdoor, tiny_roma_v1_outdoor
 
-from matching.base_matcher import BaseMatcher
 from PIL import Image
 from skimage.util import img_as_ubyte
-
 
 class RomaMatcher(BaseMatcher):
     dino_patch_size = 14

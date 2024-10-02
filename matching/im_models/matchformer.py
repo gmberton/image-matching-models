@@ -1,15 +1,12 @@
 import torch
 from pathlib import Path
 import gdown
-import sys
 import torchvision.transforms as tfm
 
-from matching import WEIGHTS_DIR
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, lower_config
+from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/MatchFormer")
-sys.path.append(str(BASE_PATH))
+add_to_path(THIRD_PARTY_DIR.joinpath('MatchFormer'))
 
 from model.matchformer import Matchformer
 from config.defaultmf import get_cfg_defaults as mf_cfg_defaults

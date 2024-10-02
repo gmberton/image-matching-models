@@ -1,15 +1,13 @@
-import sys
-from pathlib import Path
 import torchvision.transforms as tfm
 import torch
 import os
 import gdown
 
-from matching import WEIGHTS_DIR
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, lower_config
+from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/Se2_LoFTR")))
+
+add_to_path(THIRD_PARTY_DIR.joinpath('Se2_LoFTR'), insert=0)
 from src.loftr.loftr import LoFTR
 from configs.loftr.outdoor.loftr_ds_e2_dense_8rot import cfg as rot8_cfg
 from configs.loftr.outdoor.loftr_ds_e2_dense_big import cfg as big_cfg

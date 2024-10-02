@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 import yaml
 import py3_wget
@@ -9,12 +8,13 @@ import shutil
 import torchvision.transforms as tfm
 import gdown
 
-BASE_PATH = Path(__file__).parent.parent.resolve() / "third_party/imatch-toolbox"
-sys.path.append(str(Path(BASE_PATH)))
+
+from matching.utils import add_to_path, resize_to_divisible
+from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+
+BASE_PATH = THIRD_PARTY_DIR.joinpath('imatch-toolbox')
+add_to_path(BASE_PATH)
 import immatch
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible
-from matching import WEIGHTS_DIR
 
 
 class Patch2pixMatcher(BaseMatcher):

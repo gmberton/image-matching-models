@@ -7,9 +7,7 @@ import warnings
 from pathlib import Path
 from typing import Tuple
 
-from matching import get_matcher
 from matching.utils import to_normalized_coords, to_px_coords, to_numpy
-
 
 class BaseMatcher(torch.nn.Module):
     """
@@ -205,6 +203,8 @@ class BaseMatcher(torch.nn.Module):
 
 class EnsembleMatcher(BaseMatcher):
     def __init__(self, matcher_names=[], device="cpu", **kwargs):
+        from matching import get_matcher
+
         super().__init__(device, **kwargs)
 
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]

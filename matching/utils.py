@@ -165,3 +165,11 @@ def load_module(module_name: str, module_path: Path | str) -> None:
     module = importlib.util.module_from_spec(spec)
     sys.modules[module_name] = module
     spec.loader.exec_module(module)
+
+
+def add_to_path(path: str | Path, insert=None) -> None:
+    path = str(path)
+    if insert is None:
+        sys.path.append(path)
+    else:
+        sys.path.insert(insert, path)

@@ -1,16 +1,14 @@
-from matching.base_matcher import BaseMatcher
-from matching.utils import load_module
-from matching import WEIGHTS_DIR
 import torch
-import sys
-from pathlib import Path
 import py3_wget
 
 import gdown
 from kornia.color import rgb_to_grayscale
 
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/gim")
-sys.path.append(str(BASE_PATH))
+from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching.utils import load_module, add_to_path
+
+BASE_PATH = THIRD_PARTY_DIR.joinpath("gim")
+add_to_path(BASE_PATH)
 from dkm.models.model_zoo.DKMv3 import DKMv3
 
 
