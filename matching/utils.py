@@ -169,6 +169,8 @@ def load_module(module_name: str, module_path: Path | str) -> None:
 
 def add_to_path(path: str | Path, insert=None) -> None:
     path = str(path)
+    if path in sys.path:
+        sys.path.remove(path)
     if insert is None:
         sys.path.append(path)
     else:
