@@ -48,7 +48,7 @@ SIFT and DeDoDe
 
 ## Install
 ### From Source [Recommended]
-If you want to to install from source (easiest to edit, use `test.py` and `benchmark.py`, `demo.ipynb`), 
+If you want to to install from source (easiest to edit, use `benchmark.py`, `demo.ipynb`), 
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
