@@ -2,6 +2,8 @@ import torch
 import torchvision.transforms as tfm
 from kornia.augmentation import PadTo
 from kornia.utils import tensor_to_image
+import tempfile
+from pathlib import Path
 
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
@@ -37,17 +39,24 @@ class RomaMatcher(BaseMatcher):
         if pad:
             img = self.pad(img)
         img = tensor_to_image(img)
-        return Image.fromarray(img_as_ubyte(img), mode="RGB")
+        pil_img = Image.fromarray(img_as_ubyte(img), mode="RGB")
+        temp = tempfile.NamedTemporaryFile('w+b', suffix='.png', delete=False)
+        pil_img.save(temp.name, format='png')
+        return temp, pil_img.size
 
     def _forward(self, img0, img1, pad=False):
         if pad:
             self.compute_padding(img0, img1)
-        img0 = self.preprocess(img0)
-        img1 = self.preprocess(img1)
-        w0, h0 = img0.size
-        w1, h1 = img1.size
+        img0_temp, img0_size = self.preprocess(img0)
+        img1_temp, img1_size = self.preprocess(img1)
+        w0, h0 = img0_size
+        w1, h1 = img1_size
 
-        warp, certainty = self.roma_model.match(img0, img1, batched=False, device=self.device)
+        warp, certainty = self.roma_model.match(img0_temp.name, img1_temp.name, batched=False, device=self.device)
+
+        img0_temp.close(), img1_temp.close()
+        Path(img0_temp.name).unlink()
+        Path(img1_temp.name).unlink()
 
         matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)

@@ -114,7 +114,7 @@ class BaseMatcher(torch.nn.Module):
 
         return H, inlier_kpts0, inlier_kpts1
 
-    def preprocess(self, img: torch.Tensor) -> torch.Tensor:
+    def preprocess(self, img: torch.Tensor) -> Tuple[torch.Tensor, Tuple[int, int]]:
         """Image preprocessing for each matcher. Some matchers require grayscale, normalization, etc.
         Applied to each input img independently
 
@@ -124,9 +124,11 @@ class BaseMatcher(torch.nn.Module):
             img (torch.Tensor): input image (before preprocessing)
 
         Returns:
-            img (torch.Tensor): img after preprocessing
+            img, (H,W) (Tuple[torch.Tensor, Tuple[int, int]]): img after preprocessing, original image shape
         """
-        return img
+        _, h, w = img.shape
+        orig_shape = h, w
+        return img, orig_shape
 
     @torch.inference_mode()
     def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path) -> dict:

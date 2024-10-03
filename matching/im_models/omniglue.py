@@ -66,8 +66,6 @@ class OmniglueMatcher(BaseMatcher):
                 OmniglueMatcher.DINOv2_PATH,
             )
 
-        return NotImplementedError
-
     def preprocess(self, img):
         if isinstance(img, torch.Tensor):
             img = tensor_to_image(img)

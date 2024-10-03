@@ -28,7 +28,7 @@ class MatchformerMatcher(BaseMatcher):
         if not Path(self.weights_path).is_file():
             print("Downloading Matchformer outdoor... (takes a while)")
             gdown.download(
-                Matchformer.weights_src,
+                MatchformerMatcher.weights_src,
                 output=str(self.weights_path),
                 fuzzy=True,
             )
