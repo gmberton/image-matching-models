@@ -3,17 +3,20 @@ File to import matchers. The module's import are within the functions, so that
 a module is imported only iff needed, reducing the number of raised errors and
 warnings due to unused modules.
 """
-
-import sys
 from pathlib import Path
-from .utils import supress_stdout
+from .utils import supress_stdout, add_to_path
+from .im_models.base_matcher import BaseMatcher
 
 # add viz2d from lightglue to namespace - thanks lightglue!
-sys.path.append(str(Path(__file__).parent.parent / "third_party/LightGlue"))
+THIRD_PARTY_DIR = Path(__file__).parent.joinpath('third_party')
+
+add_to_path(THIRD_PARTY_DIR.joinpath('LightGlue'))
 from lightglue import viz2d  # for quick import later 'from matching import viz2d'
 
-WEIGHTS_DIR = Path(__file__).parent.parent.joinpath("model_weights")
+WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
 WEIGHTS_DIR.mkdir(exist_ok=True)
+
+__version__ = "1.0.0"
 
 available_models = [
     "loftr",
@@ -64,68 +67,68 @@ def get_version(pkg):
 @supress_stdout
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
-        from matching.base_matcher import EnsembleMatcher
+        from matching.im_models.base_matcher import EnsembleMatcher
 
         return EnsembleMatcher(matcher_name, device, *args, **kwargs)
     if "subpx" in matcher_name:
-        from matching import keypt2subpx
+        from matching.im_models import keypt2subpx
 
         detector_name = matcher_name.removesuffix("-subpx")
 
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
 
     if matcher_name == "loftr":
-        from matching import loftr
+        from matching.im_models import loftr
 
         return loftr.LoftrMatcher(device, *args, **kwargs)
 
     if matcher_name == "eloftr":
-        from matching import efficient_loftr
+        from matching.im_models import efficient_loftr
 
         return efficient_loftr.EfficientLoFTRMatcher(device, *args, **kwargs)
 
     if matcher_name == "se2loftr":
-        from matching import se2loftr
+        from matching.im_models import se2loftr
 
         return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
 
     elif matcher_name == "aspanformer":
-        from matching import aspanformer
+        from matching.im_models import aspanformer
 
         return aspanformer.AspanformerMatcher(device, *args, **kwargs)
 
     elif matcher_name == "matchformer":
-        from matching import matchformer
+        from matching.im_models import matchformer
 
         return matchformer.MatchformerMatcher(device, *args, **kwargs)
 
     elif matcher_name == "sift-lg":
-        from matching import lightglue
+        from matching.im_models import lightglue
 
         return lightglue.SiftLightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "superpoint-lg":
-        from matching import lightglue
+        from matching.im_models import lightglue
 
         return lightglue.SuperpointLightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "disk-lg":
-        from matching import lightglue
+        from matching.im_models import lightglue
 
         return lightglue.DiskLightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "aliked-lg":
-        from matching import lightglue
+        from matching.im_models import lightglue
 
         return lightglue.AlikedLightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "doghardnet-lg":
-        from matching import lightglue
+        from matching.im_models import lightglue
 
         return lightglue.DognetLightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif "roma" in matcher_name:
-        from matching import roma
+        from matching.im_models import roma
 
         if "tiny" in matcher_name:
             return roma.TinyRomaMatcher(device, max_num_keypoints, *args, **kwargs)
@@ -133,67 +136,67 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
             return roma.RomaMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode":
-        from matching import dedode
+        from matching.im_models import dedode
 
         return dedode.DedodeMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode-kornia":
-        from matching import dedode
+        from matching.im_models import dedode
 
         return dedode.DedodeKorniaMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "steerers":
-        from matching import steerers
+        from matching.im_models import steerers
 
         return steerers.SteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "sift-nn":
-        from matching import handcrafted
+        from matching.im_models import handcrafted
 
         return handcrafted.SiftNNMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "orb-nn":
-        from matching import handcrafted
+        from matching.im_models import handcrafted
 
         return handcrafted.OrbNNMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "patch2pix":
-        from matching import matching_toolbox
+        from matching.im_models import matching_toolbox
 
         return matching_toolbox.Patch2pixMatcher(device, *args, **kwargs)
 
     elif matcher_name == "superglue":
-        from matching import matching_toolbox
+        from matching.im_models import matching_toolbox
 
         return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "r2d2":
-        from matching import matching_toolbox
+        from matching.im_models import matching_toolbox
 
         return matching_toolbox.R2D2Matcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "d2net":
-        from matching import matching_toolbox
+        from matching.im_models import matching_toolbox
 
         return matching_toolbox.D2netMatcher(device, *args, **kwargs)
 
     elif matcher_name in ["duster", "dust3r"]:
-        from matching import duster
+        from matching.im_models import duster
 
         return duster.Dust3rMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name in ["master", "mast3r"]:
-        from matching import master
+        from matching.im_models import master
 
         return master.Mast3rMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "doghardnet-nn":
-        from matching import matching_toolbox
+        from matching.im_models import matching_toolbox
 
         return matching_toolbox.DogAffHardNNMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif "xfeat" in matcher_name:
-        from matching import xfeat
+        from matching.im_models import xfeat
 
         kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
 
@@ -202,27 +205,27 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode-lg":
-        from matching import kornia
+        from matching.im_models import kornia
 
         return kornia.DeDoDeLightGlue(device, *args, **kwargs)
 
     elif matcher_name == "gim-dkm":
-        from matching import gim
+        from matching.im_models import gim
 
         return gim.GIM_DKM(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "gim-lg":
-        from matching import gim
+        from matching.im_models import gim
 
         return gim.GIM_LG(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "silk":
-        from matching import silk
+        from matching.im_models import silk
 
         return silk.SilkMatcher(device, *args, **kwargs)
 
     elif matcher_name == "omniglue":
-        from matching import omniglue
+        from matching.im_models import omniglue
 
         return omniglue.OmniglueMatcher(device, *args, **kwargs)
     else:

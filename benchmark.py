@@ -114,7 +114,7 @@ def main(args):
     elif args.task == "test":
         with open("test_results.txt", "w") as f:
             test_str = "Matcher, Passing Tests, Error (px)"
-            f.write(test_str + "\n")
+            f.write(test_str + "\n" + '-'* 40 +'\n')
             tqdm.write(test_str)
 
             for model in tqdm(args.models):
@@ -126,6 +126,7 @@ def main(args):
                     f.write(test_str + "\n")
                     tqdm.write(test_str)
                 except Exception as e:
+                    f.write(f"Error with {model}: {e}")
                     tqdm.write(f"Error with {model}: {e}")
 
 

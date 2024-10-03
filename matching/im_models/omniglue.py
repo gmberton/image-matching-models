@@ -1,15 +1,3 @@
-from matching.base_matcher import BaseMatcher, to_numpy
-import sys
-from pathlib import Path
-
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/omniglue")
-OMNI_SRC_PATH = BASE_PATH.joinpath("src")
-OMNI_THIRD_PARTY_PATH = BASE_PATH
-
-sys.path.append(str(OMNI_SRC_PATH))
-sys.path.append(str(OMNI_THIRD_PARTY_PATH))  # allow access to dinov2
-import omniglue
-
 import py3_wget
 import tarfile
 import zipfile
@@ -18,8 +6,17 @@ import torch
 import numpy as np
 from skimage.util import img_as_ubyte
 
-from matching import WEIGHTS_DIR
+from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
+from matching.utils import add_to_path
 
+
+BASE_PATH = THIRD_PARTY_DIR.joinpath("omniglue")
+OMNI_SRC_PATH = BASE_PATH.joinpath("src")
+OMNI_THIRD_PARTY_PATH = BASE_PATH
+
+add_to_path(OMNI_SRC_PATH)
+add_to_path(OMNI_THIRD_PARTY_PATH) # allow access to dinov2
+import omniglue
 
 class OmniglueMatcher(BaseMatcher):
 
@@ -68,8 +65,6 @@ class OmniglueMatcher(BaseMatcher):
                 "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
                 OmniglueMatcher.DINOv2_PATH,
             )
-
-        return NotImplementedError
 
     def preprocess(self, img):
         if isinstance(img, torch.Tensor):

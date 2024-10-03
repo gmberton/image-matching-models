@@ -1,16 +1,14 @@
 import torch
 from pathlib import Path
 import gdown
-import sys
 import torchvision.transforms as tfm
 import tarfile
 
-from matching import WEIGHTS_DIR
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, lower_config
+from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/aspanformer")
-sys.path.append(str(BASE_PATH))
+BASE_PATH = THIRD_PARTY_DIR.joinpath("aspanformer")
+add_to_path(BASE_PATH)
 
 from src.ASpanFormer.aspanformer import ASpanFormer
 from src.config.default import get_cfg_defaults as aspan_cfg_defaults

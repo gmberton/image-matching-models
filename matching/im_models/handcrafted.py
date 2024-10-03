@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import torch
 
-from matching.base_matcher import BaseMatcher
+from matching import BaseMatcher
 from matching.utils import to_numpy
 
 

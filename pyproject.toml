@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "image-matching-models"
-version = "1.0"
 readme = "README.md"
 description = "Easily test and apply pairwise image matching models"
 authors = [
@@ -16,12 +15,16 @@ maintainers = [
   {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
 ]
-
+requires-python = ">= 3.10"
+license = {file = "LICENSE"}
 keywords = ["image matching"]
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python"
 ]
+dynamic = ["version",
+            "dependencies"]
+
 
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
@@ -30,8 +33,14 @@ Repository = "https://github.com/gmberton/image-matching-models"
 # "Bug Tracker" = "https://github.com/me/spam/issues"
 # Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
-[tool.setuptools]
-packages = ["matching"]
+[tool.setuptools.dynamic]
+dependencies = { file = [
+  "./requirements.txt",
+] }
+version = { attr = "matching.__version__" }
+
+[tool.setuptools.packages]
+find = {}
 
 [project.optional-dependencies]
 silk = [
@@ -48,3 +57,4 @@ omniglue = ["tensorflow"
             ] 
 
 duster = ["huggingface_hub"]
+all = ["image-matching-models[loftrs, omniglue, duster]"]

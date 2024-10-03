@@ -1,21 +1,17 @@
-import sys
-from pathlib import Path
 import os
 import torchvision.transforms as tfm
 import py3_wget
 import numpy as np
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/mast3r")))
+from matching import BaseMatcher, WEIGHTS_DIR, THIRD_PARTY_DIR
+from matching.utils import resize_to_divisible, add_to_path
+
+add_to_path(THIRD_PARTY_DIR.joinpath("mast3r"))
 
 from mast3r.model import AsymmetricMASt3R
 from mast3r.fast_nn import fast_reciprocal_NNs
 
 from dust3r.inference import inference
-
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible
-
-from matching import WEIGHTS_DIR
 
 
 class Mast3rMatcher(BaseMatcher):

@@ -1,22 +1,19 @@
-import sys
-from pathlib import Path
 import torch
 import numpy as np
-
-from matching.base_matcher import BaseMatcher
-from matching import get_matcher
-from matching.utils import to_numpy, to_tensor, load_module
 
 from omegaconf import OmegaConf
 import torchvision.transforms as tfm
 
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/keypt2subpx")
-sys.path.append(str(BASE_PATH))
+from matching import get_matcher, BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import to_numpy, to_tensor, load_module, add_to_path
+
+BASE_PATH = THIRD_PARTY_DIR.joinpath("keypt2subpx")
+add_to_path(BASE_PATH)
 
 load_module("gluefactory", BASE_PATH.joinpath("submodules/glue_factory/gluefactory/__init__.py"))
 from dataprocess.superpoint_densescore import *
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/LightGlue")))
+add_to_path(THIRD_PARTY_DIR.joinpath('LightGlue'))
 from lightglue import LightGlue
 from lightglue.utils import rbd, batch_to_device
 

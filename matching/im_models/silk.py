@@ -1,12 +1,12 @@
-import sys
-from pathlib import Path
 import py3_wget
-from matching.base_matcher import BaseMatcher, to_numpy
 from kornia.color import rgb_to_grayscale
 import shutil
 
-BASE_PATH = Path(__file__).parent.parent.joinpath("third_party/silk")
-sys.path.append(str(BASE_PATH))
+from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import add_to_path
+
+BASE_PATH = THIRD_PARTY_DIR.joinpath("silk")
+add_to_path(BASE_PATH)
 
 
 def setup_silk():

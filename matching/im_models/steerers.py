@@ -1,28 +1,23 @@
-import sys
-from pathlib import Path
 import torch
 import os
 import torchvision.transforms as tfm
 import py3_wget
-from matching.base_matcher import BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible
+from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
+from matching.utils import resize_to_divisible, add_to_path
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/DeDoDe")))
+
+add_to_path(THIRD_PARTY_DIR.joinpath('DeDoDe'))
 from DeDoDe import (
     dedode_detector_L,
     dedode_descriptor_B,
 )
 
-sys.path.append(str(Path(__file__).parent.parent.joinpath("third_party/Steerers")))
+add_to_path(THIRD_PARTY_DIR.joinpath('Steerers'))
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
 from rotation_steerers.matchers.max_similarity import (
     MaxSimilarityMatcher,
     ContinuousMaxSimilarityMatcher,
 )
-
-from matching import WEIGHTS_DIR
-
-
 class SteererMatcher(BaseMatcher):
     detector_path_L = WEIGHTS_DIR.joinpath("dedode_detector_L.pth")
 
