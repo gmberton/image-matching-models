@@ -22,9 +22,10 @@ class BaseMatcher(torch.nn.Module):
     DEFAULT_RANSAC_CONF = 0.95
     DEFAULT_REPROJ_THRESH = 3
 
-    def __init__(self, device="cpu", **kwargs):
+    def __init__(self, device="cpu", skip_homography=False, **kwargs):
         super().__init__()
         self.device = device
+        self.skip_homography = skip_homography  # New parameter
 
         self.ransac_iters = kwargs.get("ransac_iters", BaseMatcher.DEFAULT_RANSAC_ITERS)
         self.ransac_conf = kwargs.get("ransac_conf", BaseMatcher.DEFAULT_RANSAC_CONF)
@@ -172,10 +173,18 @@ class BaseMatcher(torch.nn.Module):
         matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1 = self._forward(img0, img1)
 
         matched_kpts0, matched_kpts1 = to_numpy(matched_kpts0), to_numpy(matched_kpts1)
-        H, inlier_kpts0, inlier_kpts1 = self.process_matches(matched_kpts0, matched_kpts1)
+        if not self.skip_homography:
+            # Perform homography estimation and inlier filtering
+            H, inlier_kpts0, inlier_kpts1 = self.process_matches(matched_kpts0, matched_kpts1)
+            num_inliers = len(inlier_kpts0)
+        else:
+            # Skip homography estimation; consider all matches as inliers
+            H = None
+            inlier_kpts0, inlier_kpts1 = matched_kpts0, matched_kpts1
+            num_inliers = len(inlier_kpts0)
 
         return {
-            "num_inliers": len(inlier_kpts0),
+            "num_inliers": num_inliers,
             "H": H,
             "all_kpts0": to_numpy(all_kpts0),
             "all_kpts1": to_numpy(all_kpts1),
