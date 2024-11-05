@@ -201,7 +201,7 @@ This repo was created as part of the EarthMatch paper. Please consider citing Ea
 
 ```
 @InProceedings{Berton_2024_EarthMatch,
-    author    = {Gabriele Berton, Gabriele Goletto, Gabriele Trivigno, Alex Stoken, Barbara Caputo, Carlo Masone},
+    author    = {Berton, Gabriele and Goletto, Gabriele and Trivigno, Gabriele and Stoken, Alex and Caputo, Barbara and Masone, Carlo},
     title     = {EarthMatch: Iterative Coregistration for Fine-grained Localization of Astronaut Photography},
     booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
     month     = {June},
