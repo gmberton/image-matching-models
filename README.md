@@ -76,10 +76,11 @@ You can use any of the matchers with
 
 ```python
 from matching import get_matcher
+from matching.viz import plot_matches
 
-device = 'cuda' # 'cpu'
-matcher = get_matcher('superglue', device=device)  # Choose any of our ~30+ matchers listed below
-img_size = 512 # optional
+device = 'cuda'  # 'cpu'
+matcher = get_matcher('superpoint-lg', device=device)  # Choose any of our ~30+ matchers listed below
+img_size = 512  # optional
 
 img0 = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
 img1 = matcher.load_image('assets/example_pairs/outdoor/montmartre_far.jpg', resize=img_size)
@@ -87,7 +88,7 @@ img1 = matcher.load_image('assets/example_pairs/outdoor/montmartre_far.jpg', res
 result = matcher(img0, img1)
 num_inliers, H, inlier_kpts0, inlier_kpts1 = result['num_inliers'], result['H'], result['inlier_kpts0'], result['inlier_kpts1']
 # result.keys() = ['num_inliers', 'H', 'all_kpts0', 'all_kpts1', 'all_desc0', 'all_desc1', 'matched_kpts0', 'matched_kpts1', 'inlier_kpts0', 'inlier_kpts1']
-plot_matches(img0, img1, result)
+plot_matches(img0, img1, result, save_path='plot_matches.png')
 ```
 
 You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. You may also resolution (`im_size`) and number of keypoints (`n_kpts`). This will take a few seconds on a laptop's CPU, and will produce the same images that you see above.
