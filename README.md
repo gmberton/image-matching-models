@@ -60,6 +60,8 @@ pip install .[all]
 ```
 This will install all dependencies needed to run all models.
 
+We recommend using torch>=2.2, we didn't test most models with older versions.
+
 ### As package (simplest)
 You can install directly to your package directory with 
 ```bash

@@ -1,5 +1,5 @@
 # usage: pip install -r requirements.txt
-torch>=2.2.0
+torch
 torchvision
 opencv-python
 matplotlib
