@@ -13,7 +13,6 @@ gdown>=5.1.0
 tables
 imageio
 vispy
-xformers; sys_platform == 'linux'
 pyglet==1.5.28
 tensorboard
 scipy

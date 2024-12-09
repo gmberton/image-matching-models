@@ -56,5 +56,7 @@ loftrs = ["pytorch-lightning==1.5.2"
 omniglue = ["tensorflow"
             ] 
 
+cuda = ["xformers"]
+
 duster = ["huggingface_hub"]
 all = ["image-matching-models[loftrs, omniglue, duster]"]

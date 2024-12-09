@@ -2,7 +2,7 @@
 
 A unified API for quickly and easily trying 29 (and growing!) image matching models.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alexstoken/image-matching-models/blob/main/demo.ipynb)
 
 Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model/Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
 
@@ -50,7 +50,7 @@ SIFT and DeDoDe
 ### From Source [Recommended]
 If you want to to install from source (easiest to edit, use `benchmark.py`, `demo.ipynb`), 
 ```bash
-git clone --recursive https://github.com/gmberton/image-matching-models
+git clone --recursive https://github.com/alexstoken/image-matching-models
 cd image-matching-models
 pip install .
 ```
@@ -65,11 +65,11 @@ We recommend using torch>=2.2, we didn't test most models with older versions.
 ### As package (simplest)
 You can install directly to your package directory with 
 ```bash
-pip install git+https://github.com/gmberton/image-matching-models.git
+pip install git+https://github.com/alexstoken/image-matching-models.git
 ```
 Similar to the above, to get all optional dependencies, use the `[all]` addendum:
 ```bash
-pip install "image-matching-models[all] @ git+https://github.com/gmberton/image-matching-models.git"
+pip install "image-matching-models[all] @ git+https://github.com/alexstoken/image-matching-models.git"
 ```
 
 ## Use
