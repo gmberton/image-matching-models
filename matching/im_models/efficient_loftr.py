@@ -8,7 +8,7 @@ import torchvision.transforms as tfm
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath('EfficientLoFTR'), insert=0)
+add_to_path(THIRD_PARTY_DIR.joinpath("EfficientLoFTR"), insert=0)
 
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 

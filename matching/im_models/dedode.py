@@ -9,7 +9,7 @@ import kornia
 from matching import get_version, THIRD_PARTY_DIR, WEIGHTS_DIR, BaseMatcher
 from matching.utils import add_to_path, resize_to_divisible
 
-add_to_path(THIRD_PARTY_DIR.joinpath('DeDoDe'))
+add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
 
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
@@ -121,7 +121,7 @@ class DedodeKorniaMatcher(BaseMatcher):
         descriptor_weights="G-C4",
         match_thresh=0.05,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(device, **kwargs)
 

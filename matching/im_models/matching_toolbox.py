@@ -12,7 +12,7 @@ import gdown
 from matching.utils import add_to_path, resize_to_divisible
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 
-BASE_PATH = THIRD_PARTY_DIR.joinpath('imatch-toolbox')
+BASE_PATH = THIRD_PARTY_DIR.joinpath("imatch-toolbox")
 add_to_path(BASE_PATH)
 import immatch
 

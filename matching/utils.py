@@ -12,7 +12,7 @@ logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
 def get_image_pairs_paths(inputs):
-    
+
     if len(inputs) > 2:
         raise ValueError(f"--input should be one or two paths, not {len(inputs)} paths like {inputs}")
 
@@ -21,10 +21,10 @@ def get_image_pairs_paths(inputs):
         if not inputs[0].is_file() or not inputs[1].is_file():
             raise ValueError(f"If --input is two paths, it should be two images, not {inputs}")
         return [inputs]
-    
+
     assert len(inputs) == 1
     inputs = Path(inputs[0])
-    
+
     if not inputs.exists():
         raise ValueError(f"{inputs} does not exist")
 

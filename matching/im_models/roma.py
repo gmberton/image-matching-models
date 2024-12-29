@@ -9,11 +9,12 @@ from pathlib import Path
 from matching import BaseMatcher, THIRD_PARTY_DIR
 from matching.utils import add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath('RoMa'))
+add_to_path(THIRD_PARTY_DIR.joinpath("RoMa"))
 from romatch import roma_outdoor, tiny_roma_v1_outdoor
 
 from PIL import Image
 from skimage.util import img_as_ubyte
+
 
 class RomaMatcher(BaseMatcher):
     dino_patch_size = 14
@@ -40,8 +41,8 @@ class RomaMatcher(BaseMatcher):
             img = self.pad(img)
         img = tensor_to_image(img)
         pil_img = Image.fromarray(img_as_ubyte(img), mode="RGB")
-        temp = tempfile.NamedTemporaryFile('w+b', suffix='.png', delete=False)
-        pil_img.save(temp.name, format='png')
+        temp = tempfile.NamedTemporaryFile("w+b", suffix=".png", delete=False)
+        pil_img.save(temp.name, format="png")
         return temp, pil_img.size
 
     def _forward(self, img0, img1, pad=False):

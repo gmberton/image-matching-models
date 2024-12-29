@@ -9,6 +9,7 @@ from typing import Tuple
 
 from matching.utils import to_normalized_coords, to_px_coords, to_numpy
 
+
 class BaseMatcher(torch.nn.Module):
     """
     This serves as a base class for all matchers. It provides a simple interface

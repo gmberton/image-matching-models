@@ -1,4 +1,3 @@
-
 import sys
 from matching import viz2d
 import numpy as np
@@ -65,7 +64,7 @@ def plot_matches(
     return ax
 
 
-def plot_kpts(img0, result_dict, model_name='', save_path=None):
+def plot_kpts(img0, result_dict, model_name="", save_path=None):
     """Plot keypoints in one image.
 
     Args:
@@ -77,13 +76,13 @@ def plot_kpts(img0, result_dict, model_name='', save_path=None):
         List[plt.Axes]: plot axes
     """
     if len(model_name):
-        model_name = ' - '+ model_name
+        model_name = " - " + model_name
     ax = viz2d.plot_images([img0])
     viz2d.plot_keypoints([result_dict["all_kpts0"]], colors="orange", ps=10)
     viz2d.add_text(0, f"{len(result_dict['all_kpts0'])} kpts" + model_name, fs=20)
     if model_name is not None:
         viz2d.add_text(0, f"{len(result_dict['all_kpts0'])}", fs=20)
-        
+
     if save_path is not None:
         viz2d.save_plot(save_path)
 

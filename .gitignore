@@ -5,3 +5,4 @@ model_weights
 outputs_*
 *.egg-info/*
 build
+matching/third_party/*

@@ -5,9 +5,10 @@ import gdown, py3_wget
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath('path/to/submodule'))
+add_to_path(THIRD_PARTY_DIR.joinpath("path/to/submodule"))
 
 from submodule import model, other_components
+
 
 class NewMatcher(BaseMatcher):
     weights_src = "url-to-weights-hosted-online"
@@ -27,24 +28,23 @@ class NewMatcher(BaseMatcher):
         # check if weights exist, otherwise download them
         if not Path(NewMatcher.model_path).is_file():
             print("Downloading model... (takes a while)")
-            
+
             # if a google drive link
             gdown.download(
                 NewMatcher.weights_src,
                 output=str(NewMatcher.model_path),
                 fuzzy=True,
             )
-            
+
             # else
             py3_wget.download_file(NewMatcher.model_path, NewMatcher.model_path)
-
 
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
         # if requires divisibility
         img = resize_to_divisible(img, self.divisible_size)
-        
+
         # if model requires a "batch"
         img = img.unsqueeze(0)
         return img, orig_shape
@@ -59,7 +59,6 @@ class NewMatcher(BaseMatcher):
         output = self.matcher(batch)
 
         # postprocess model output to get kpts, desc, etc
-
 
         # if we had to resize the img to divisible, then rescale the kpts back to input img size
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]

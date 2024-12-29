@@ -6,7 +6,7 @@ import torchvision.transforms as tfm
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath('MatchFormer'))
+add_to_path(THIRD_PARTY_DIR.joinpath("MatchFormer"))
 
 from model.matchformer import Matchformer
 from config.defaultmf import get_cfg_defaults as mf_cfg_defaults

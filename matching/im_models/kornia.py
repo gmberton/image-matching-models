@@ -5,6 +5,7 @@ import kornia
 from matching.utils import to_numpy
 from matching import get_version, BaseMatcher
 
+
 class DeDoDeLightGlue(BaseMatcher):
 
     detector_options = ["L-upright", "L-C4", "L-SO2", "L-C4-v2"]

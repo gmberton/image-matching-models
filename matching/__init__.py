@@ -3,14 +3,15 @@ File to import matchers. The module's import are within the functions, so that
 a module is imported only iff needed, reducing the number of raised errors and
 warnings due to unused modules.
 """
+
 from pathlib import Path
 from .utils import supress_stdout, add_to_path
 from .im_models.base_matcher import BaseMatcher
 
 # add viz2d from lightglue to namespace - thanks lightglue!
-THIRD_PARTY_DIR = Path(__file__).parent.joinpath('third_party')
+THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")
 
-add_to_path(THIRD_PARTY_DIR.joinpath('LightGlue'))
+add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 from lightglue import viz2d  # for quick import later 'from matching import viz2d'
 
 WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")

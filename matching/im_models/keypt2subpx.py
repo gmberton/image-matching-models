@@ -13,7 +13,7 @@ add_to_path(BASE_PATH)
 load_module("gluefactory", BASE_PATH.joinpath("submodules/glue_factory/gluefactory/__init__.py"))
 from dataprocess.superpoint_densescore import *
 
-add_to_path(THIRD_PARTY_DIR.joinpath('LightGlue'))
+add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 from lightglue import LightGlue
 from lightglue.utils import rbd, batch_to_device
 

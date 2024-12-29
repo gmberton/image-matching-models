@@ -7,7 +7,7 @@ import py3_wget
 from matching.utils import add_to_path, resize_to_divisible
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 
-add_to_path(THIRD_PARTY_DIR.joinpath('duster'))
+add_to_path(THIRD_PARTY_DIR.joinpath("duster"))
 
 from dust3r.inference import inference
 from dust3r.model import AsymmetricCroCo3DStereo

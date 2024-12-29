@@ -6,6 +6,7 @@ from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 
+
 class LightGlueBase(BaseMatcher):
     """
     This class is the parent for all methods that use LightGlue as a matcher,

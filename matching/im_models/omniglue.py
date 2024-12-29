@@ -15,8 +15,9 @@ OMNI_SRC_PATH = BASE_PATH.joinpath("src")
 OMNI_THIRD_PARTY_PATH = BASE_PATH
 
 add_to_path(OMNI_SRC_PATH)
-add_to_path(OMNI_THIRD_PARTY_PATH) # allow access to dinov2
+add_to_path(OMNI_THIRD_PARTY_PATH)  # allow access to dinov2
 import omniglue
+
 
 class OmniglueMatcher(BaseMatcher):
 
