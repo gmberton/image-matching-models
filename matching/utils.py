@@ -12,25 +12,43 @@ logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
 def get_image_pairs_paths(inputs):
-    inputs = Path(inputs)
+    
+    if len(inputs) > 2:
+        raise ValueError(f"--input should be one or two paths, not {len(inputs)} paths like {inputs}")
+
+    if len(inputs) == 2:
+        # --input is two paths of images
+        if not inputs[0].is_file() or not inputs[1].is_file():
+            raise ValueError(f"If --input is two paths, it should be two images, not {inputs}")
+        return [inputs]
+    
+    assert len(inputs) == 1
+    inputs = Path(inputs[0])
+    
     if not inputs.exists():
-        raise RuntimeError(f"{inputs} does not exist")
+        raise ValueError(f"{inputs} does not exist")
 
     if inputs.is_file():
+        # --input is a file with pairs of images paths
         with open(inputs) as file:
             lines = file.read().splitlines()
         pairs_of_paths = [line.strip().split(" ") for line in lines]
         for pair in pairs_of_paths:
             if len(pair) != 2:
-                raise RuntimeError(f"{pair} should be a pair of paths")
-        pairs_of_paths = [(Path(path0.strip()), Path(path1.strip())) for path0, path1 in pairs_of_paths]
+                raise ValueError(f"{pair} should be a pair of paths")
+        return [(Path(path0.strip()), Path(path1.strip())) for path0, path1 in pairs_of_paths]
     else:
-        pair_dirs = sorted(Path(inputs).glob("*"))
-        pairs_of_paths = [list(pair_dir.glob("*")) for pair_dir in pair_dirs]
-        for pair in pairs_of_paths:
-            if len(pair) != 2:
-                raise RuntimeError(f"{pair} should be a pair of paths")
-    return pairs_of_paths
+        inner_files = sorted(Path(inputs).glob("*"))
+        if len(inner_files) == 2 and inner_files[0].is_file() and inner_files[1].is_file():
+            # --input is a dir with a pair of images
+            return [inner_files]
+        else:
+            # --input is a dir of subdirs, where each subdir has a pair of images
+            pairs_of_paths = [list(pair_dir.glob("*")) for pair_dir in inner_files]
+            for pair in pairs_of_paths:
+                if len(pair) != 2:
+                    raise ValueError(f"{pair} should be a pair of paths")
+            return pairs_of_paths
 
 
 def to_numpy(x: torch.Tensor | np.ndarray | dict | list) -> np.ndarray:

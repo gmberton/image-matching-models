@@ -25,9 +25,7 @@ def main(args):
         # Find all jpg, jpeg and png images within args.input_dir
         images_paths = args.input.rglob("*.(jpg|png|jpeg)")
         images_paths = (
-            list(args.input.rglob("*.jpg"))
-            + list(args.input.rglob("*.jpeg"))
-            + list(args.input.rglob("*.png"))
+            list(args.input.rglob("*.jpg")) + list(args.input.rglob("*.jpeg")) + list(args.input.rglob("*.png"))
         )
 
     for i, img_path in enumerate(images_paths):

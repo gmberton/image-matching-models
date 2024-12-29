@@ -69,9 +69,11 @@ def parse_args():
 
     parser.add_argument(
         "--input",
-        type=str,
+        type=Path,
+        nargs="+",  # Accept one or more arguments
         default="assets/example_pairs",
-        help="path to either (1) dir with dirs with image pairs or (2) txt file with two image paths per line",
+        help="path to either (1) two image paths or (2) dir with two images or (3) dir with dirs with image pairs or "
+        "(4) txt file with two image paths per line",
     )
     parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
 
