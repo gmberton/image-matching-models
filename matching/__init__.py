@@ -55,6 +55,7 @@ available_models = [
     "dedode-subpx",
     "splg-subpx",
     "aliked-subpx",
+    "sphereglue"
 ]
 
 
@@ -228,6 +229,10 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import omniglue
 
         return omniglue.OmniglueMatcher(device, *args, **kwargs)
+    if matcher_name == "sphereglue":
+        from matching.im_models import sphereglue
+
+        return sphereglue.SphereGlueMatcher(device, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"

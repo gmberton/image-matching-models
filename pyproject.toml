@@ -59,4 +59,12 @@ omniglue = ["tensorflow"
 cuda = ["xformers"]
 
 duster = ["huggingface_hub"]
+sphereglue = [
+    "pyg-lib",
+    "torch-scatter",
+    "torch-sparse",
+    "torch-cluster",
+    "torch-spline-conv",
+    "torch-geometric==2.3.1"
+]
 all = ["image-matching-models[loftrs, omniglue, duster]"]

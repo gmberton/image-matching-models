@@ -43,3 +43,6 @@
 [submodule "matching/third_party/keypt2subpx"]
 	path = matching/third_party/keypt2subpx
 	url = https://github.com/KimSinjeong/keypt2subpx.git
+[submodule "matching/third_party/SphereGlue"]
+	path = matching/third_party/SphereGlue
+	url = https://github.com/vishalsharbidar/SphereGlue
