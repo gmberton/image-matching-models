@@ -5,18 +5,12 @@ but the matches are not used or displayed. This approach allows us to use the sa
 for keypoint extraction without implementing separate functions for each method.
 """
 
-import sys
 import argparse
-import matplotlib
 from glob import glob
 from pathlib import Path
 
 from matching import get_matcher, available_models
 from matching.viz import plot_kpts
-
-# This is to be able to use matplotlib also without a GUI
-if not hasattr(sys, "ps1"):
-    matplotlib.use("Agg")
 
 
 def main(args):

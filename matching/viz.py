@@ -1,9 +1,15 @@
+
+import sys
 from matching import viz2d
-import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import matplotlib
 from kornia.utils import tensor_to_image
 import torch
+
+# This is to be able to use matplotlib also without a GUI
+if not hasattr(sys, "ps1"):
+    matplotlib.use("Agg")
 
 
 def plot_matches(

@@ -4,19 +4,13 @@ detects keypoints, matches them, and performs RANSAC to find inliers. The result
 and metadata, are saved to the specified output directory.
 """
 
-import sys
 import torch
 import argparse
-import matplotlib
 from pathlib import Path
 
 from matching.utils import get_image_pairs_paths
 from matching import get_matcher, available_models
 from matching.viz import plot_matches
-
-# This is to be able to use matplotlib also without a GUI
-if not hasattr(sys, "ps1"):
-    matplotlib.use("Agg")
 
 
 def main(args):
