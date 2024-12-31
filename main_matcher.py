@@ -71,7 +71,7 @@ def parse_args():
         "--input",
         type=Path,
         nargs="+",  # Accept one or more arguments
-        default="assets/example_pairs",
+        default=[Path("assets/example_pairs")],
         help="path to either (1) two image paths or (2) dir with two images or (3) dir with dirs with image pairs or "
         "(4) txt file with two image paths per line",
     )
