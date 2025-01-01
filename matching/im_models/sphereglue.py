@@ -1,108 +1,111 @@
-import sys
-from pathlib import Path
 import os
-import torchvision.transforms as tfm
+import torch
 import py3_wget
 
-from matching.utils import add_to_path, resize_to_divisible
+from matching.im_models.lightglue import SIFT, SuperPoint
+from matching.utils import add_to_path
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 
 add_to_path(THIRD_PARTY_DIR.joinpath('SphereGlue'))
 
 from model.sphereglue import SphereGlue
-
-_cfg = {
-    'K': 2, #Chebyshev filter size
-    'GNN_layers': ['cross'], 
-    'match_threshold': args.match_threshold,
-    'sinkhorn_iterations': args.sinkhorn_iterations,
-    'aggr': args.aggregation,
-    'knn': args.knn,
-    'max_kpts': args.max_kpts
-}
+from utils.Utils import sphericalToCartesian
 
 
-if args.detector in ['kp2d', 'superpoint', 'superpoint_tf']:
-    default_config['descriptor_dim'] = 256
-    default_config['output_dim'] = 256*2
-if args.detector  == 'sift':
-    default_config['descriptor_dim'] = 128
-    default_config['output_dim'] = 128*2
-if args.detector  == 'akaze':
-    default_config['descriptor_dim'] = 64
-    default_config['output_dim'] = 64*2
+def unit_cartesian(points):
+    phi, theta =  torch.split(torch.as_tensor(points), 1, dim=1)
+    unitCartesian = sphericalToCartesian(phi, theta, 1).squeeze(dim=2)
+    return unitCartesian
 
-class SphereGlueMatcher(BaseMatcher):
-    weights = {
-        "kp2d": {"descriptor_dim": 256*2, "output_dim": 256}
-        ""
-    }
-    model_path = WEIGHTS_DIR.joinpath("duster_vit_large.pth")
-    vit_patch_size = 16
 
-    def __init__(self, device="cpu", *args, **kwargs):
+class SphereGlueBase(BaseMatcher):
+    """
+    This class is the parent for all methods that use LightGlue as a matcher,
+    with different local features. It implements the forward which is the same
+    regardless of the feature extractor of choice.
+    Therefore this class should *NOT* be instatiated, as it needs its children to define
+    the extractor and the matcher.
+    """
+
+    def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
-        self.normalize = tfm.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        self.sphereglue_cfg = {
+            "K": kwargs.get("K", 2),
+            "GNN_layers": kwargs.get("GNN_layers", ["cross"]),
+            "match_threshold": kwargs.get("match_threshold", 0.2),
+            "sinkhorn_iterations": kwargs.get("sinkhorn_iterations", 20),
+            "aggr": kwargs.get("aggr", "add"),
+            "knn": kwargs.get("knn", 20),
+        }
 
-        self.verbose = False
-
-        self.download_weights()
-        self.model = AsymmetricCroCo3DStereo.from_pretrained(self.model_path).to(device)
-
-    @staticmethod
-    def download_weights():
-        url = "https://download.europe.naverlabs.com/ComputerVision/DUSt3R/DUSt3R_ViTLarge_BaseDecoder_512_dpt.pth"
-
-        if not os.path.isfile(Dust3rMatcher.model_path):
-            print("Downloading Dust3r(ViT large)... (takes a while)")
-            py3_wget.download_file(url, Dust3rMatcher.model_path)
-
-    def preprocess(self, img):
-        _, h, w = img.shape
-        orig_shape = h, w
-
-        img = resize_to_divisible(img, self.vit_patch_size)
-
-        img = self.normalize(img).unsqueeze(0)
-
-        return img, orig_shape
+    def download_weights(self):
+        if not os.path.isfile(self.model_path):
+            print("Downloading SphereGlue weights")
+            py3_wget.download_file(self.url, self.model_path)
 
     def _forward(self, img0, img1):
-        img0, img0_orig_shape = self.preprocess(img0)
-        img1, img1_orig_shape = self.preprocess(img1)
+        """
+        "extractor" and "matcher" are instantiated by the subclasses.
+        """
+        feats0 = self.extractor.extract(img0)
+        feats1 = self.extractor.extract(img1)
 
-        images = [
-            {"img": img0, "idx": 0, "instance": 0},
-            {"img": img1, "idx": 1, "instance": 1},
-        ]
-        pairs = make_pairs(images, scene_graph="complete", prefilter=None, symmetrize=True)
-        output = inference(pairs, self.model, self.device, batch_size=1, verbose=self.verbose)
+        unit_cartesian1 = unit_cartesian(feats0["keypoints"].squeeze(dim=0)).unsqueeze(dim=0).to(self.device)
+        unit_cartesian2 = unit_cartesian(feats1["keypoints"].squeeze(dim=0)).to(self.device)
 
-        scene = global_aligner(
-            output,
-            device=self.device,
-            mode=GlobalAlignerMode.PairViewer,
-            verbose=self.verbose,
+        inputs = {
+            "h1": feats0["descriptors"],
+            "h2": feats1["descriptors"],
+            "scores1": feats0["keypoint_scores"],
+            "scores2": feats1["keypoint_scores"],
+            "unitCartesian1": unit_cartesian1,
+            "unitCartesian2": unit_cartesian2,
+        }
+        for k, v in inputs.items():
+            print(k, v.shape, v.dtype)
+
+        outputs = self.matcher(inputs)
+        return outputs
+        """
+        kpts0, kpts1, matches = (
+            feats0["keypoints"].squeeze(dim=0),
+            feats1["keypoints"].squeeze(dim=0),
+            matches01["matches"],
         )
-        # retrieve useful values from scene:
-        confidence_masks = scene.get_masks()
-        pts3d = scene.get_pts3d()
-        imgs = scene.imgs
-        pts2d_list, pts3d_list = [], []
 
-        for i in range(2):
-            conf_i = confidence_masks[i].cpu().numpy()
-            pts2d_list.append(xy_grid(*imgs[i].shape[:2][::-1])[conf_i])  # imgs[i].shape[:2] = (H, W)
-            pts3d_list.append(pts3d[i].detach().cpu().numpy()[conf_i])
-        reciprocal_in_P2, nn2_in_P1, _ = find_reciprocal_matches(*pts3d_list)
+        desc0 = feats0["descriptors"].squeeze(dim=0)
+        desc1 = feats1["descriptors"].squeeze(dim=0)
 
-        mkpts1 = pts2d_list[1][reciprocal_in_P2]
-        mkpts0 = pts2d_list[0][nn2_in_P1][reciprocal_in_P2]
+        mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
 
-        # duster sometimes requires reshaping an image to fit vit patch size evenly, so we need to
-        # rescale kpts to the original img
-        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
-        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
-        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        """
 
-        return mkpts0, mkpts1, None, None, None, None
+class SiftSphereGlue(SphereGlueBase):
+    model_path = WEIGHTS_DIR.joinpath("sift-sphereglue.pt")
+    weights_url = "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/sift/autosaved.pt"
+
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
+        super().__init__(device, **kwargs)
+        self.sphereglue_cfg.update({
+            "descriptor_dim": 128,
+            "output_dim": 128*2,
+            "max_kpts": max_num_keypoints
+        })
+        self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
+
+
+class SuperpointSphereGlue(SphereGlueBase):
+    model_path = WEIGHTS_DIR.joinpath("superpoint-sphereglue.pt")
+    weights_url = "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/superpoint/autosaved.pt"
+
+    def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
+        super().__init__(device, **kwargs)
+        self.sphereglue_cfg.update({
+            "descriptor_dim": 256,
+            "output_dim": 256*2,
+            "max_kpts": max_num_keypoints
+        })
+        self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
+        self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
