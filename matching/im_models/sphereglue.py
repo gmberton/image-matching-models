@@ -41,7 +41,7 @@ class SphereGlueBase(BaseMatcher):
     def download_weights(self):
         if not os.path.isfile(self.model_path):
             print("Downloading SphereGlue weights")
-            py3_wget.download_file(self.url, self.model_path)
+            py3_wget.download_file(self.weights_url, self.model_path)
 
     def _forward(self, img0, img1):
         """
@@ -50,8 +50,8 @@ class SphereGlueBase(BaseMatcher):
         feats0 = self.extractor.extract(img0)
         feats1 = self.extractor.extract(img1)
 
-        unit_cartesian1 = unit_cartesian(feats0["keypoints"].squeeze(dim=0)).unsqueeze(dim=0).to(self.device)
-        unit_cartesian2 = unit_cartesian(feats1["keypoints"].squeeze(dim=0)).to(self.device)
+        unit_cartesian1 = unit_cartesian(feats0["keypoints"][0]).unsqueeze(dim=0).to(self.device)
+        unit_cartesian2 = unit_cartesian(feats1["keypoints"][0]).unsqueeze(dim=0).to(self.device)
 
         inputs = {
             "h1": feats0["descriptors"],
@@ -61,25 +61,24 @@ class SphereGlueBase(BaseMatcher):
             "unitCartesian1": unit_cartesian1,
             "unitCartesian2": unit_cartesian2,
         }
-        for k, v in inputs.items():
-            print(k, v.shape, v.dtype)
-
         outputs = self.matcher(inputs)
-        return outputs
-        """
+
         kpts0, kpts1, matches = (
             feats0["keypoints"].squeeze(dim=0),
             feats1["keypoints"].squeeze(dim=0),
-            matches01["matches"],
+            outputs["matches0"].squeeze(dim=0),
         )
-
         desc0 = feats0["descriptors"].squeeze(dim=0)
         desc1 = feats1["descriptors"].squeeze(dim=0)
 
-        mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
+        mask = matches.ge(0)
+        kpts0_idx = torch.masked_select(torch.arange(matches.shape[0]), mask)
+        kpts1_idx = torch.masked_select(matches, mask)
+        mkpts0 = kpts0[kpts0_idx]
+        mkpts1 = kpts1[kpts1_idx]
 
         return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
-        """
+
 
 class SiftSphereGlue(SphereGlueBase):
     model_path = WEIGHTS_DIR.joinpath("sift-sphereglue.pt")
@@ -87,6 +86,7 @@ class SiftSphereGlue(SphereGlueBase):
 
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
+        self.download_weights()
         self.sphereglue_cfg.update({
             "descriptor_dim": 128,
             "output_dim": 128*2,
@@ -94,6 +94,7 @@ class SiftSphereGlue(SphereGlueBase):
         })
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
+        self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])
 
 
 class SuperpointSphereGlue(SphereGlueBase):
@@ -102,6 +103,7 @@ class SuperpointSphereGlue(SphereGlueBase):
 
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
+        self.download_weights()
         self.sphereglue_cfg.update({
             "descriptor_dim": 256,
             "output_dim": 256*2,
@@ -109,3 +111,4 @@ class SuperpointSphereGlue(SphereGlueBase):
         })
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
+        self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])
