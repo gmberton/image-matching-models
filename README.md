@@ -169,7 +169,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 | DUSt3R (CVPR '24) | [Official](https://github.com/naver/dust3r) | [arxiv](https://arxiv.org/abs/2312.14132) | 3.639 |  26.813 |
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218 (+LG) | ❌ |
 | Steerers (CVPR '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
-| SphereGlue* (CVPRW '23) | [Official](https://github.com/vishalsharbidar/SphereGlue) | [pdf](https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf) | -- / --  | 0.804 / 7.407  |
+| SphereGlue* (CVPRW '23) | [Official](https://github.com/vishalsharbidar/SphereGlue) | [pdf](https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf) | 0.548 / 0.070  | 0.804 / 7.407  |
 | LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/abs/2306.13643) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
 | SE2-LoFTR (CVPRW '22) | [Official](https://github.com/georg-bn/se2-loftr) | [arxiv](https://arxiv.org/abs/2204.10144) | 0.133 | 2.378 | 
 | Aspanformer (ECCV '22) | [Official](https://github.com/apple/ml-aspanformer) | [arxiv](https://arxiv.org/abs/2208.14201) | 0.384 | 11.73 | 

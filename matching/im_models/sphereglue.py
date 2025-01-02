@@ -72,7 +72,7 @@ class SphereGlueBase(BaseMatcher):
         desc1 = feats1["descriptors"].squeeze(dim=0)
 
         mask = matches.ge(0)
-        kpts0_idx = torch.masked_select(torch.arange(matches.shape[0]), mask)
+        kpts0_idx = torch.masked_select(torch.arange(matches.shape[0]).to(mask.device), mask)
         kpts1_idx = torch.masked_select(matches, mask)
         mkpts0 = kpts0[kpts0_idx]
         mkpts1 = kpts1[kpts1_idx]
