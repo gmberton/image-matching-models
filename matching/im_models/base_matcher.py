@@ -27,6 +27,7 @@ class BaseMatcher(torch.nn.Module):
         super().__init__()
         self.device = device
 
+        self.skip_ransac = False
         self.ransac_iters = kwargs.get("ransac_iters", BaseMatcher.DEFAULT_RANSAC_ITERS)
         self.ransac_conf = kwargs.get("ransac_conf", BaseMatcher.DEFAULT_RANSAC_CONF)
         self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", BaseMatcher.DEFAULT_REPROJ_THRESH)
@@ -100,7 +101,7 @@ class BaseMatcher(torch.nn.Module):
         Returns:
             Tuple[np.ndarray, np.ndarray, np.ndarray]: Homography matrix from img0 to img1, inlier kpts in img0, inlier kpts in img1
         """
-        if len(matched_kpts0) < 4:
+        if len(matched_kpts0) < 4 or self.skip_ransac:
             return None, matched_kpts0, matched_kpts1
 
         H, inliers_mask = self.find_homography(

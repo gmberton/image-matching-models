@@ -193,3 +193,14 @@ def add_to_path(path: str | Path, insert=None) -> None:
         sys.path.append(path)
     else:
         sys.path.insert(insert, path)
+
+def get_default_device():
+    device = "cpu"
+
+    if sys.platform == "darwin" and torch.backends.mps.is_available():
+        device = "mps"
+
+    elif torch.cuda.is_available():
+        device = "cuda"
+
+    return torch.device(device)

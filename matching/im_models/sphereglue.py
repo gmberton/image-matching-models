@@ -38,6 +38,8 @@ class SphereGlueBase(BaseMatcher):
             "knn": kwargs.get("knn", 20),
         }
 
+        self.skip_ransac = True
+
     def download_weights(self):
         if not os.path.isfile(self.model_path):
             print("Downloading SphereGlue weights")

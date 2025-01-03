@@ -8,7 +8,7 @@ import torch
 import argparse
 from pathlib import Path
 
-from matching.utils import get_image_pairs_paths
+from matching.utils import get_image_pairs_paths, get_default_device
 from matching import get_matcher, available_models
 from matching.viz import plot_matches
 
@@ -64,7 +64,7 @@ def parse_args():
     # Hyperparameters shared by all methods:
     parser.add_argument("--im_size", type=int, default=512, help="resize img to im_size x im_size")
     parser.add_argument("--n_kpts", type=int, default=2048, help="max num keypoints")
-    parser.add_argument("--device", type=str, default="cuda", choices=["cpu", "cuda"])
+    parser.add_argument("--device", type=str, default=get_default_device(), choices=["cpu", "cuda"])
     parser.add_argument("--no_viz", action="store_true", help="avoid saving visualizations")
 
     parser.add_argument(

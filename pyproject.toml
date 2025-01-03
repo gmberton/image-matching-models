@@ -7,13 +7,13 @@ name = "image-matching-models"
 readme = "README.md"
 description = "Easily test and apply pairwise image matching models"
 authors = [
+  {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
   {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
   {name = "Gabriele Trivigno", email="gabriele.trivigno@polito.it"},
-  {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
 ]
 maintainers = [
-  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
+  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
 ]
 requires-python = ">= 3.10"
 license = {file = "LICENSE"}
@@ -54,10 +54,12 @@ loftrs = ["pytorch-lightning==1.5.2"
             ]
 
 omniglue = ["tensorflow"
-            ] 
+            ]
 
 cuda = ["xformers"]
 
 duster = ["huggingface_hub"]
+
 sphereglue = ["torch-geometric", "torch-cluster"]
+
 all = ["image-matching-models[loftrs, omniglue, duster, sphereglue]"]
