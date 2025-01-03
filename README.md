@@ -8,7 +8,7 @@ Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add 
 
 ### Matching Examples
 Compare matching models across various scenes. For example, we show `SIFT-LightGlue` and `LoFTR` matches on pairs: 
-<p>(1) outdoor, (2) indoor, (3) satellite remote sensing, (4) paintings, and (5) a false positive. </p>
+<p>(1) outdoor, (2) indoor, (3) satellite remote sensing, (4) paintings, (5) a false positive, and (6) spherical. </p>
 <details open><summary>
 SIFT-LightGlue
 </summary>
@@ -18,6 +18,8 @@ SIFT-LightGlue
   <img src="assets/example_sift-lg/output_4_matches.jpg" width="195" />
   <img src="assets/example_sift-lg/output_1_matches.jpg" width="195" />
   <img src="assets/example_sift-lg/output_0_matches.jpg" width="195" />
+    <img src="assets/example_sift-lg/output_5_matches.jpg" width="195" />
+
 </p>
 </details>
 
@@ -30,6 +32,7 @@ LoFTR
   <img src="assets/example_loftr/output_4_matches.jpg" width="195" />
   <img src="assets/example_loftr/output_1_matches.jpg" width="195" />
   <img src="assets/example_loftr/output_0_matches.jpg" width="195" />
+  <img src="assets/example_loftr/output_5_matches.jpg" width="195" />
 </p>
 </details>
 
@@ -71,6 +74,10 @@ Similar to the above, to get all optional dependencies, use the `[all]` addendum
 ```bash
 pip install "image-matching-models[all] @ git+https://github.com/alexstoken/image-matching-models.git"
 ```
+
+> [!Note]  
+> SphereGlue depends on `torch-geometric` and `torch-cluster` which require that you pass an additional parameter given your installed versions of torch and CUDA like so: `pip install .[all] -f https://data.pyg.org/whl/torch-2.5.0+cu124.html` (replace `cu124` with `cpu` for CPU version). See [PyTorch Geometric installation docs](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) for more information 
+
 
 ## Use
 
@@ -139,7 +146,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, aspanformer, matchformer, xfeat-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue```
 
 > [!TIP]
 > You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints. 
@@ -162,6 +169,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 | DUSt3R (CVPR '24) | [Official](https://github.com/naver/dust3r) | [arxiv](https://arxiv.org/abs/2312.14132) | 3.639 |  26.813 |
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218 (+LG) | ❌ |
 | Steerers (CVPR '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
+| SphereGlue* (CVPRW '23) | [Official](https://github.com/vishalsharbidar/SphereGlue) | [pdf](https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf) | 0.548 / 0.070  | 0.804 / 7.407  |
 | LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/abs/2306.13643) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
 | SE2-LoFTR (CVPRW '22) | [Official](https://github.com/georg-bn/se2-loftr) | [arxiv](https://arxiv.org/abs/2204.10144) | 0.133 | 2.378 | 
 | Aspanformer (ECCV '22) | [Official](https://github.com/apple/ml-aspanformer) | [arxiv](https://arxiv.org/abs/2208.14201) | 0.384 | 11.73 | 
@@ -180,7 +188,10 @@ Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are base
 
 Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in the `assets/example_pairs` folder at image size 512x512. Benchmark is done using `benchmark.py` on an NVIDIA RTX A4000 GPU. Results rounded to the hundredths place.
 
+\* `SphereGlue` model runtimes are listed in the order: SIFT, SuperPoint
+
 \* `LightGlue` model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
+
 
 \* `Keypt2Subpx` model runtimes are listed in the order: superpoint-lg, aliked-lg, xfeat, dedode
 ##

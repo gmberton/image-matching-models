@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument(
         "--num-iters",
         type=int,
-        default=1,
+        default=5,
         help="number of interations to run benchmark and average over",
     )
     args = parser.parse_args()
