@@ -204,10 +204,12 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         if "steerers" in matcher_name:
             from matching.im_models import xfeat_steerers
 
-            kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
+            if kwargs.get("mode", None) is None:
+                # only use matcher_name to assign mode if mode is not a given kwarg
+                kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
 
             return xfeat_steerers.xFeatSteerersMatcher(device, max_num_keypoints, *args, **kwargs)
-        
+
         else:
             from matching.im_models import xfeat
 

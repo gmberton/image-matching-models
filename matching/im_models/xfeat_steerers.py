@@ -37,8 +37,14 @@ class xFeatSteerersMatcher(BaseMatcher):
         if not self.weights_path.exists():
             download_file_from_google_drive(self.weights_gdrive_id, root=WEIGHTS_DIR, filename="xfeat_perm_steer.pth")
 
+    def preprocess(self, img: torch.Tensor) -> torch.Tensor:
+        img = self.model.parse_input(img)
+        if self.device == 'cuda' and self.mode == 'semi-dense' and img.dtype == torch.uint8:
+            img = img / 255 # cuda error in upsample_bilinear_2d_out_frame if img is ubyte
+        return img
+
     def _forward(self, img0, img1):
-        img0, img1 = self.model.parse_input(img0), self.model.parse_input(img1)
+        img0, img1 = self.preprocess(img0), self.preprocess(img1)
 
         if self.mode == "semi-dense":
             output0 = self.model.detectAndComputeDense(img0, top_k=self.max_num_keypoints)
