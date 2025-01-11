@@ -208,6 +208,12 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
                 # only use matcher_name to assign mode if mode is not a given kwarg
                 kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
 
+            if kwargs.get("steerer_type", None) is None:
+                if "perm" in matcher_name:
+                    kwargs["steerer_type"] = "perm"
+                else:
+                    kwargs["steerer_type"] = "learned" # learned performs better, should be default
+
             return xfeat_steerers.xFeatSteerersMatcher(device, max_num_keypoints, *args, **kwargs)
 
         else:
