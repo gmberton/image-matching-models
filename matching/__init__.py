@@ -47,8 +47,10 @@ available_models = [
     "xfeat",
     "xfeat-star",
     "xfeat-lg",
-    "xfeat-steerers",
-    "xfeat-star-steerers",
+    "xfeat-steerers-perm",
+    "xfeat-steerers-learned",
+    "xfeat-star-steerers-perm",
+    "xfeat-star-steerers-learned"
     "dedode-lg",
     "gim-dkm",
     "gim-lg",
