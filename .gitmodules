@@ -46,3 +46,6 @@
 [submodule "matching/third_party/SphereGlue"]
 	path = matching/third_party/SphereGlue
 	url = https://github.com/vishalsharbidar/SphereGlue
+[submodule "matching/third_party/affine-steerers"]
+	path = matching/third_party/affine-steerers
+	url = https://github.com/georg-bn/affine-steerers.git
