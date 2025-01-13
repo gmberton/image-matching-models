@@ -1,4 +1,4 @@
-from matching import get_matcher, available_models
+from matching import get_matcher, available_models, get_default_device
 from pathlib import Path
 from argparse import ArgumentParser
 import cv2
@@ -12,7 +12,7 @@ def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--task", type=str, default="benchmark", help="run benchmark or unit tests")
     parser.add_argument(
-        "--models",
+        "--matcher",
         type=str,
         nargs="+",
         default="all",
@@ -24,7 +24,7 @@ def parse_args():
         default=512,
         help="image size to run matching on (resized to square)",
     )
-    parser.add_argument("--device", type=str, default="cuda", help="Device to run benchmark on")
+    parser.add_argument("--device", type=str, default=get_default_device(), help="Device to run benchmark on")
     parser.add_argument(
         "--num-iters",
         type=int,

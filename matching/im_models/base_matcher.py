@@ -32,6 +32,11 @@ class BaseMatcher(torch.nn.Module):
         self.ransac_conf = kwargs.get("ransac_conf", BaseMatcher.DEFAULT_RANSAC_CONF)
         self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", BaseMatcher.DEFAULT_REPROJ_THRESH)
 
+
+    @property
+    def name(self):
+        return self.__class__.__name__
+
     @staticmethod
     def image_loader(path: str | Path, resize: int | Tuple, rot_angle: float = 0) -> torch.Tensor:
         warnings.warn(

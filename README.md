@@ -1,6 +1,6 @@
 # Image Matching Models (IMM)
 
-A unified API for quickly and easily trying 31 (and growing!) image matching models.
+A unified API for quickly and easily trying 32 (and growing!) image matching models.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alexstoken/image-matching-models/blob/main/demo.ipynb)
 
