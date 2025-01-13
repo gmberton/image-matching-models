@@ -123,7 +123,7 @@ To extract keypoints and descriptions (when available) from a single image, use 
 from matching import get_matcher
 
 device = 'cuda' # 'cpu'
-matcher = get_matcher('superglue', device=device)  # Choose any of our ~30+ matchers listed below
+matcher = get_matcher('xfeat', device=device)  # Choose any of our ~30+ matchers listed below
 img_size = 512 # optional
 
 img = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
@@ -146,12 +146,12 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned]```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue```
 
 > [!TIP]
-> You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints. 
+> You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints.
 
-All the matchers can run on GPU, and most of them can run both on GPU or CPU. A few can't run on CPU.
+Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#model-details) for runtimes. If a runtime is ❌, it means that model can not run on that device. 
 
 ## Model Details
 > [!IMPORTANT]
@@ -159,6 +159,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
+| Affine Steerers (ECCV '24) | [Official](https://github.com/georg-bn/affine-steerers?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2408.14186)| 0.677 | ❌ |
 | Keypt2Subpx* (ECCV '24) | [Official](https://github.com/KimSinjeong/keypt2subpx) | [arxiv](https://arxiv.org/abs/2407.11668)| 0.055 /0.164 / 0.033 / 0.291  | -- |
 | MASt3R (ArXiv '24) | [Official](https://github.com/naver/mast3r?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2406.09756) | 0.699 | -- |
 | Efficient-LoFTR (CVPR '24) | [Official](https://github.com/zju3dv/efficientloftr) | [pdf](https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf) | 0.1026 | 2.117 |
@@ -169,7 +170,7 @@ All the matchers can run on GPU, and most of them can run both on GPU or CPU. A 
 | RoMa / Tiny-RoMa (CVPR '24) | [Official](https://github.com/Parskatt/RoMa) | [arxiv](https://arxiv.org/abs/2305.15404) |  0.453 / 0.0456 |  18.950 |
 | DUSt3R (CVPR '24) | [Official](https://github.com/naver/dust3r) | [arxiv](https://arxiv.org/abs/2312.14132) | 3.639 |  26.813 |
 | DeDoDe (3DV '24) | [Official](https://github.com/Parskatt/DeDoDe/tree/main) | [arxiv](https://arxiv.org/abs/2308.08479) |  0.311 (+MNN)/ 0.218 (+LG) | ❌ |
-| Steerers (CVPR '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | ❌ |
+| Steerers (CVPR '24) | [Official](https://github.com/georg-bn/rotation-steerers) | [arxiv](https://arxiv.org/abs/2312.02152) | 0.150 | 26.425 |
 | SphereGlue* (CVPRW '23) | [Official](https://github.com/vishalsharbidar/SphereGlue) | [pdf](https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf) | 0.548 / 0.070  | 0.804 / 7.407  |
 | LightGlue* (ICCV '23) | [Official](https://github.com/cvg/LightGlue) | [arxiv](https://arxiv.org/abs/2306.13643) | 0.417 / 0.093 / 0.184 / 0.128 | 2.828 / 8.852 / 8.100 / 8.128 |
 | SE2-LoFTR (CVPRW '22) | [Official](https://github.com/georg-bn/se2-loftr) | [arxiv](https://arxiv.org/abs/2204.10144) | 0.133 | 2.378 | 
@@ -203,7 +204,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
     
 > [!Note]  
-> This repo is optimized usability, but necessarily for speed. The idea is to use this repo to find the matcher that best suits your needs, and then use the original code to get the best out of it.
+> This repo is optimized for usability, not necessarily for speed or performance. Ideally you can use this repo to find the matcher that best suits your needs, and then use the original code (or a modified version of this code) to get maximize performance. Default hyperparameters used here **may not be optimal for your use case!**
 
     
 ### Acknowledgements
@@ -212,7 +213,7 @@ Special thanks to the authors of the respective works that are included in this 
 
 
 ## Cite
-This repo was created as part of the EarthMatch paper. Please consider citing EarthMatch work if this repo is helpful to you!
+This repo was created as part of the EarthMatch paper. Please consider citing EarthMatch if this repo is helpful to you!
 
 ```
 @InProceedings{Berton_2024_EarthMatch,

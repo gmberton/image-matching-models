@@ -34,7 +34,7 @@ available_models = [
     "tiny-roma",
     "dedode",
     "steerers",
-    "aff-steerers",
+    "affine-steerers",
     "dedode-kornia",
     "sift-nn",
     "orb-nn",
@@ -158,7 +158,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return steerers.SteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "aff-steerers":
+    elif matcher_name in ["aff-steerers", "affine-steerers"]:
         from matching.im_models import aff_steerers
 
         return aff_steerers.AffSteererMatcher(device, max_num_keypoints, *args, **kwargs)

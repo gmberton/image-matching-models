@@ -33,6 +33,8 @@ class AffSteererMatcher(BaseMatcher):
 
     dino_patch_size = 14
 
+    STEERER_TYPES = ["equi_G", "steer_G", "equi_B", "steer_B"]
+
     def __init__(
         self,
         device="cpu",
@@ -44,8 +46,17 @@ class AffSteererMatcher(BaseMatcher):
     ):
         super().__init__(device, **kwargs)
 
+        if self.device != "cuda": # only cuda devices work due to autocast in cuda in upstream.
+            raise ValueError("Only device 'cuda' supported for AffineSteerers.")
+
         WEIGHTS_DIR.mkdir(exist_ok=True)
-        # download detector
+
+        self.steerer_type = steerer_type
+        if self.steerer_type not in self.STEERER_TYPES:
+            raise ValueError(f'unsupported type for aff-steerer: {steerer_type}. Must choose from {self.STEERER_TYPES}.')
+
+        # download detector / descriptor / steerer
+
         self.download_weights()
 
         self.max_keypoints = max_num_keypoints
@@ -53,11 +64,7 @@ class AffSteererMatcher(BaseMatcher):
 
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        self.steerer_type = steerer_type
-        if self.steerer_type not in ["equi_G", "steer_G"]:
-            raise ValueError(f'unsupported type for aff-steerer: {steerer_type}. Must choose from ["equi_G", "steer_G"]. Learned usually perofrms better.')
 
-        self.steerer_type = steerer_type
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher()
 
     def download_weights(self):
@@ -69,28 +76,28 @@ class AffSteererMatcher(BaseMatcher):
             )
 
         # download descriptors
-        if not AffSteererMatcher.descriptor_path_equi_G.exists():
+        if self.steerer_type == "equi_G" and not AffSteererMatcher.descriptor_path_equi_G.exists():
             print("Downloading descriptor_aff_equi_G.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_equi_G.pth",
                 AffSteererMatcher.descriptor_path_equi_G,
             )
 
-        if not AffSteererMatcher.descriptor_path_steer_G.exists():
+        if self.steerer_type == "steer_G" and not AffSteererMatcher.descriptor_path_steer_G.exists():
             print("Downloading descriptor_aff_steer_G.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_steer_G.pth",
                 AffSteererMatcher.descriptor_path_steer_G,
             )
 
-        if not AffSteererMatcher.descriptor_path_equi_B.exists():
+        if self.steerer_type == "equi_B" and not AffSteererMatcher.descriptor_path_equi_B.exists():
             print("Downloading descriptor_aff_equi_B.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_equi_B.pth",
                 AffSteererMatcher.descriptor_path_equi_B,
             )
 
-        if not AffSteererMatcher.descriptor_path_steer_B.exists():
+        if self.steerer_type == "steer_B" and not AffSteererMatcher.descriptor_path_steer_B.exists():
             print("Downloading descriptor_aff_steer_B.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_steer_B.pth",
@@ -98,26 +105,26 @@ class AffSteererMatcher(BaseMatcher):
             )
 
         # download steerers
-        if not AffSteererMatcher.steerer_path_equi_G.exists():
+        if self.steerer_type == "equi_G" and not AffSteererMatcher.steerer_path_equi_G.exists():
             print("Downloading steerer_aff_equi_G.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_equi_G.pth",
                 AffSteererMatcher.steerer_path_equi_G,
             )
-        if not AffSteererMatcher.steerer_path_steer_G.exists():
+        if self.steerer_type == "steer_G" and not AffSteererMatcher.steerer_path_steer_G.exists():
             print("Downloading steerer_aff_steer_G.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_steer_G.pth",
                 AffSteererMatcher.steerer_path_steer_G,
             )
 
-        if not AffSteererMatcher.steerer_path_equi_B.exists():
+        if self.steerer_type == "equi_B" and not AffSteererMatcher.steerer_path_equi_B.exists():
             print("Downloading steerer_aff_equi_B.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_equi_B.pth",
                 AffSteererMatcher.steerer_path_equi_B,
             )
-        if not AffSteererMatcher.steerer_path_steer_B.exists():
+        if self.steerer_type == "steer_B" and not AffSteererMatcher.steerer_path_steer_B.exists():
             print("Downloading steerer_aff_steer_B.pth")
             py3_wget.download_file(
                 "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_steer_B.pth",
@@ -143,8 +150,7 @@ class AffSteererMatcher(BaseMatcher):
         else:
             steerer_path = self.steerer_path_equi_B if 'equi' in self.steerer_type else self.steerer_path_steer_B
 
-        print(steerer_path)
-        assert steerer_path.exists()
+        assert steerer_path.exists(), f"could not find steerer weights at {steerer_path}. Please check that they exist."
         steerer = self.load_steerer(
                     steerer_path
                 ).to(self.device).eval()
