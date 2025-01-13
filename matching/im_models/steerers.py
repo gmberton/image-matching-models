@@ -43,6 +43,9 @@ class SteererMatcher(BaseMatcher):
     ):
         super().__init__(device, **kwargs)
 
+        if torch.cuda.is_available() and self.device != "cuda": # only cuda devices work due to autocast in cuda in upstream.
+            raise ValueError("Only device 'cuda' supported for Steerers.")
+
         WEIGHTS_DIR.mkdir(exist_ok=True)
         # download detector
         self.download_weights()
