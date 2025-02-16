@@ -65,6 +65,10 @@ available_models = [
     "sift-sphereglue",
     "superpoint-sphereglue",
     "minima",
+    "minima-roma",
+    "minima-roma-tiny",
+    "minima-splg",
+    "minima-loftr",
 ]
 
 
@@ -297,10 +301,30 @@ def get_matcher(
             device, max_num_keypoints, *args, **kwargs
         )
 
-    elif matcher_name == "minima":
+    elif "minima" in matcher_name:
         from matching.im_models import minima
 
-        return minima.MINIMAMatcher(device, *args, **kwargs)
+        if "model_type" not in kwargs.keys():
+            if "lg" in matcher_name:
+                kwargs["model_type"] = "sp_lg"
+            elif "roma" in matcher_name:
+                kwargs["model_type"] = "roma"
+                if "tiny" in matcher_name:
+                    kwargs["model_size"] = "tiny"
+                else:
+                    kwargs["model_size"] = "large"
+            elif "loftr" in matcher_name:
+                kwargs["model_type"] = "loftr"
+            else:  # set default to sp_lg
+                print("no model type set. Using sp-lg as default...")
+                kwargs["model_type"] = "sp_lg"
+
+        if kwargs["model_type"] == "sp_lg":
+            return minima.MINIMASpLgMatcher(device, *args, **kwargs)
+        if kwargs["model_type"] == "loftr":
+            return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
+        if kwargs["model_type"] == "roma":
+            return minima.MINIMARomaMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
