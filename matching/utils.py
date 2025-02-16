@@ -203,4 +203,4 @@ def get_default_device():
     elif torch.cuda.is_available():
         device = "cuda"
 
-    return torch.device(device)
+    return device
