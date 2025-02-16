@@ -23,6 +23,7 @@ available_models = [
     "loftr",
     "eloftr",
     "se2loftr",
+    "xoftr",
     "aspanformer",
     "matchformer",
     "sift-lg",
@@ -99,6 +100,11 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import se2loftr
 
         return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
+
+    if matcher_name == "xoftr":
+        from matching.im_models import xoftr
+
+        return xoftr.XoFTRMatcher(device, *args, **kwargs)
 
     elif matcher_name == "aspanformer":
         from matching.im_models import aspanformer
