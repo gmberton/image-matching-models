@@ -64,6 +64,7 @@ available_models = [
     "aliked-subpx",
     "sift-sphereglue",
     "superpoint-sphereglue",
+    "minima",
 ]
 
 
@@ -295,6 +296,11 @@ def get_matcher(
         return sphereglue.SuperpointSphereGlue(
             device, max_num_keypoints, *args, **kwargs
         )
+
+    elif matcher_name == "minima":
+        from matching.im_models import minima
+
+        return minima.MINIMAMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
