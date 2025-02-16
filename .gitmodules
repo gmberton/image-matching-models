@@ -49,3 +49,6 @@
 [submodule "matching/third_party/affine-steerers"]
 	path = matching/third_party/affine-steerers
 	url = https://github.com/georg-bn/affine-steerers.git
+[submodule "matching/third_party/XoFTR"]
+	path = matching/third_party/XoFTR
+	url = https://github.com/OnderT/XoFTR
