@@ -55,7 +55,7 @@ If you want to to install from source (easiest to edit, use `benchmark.py`, `dem
 ```bash
 git clone --recursive https://github.com/alexstoken/image-matching-models
 cd image-matching-models
-pip install .
+pip install -e .
 ```
 Some models (`omniglue`, LoFTR family) require one-off dependencies (`tensorflow`, `pytorch-lightning`), which are not included in the default list. To install these, use 
 ```
