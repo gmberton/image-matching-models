@@ -55,3 +55,6 @@
 [submodule "matching/third_party/MINIMA"]
 	path = matching/third_party/MINIMA
 	url = https://github.com/LSXI7/MINIMA
+[submodule "matching/third_party/JamMa"]
+	path = matching/third_party/JamMa
+	url = https://github.com/leoluxxx/JamMa.git

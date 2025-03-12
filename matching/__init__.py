@@ -69,6 +69,7 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "jamma"
 ]
 
 
@@ -325,6 +326,10 @@ def get_matcher(
             return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "jamma":
+        from matching.im_models import jamma
+        return jamma.JaMmaMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
