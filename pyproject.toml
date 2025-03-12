@@ -62,4 +62,6 @@ duster = ["huggingface_hub"]
 
 sphereglue = ["torch-geometric", "torch-cluster"]
 
-all = ["image-matching-models[loftrs, omniglue, duster, sphereglue]"]
+mamba = ["mamba-ssm"]
+
+all = ["image-matching-models[loftrs, omniglue, duster, sphereglue, mamba]"]

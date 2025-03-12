@@ -58,3 +58,6 @@
 [submodule "matching/third_party/JamMa"]
 	path = matching/third_party/JamMa
 	url = https://github.com/leoluxxx/JamMa.git
+[submodule "matching/third_party/MambaGlue"]
+	path = matching/third_party/MambaGlue
+	url = https://github.com/url-kaist/MambaGlue.git

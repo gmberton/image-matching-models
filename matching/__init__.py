@@ -69,7 +69,12 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
-    "jamma"
+    "jamma",
+    "sift-mambaglue",
+    "superpoint-mambaglue",
+    "disk-mambaglue",
+    "aliked-mambaglue",
+    "doghardnet-mambaglue",
 ]
 
 
@@ -330,6 +335,19 @@ def get_matcher(
     elif matcher_name == "jamma":
         from matching.im_models import jamma
         return jamma.JaMmaMatcher(device, *args, **kwargs)
+
+    elif "mamba" in matcher_name:
+        from matching.im_models import mambaglue
+        if 'sift' in matcher_name:
+            return mambaglue.SiftMambaGlue(device, max_num_keypoints, *args, **kwargs)
+        if 'sp' in matcher_name or 'superpoint' in matcher_name:
+            return mambaglue.SuperGlueMambaGlue(device, max_num_keypoints, *args, **kwargs)
+        if 'disk' in matcher_name:
+            return mambaglue.DiskMambaGlue(device, max_num_keypoints, *args, **kwargs)
+        if 'aliked' in matcher_name:
+            return mambaglue.AlikedMambaGlue(device, max_num_keypoints, *args, **kwargs)
+        if 'doghardnet' in matcher_name:
+            return mambaglue.DognetMambaGlue(device, max_num_keypoints, *args, **kwargs)
 
     else:
         raise RuntimeError(
