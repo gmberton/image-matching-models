@@ -13,7 +13,7 @@ from src.utils.dataset import read_megadepth_color
 import torch.nn.functional as F
 
 class JaMmaMatcher(BaseMatcher):
-    weight_path = THIRD_PARTY_DIR.joinpath("JamMa", "weight", "jamma_weight.ckpt"
+    weight_path = THIRD_PARTY_DIR.joinpath("JamMa", "weight", "jamma_weight.ckpt")
     normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     divisible_size = 16
@@ -24,7 +24,7 @@ class JaMmaMatcher(BaseMatcher):
         assert weight_path.exists()
         assert "cuda" in device, "JaMma only supported on cuda devices due to mamba-ssm dependency."
 
-        self.matcher = JamMa(pretrained=self.weight_path), config=cfg).eval().to(device)
+        self.matcher = JamMa(pretrained=self.weight_path, config=cfg).eval().to(device)
 
     def preprocess(self, img):
         # https://github.com/leoluxxx/JamMa/blob/f3d680c7c964505292d703c3e1bbec01a1b7435e/src/utils/dataset.py#L126

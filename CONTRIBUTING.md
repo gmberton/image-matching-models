@@ -9,6 +9,13 @@ git submodule add https://github.com/cvg/LightGlue matching/third_party/LightGlu
 ```
 This command automatically modifies `.gitmodules` (and modifying it manually doesn't work).
 
+If the submodule you are adding *also* has submodules, you may need to run 
+
+```bash
+git submodule update --init --recursive
+```
+to get those additional submoduels. 
+
 3. Add the method by subclassing `BaseMatcher` and implementing `_forward`, which takes two image tensors as input and returns a dict with keys `['num_inliers','H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', desc1']`. The value of any key may be 0, if that model does not produce that output, but they key must exist. See `TEMPLATE.py` for an example.
 <br></br>You may also want to implement `preprocess`, `download_weights`, and anything else necessary to make the model easy to run. 
 
