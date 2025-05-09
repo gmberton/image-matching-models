@@ -37,35 +37,35 @@ class MambaGlueBase(BaseMatcher):
         return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
 
 
-class SiftMambaGlue(LightGlueBase):
+class SiftMambaGlue(MambaGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = MambaGlue(features="sift", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
-class SuperpointMambaGlue(LightGlueBase):
+class SuperpointMambaGlue(MambaGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = MambaGlue(features="superpoint", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
-class DiskMambaGlue(LightGlueBase):
+class DiskMambaGlue(MambaGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.extractor = DISK(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = MambaGlue(features="disk", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
-class AlikedMambaGlue(LightGlueBase):
+class AlikedMambaGlue(MambaGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.extractor = ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = MambaGlue(features="aliked", depth_confidence=-1, width_confidence=-1).to(self.device)
 
 
-class DognetMambaGlue(LightGlueBase):
+class DognetMambaGlue(MambaGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
