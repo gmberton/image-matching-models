@@ -22,7 +22,7 @@ class DeDoDeLightGlue(BaseMatcher):
 
         major, minor, patch = get_version(kornia)
         assert major > 1 or (
-            minor >= 7 and patch >= 3
+            minor > 7 or (minor == 7 and patch >= 3)
         ), "DeDoDe-LG only available in kornia v 0.7.3 or greater. Update kornia to use this model."
 
         assert (
