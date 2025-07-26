@@ -20,6 +20,7 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 __version__ = "1.0.0"
 
 available_models = [
+    "liftfeat",
     "loftr",
     "eloftr",
     "se2loftr",
@@ -80,9 +81,7 @@ def get_version(pkg):
 
 
 @supress_stdout
-def get_matcher(
-    matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
-):
+def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
         from matching.im_models.base_matcher import EnsembleMatcher
 
@@ -92,9 +91,12 @@ def get_matcher(
 
         detector_name = matcher_name.removesuffix("-subpx")
 
-        return keypt2subpx.Keypt2SubpxMatcher(
-            device, detector_name=detector_name, *args, **kwargs
-        )
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
+
+    if matcher_name == "liftfeat":
+        from matching.im_models import liftfeat
+
+        return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
 
     if matcher_name == "loftr":
         from matching.im_models import loftr
@@ -177,9 +179,7 @@ def get_matcher(
     elif matcher_name in ["aff-steerers", "affine-steerers"]:
         from matching.im_models import aff_steerers
 
-        return aff_steerers.AffSteererMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return aff_steerers.AffSteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "sift-nn":
         from matching.im_models import handcrafted
@@ -199,9 +199,7 @@ def get_matcher(
     elif matcher_name == "superglue":
         from matching.im_models import matching_toolbox
 
-        return matching_toolbox.SuperGlueMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "r2d2":
         from matching.im_models import matching_toolbox
@@ -226,9 +224,7 @@ def get_matcher(
     elif matcher_name == "doghardnet-nn":
         from matching.im_models import matching_toolbox
 
-        return matching_toolbox.DogAffHardNNMatcher(
-            device, max_num_keypoints=max_num_keypoints, *args, **kwargs
-        )
+        return matching_toolbox.DogAffHardNNMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif "xfeat" in matcher_name:
         if "steerers" in matcher_name:
@@ -242,13 +238,9 @@ def get_matcher(
                 if "perm" in matcher_name:
                     kwargs["steerer_type"] = "perm"
                 else:
-                    kwargs["steerer_type"] = (
-                        "learned"  # learned performs better, should be default
-                    )
+                    kwargs["steerer_type"] = "learned"  # learned performs better, should be default
 
-            return xfeat_steerers.xFeatSteerersMatcher(
-                device, max_num_keypoints, *args, **kwargs
-            )
+            return xfeat_steerers.xFeatSteerersMatcher(device, max_num_keypoints, *args, **kwargs)
 
         else:
             from matching.im_models import xfeat
@@ -261,9 +253,7 @@ def get_matcher(
                 "lighterglue",
             ]:
                 kwargs["mode"] = "lighterglue"
-            return xfeat.xFeatMatcher(
-                device, max_num_keypoints=max_num_keypoints, *args, **kwargs
-            )
+            return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode-lg":
         from matching.im_models import kornia
@@ -298,9 +288,7 @@ def get_matcher(
     elif matcher_name == "superpoint-sphereglue":
         from matching.im_models import sphereglue
 
-        return sphereglue.SuperpointSphereGlue(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return sphereglue.SuperpointSphereGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif "minima" in matcher_name:
         from matching.im_models import minima
