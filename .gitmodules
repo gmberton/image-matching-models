@@ -55,3 +55,6 @@
 [submodule "matching/third_party/MINIMA"]
 	path = matching/third_party/MINIMA
 	url = https://github.com/LSXI7/MINIMA
+[submodule "matching/third_party/LiftFeat"]
+	path = matching/third_party/LiftFeat
+	url = https://github.com/lyp-deeplearning/LiftFeat.git

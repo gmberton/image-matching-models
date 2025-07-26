@@ -20,6 +20,7 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 __version__ = "1.0.0"
 
 available_models = [
+    "liftfeat",
     "loftr",
     "eloftr",
     "se2loftr",
@@ -94,6 +95,11 @@ def get_matcher(
         return keypt2subpx.Keypt2SubpxMatcher(
             device, detector_name=detector_name, *args, **kwargs
         )
+    
+    if matcher_name == "liftfeat":
+        from matching.im_models import liftfeat
+
+        return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
 
     if matcher_name == "loftr":
         from matching.im_models import loftr
