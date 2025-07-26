@@ -69,6 +69,7 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "ufm",
 ]
 
 
@@ -325,6 +326,11 @@ def get_matcher(
             return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "ufm":
+        from matching.im_models import ufm
+
+        return ufm.UFMMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
