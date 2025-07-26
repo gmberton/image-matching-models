@@ -69,6 +69,7 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "rdd",
 ]
 
 
@@ -325,6 +326,11 @@ def get_matcher(
             return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "rdd":
+        from matching.im_models import rdd
+
+        return rdd.RDDMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
