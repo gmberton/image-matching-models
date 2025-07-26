@@ -1,5 +1,4 @@
 import torch
-from pathlib import Path
 import numpy as np
 
 from matching import THIRD_PARTY_DIR, BaseMatcher

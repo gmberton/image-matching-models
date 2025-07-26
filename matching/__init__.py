@@ -96,7 +96,6 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import liftfeat
 
         return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
-
     if matcher_name == "loftr":
         from matching.im_models import loftr
 
