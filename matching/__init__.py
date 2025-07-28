@@ -70,6 +70,7 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "minima-xoftr",
 ]
 
 
@@ -321,6 +322,8 @@ def get_matcher(
                     kwargs["model_size"] = "large"
             elif "loftr" in matcher_name:
                 kwargs["model_type"] = "loftr"
+            elif "xoftr" in matcher_name:
+                kwargs["model_type"] = "xoftr"
             else:  # set default to sp_lg
                 print("no model type set. Using sp-lg as default...")
                 kwargs["model_type"] = "sp_lg"
@@ -331,6 +334,8 @@ def get_matcher(
             return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
+        if kwargs["model_type"] == "xoftr":
+            return minima.MINIMAXoFTRMatcher(device, *args, **kwargs)
 
     else:
         raise RuntimeError(
