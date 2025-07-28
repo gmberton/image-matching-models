@@ -144,7 +144,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma```
 
-**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], ```
+**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, minima-xoftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], ```
 
 **Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat```
 
