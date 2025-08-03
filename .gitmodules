@@ -64,3 +64,6 @@
 [submodule "matching/third_party/EDM"]
 	path = matching/third_party/EDM
 	url = https://github.com/chicleee/EDM
+[submodule "matching/third_party/LISRD"]
+	path = matching/third_party/LISRD
+	url = https://github.com/rpautrat/LISRD.git
