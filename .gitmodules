@@ -61,3 +61,6 @@
 [submodule "matching/third_party/LiftFeat"]
 	path = matching/third_party/LiftFeat
 	url = https://github.com/lyp-deeplearning/LiftFeat.git
+[submodule "matching/third_party/EDM"]
+	path = matching/third_party/EDM
+	url = https://github.com/chicleee/EDM
