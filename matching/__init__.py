@@ -79,7 +79,7 @@ def get_version(pkg):
     return major, minor, patch
 
 
-@supress_stdout
+# @supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):
@@ -329,6 +329,12 @@ def get_matcher(
 
     elif "rdd" in matcher_name:
         from matching.im_models import rdd
+
+        if "lg" in matcher_name:
+            return rdd.RDD_LGMatcher(device, *args, **kwargs)
+
+        if "aliked" in matcher_name:
+            return rdd.RDD_ThirdPartyMatcher(device, detector="aliked", *args, **kwargs)
 
         if "dense" in matcher_name:
             kwargs["mode"] = "dense"
