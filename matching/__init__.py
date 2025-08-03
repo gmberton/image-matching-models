@@ -20,6 +20,7 @@ WEIGHTS_DIR.mkdir(exist_ok=True)
 __version__ = "1.0.0"
 
 available_models = [
+    "liftfeat",
     "loftr",
     "eloftr",
     "se2loftr",
@@ -73,6 +74,7 @@ available_models = [
     "rdd-star",
     "rdd-lg",
     "rdd-aliked",
+    "minima-xoftr",
 ]
 
 
@@ -98,6 +100,11 @@ def get_matcher(
         return keypt2subpx.Keypt2SubpxMatcher(
             device, detector_name=detector_name, *args, **kwargs
         )
+    
+    if matcher_name == "liftfeat":
+        from matching.im_models import liftfeat
+
+        return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
 
     if matcher_name == "loftr":
         from matching.im_models import loftr
@@ -319,6 +326,8 @@ def get_matcher(
                     kwargs["model_size"] = "large"
             elif "loftr" in matcher_name:
                 kwargs["model_type"] = "loftr"
+            elif "xoftr" in matcher_name:
+                kwargs["model_type"] = "xoftr"
             else:  # set default to sp_lg
                 print("no model type set. Using sp-lg as default...")
                 kwargs["model_type"] = "sp_lg"
@@ -329,6 +338,8 @@ def get_matcher(
             return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
+        if kwargs["model_type"] == "xoftr":
+            return minima.MINIMAXoFTRMatcher(device, *args, **kwargs)
 
     elif "rdd" in matcher_name:
         from matching.im_models import rdd

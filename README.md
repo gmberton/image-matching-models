@@ -146,7 +146,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], rdd-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, rdd-[sparse,lg, aliked]```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked]```
 
 
 > [!TIP]
@@ -161,11 +161,12 @@ Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#mo
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
 | RDD (CVPR '25) | [Official](https://github.com/xtcpete/rdd?tab=readme-ov-file)| [Project page](https://xtcpete.github.io/rdd/) | | 6.73 / 7.85 / 9.18 / 15.75 
-| MINIMA (arxiv '24)| [Official](https://github.com/LSXI7/MINIMA/tree/main) | [arxiv](https://arxiv.org/abs/2412.19412) | | 11.32 / 7.355 / 96.6 / 0.561
+| LiftFeat (ICRA '25) | [Official](https://github.com/lyp-deeplearning/LiftFeat) | [arxiv](https://www.arxiv.org/abs/2505.03422) | 0.514   | 2.577
+| MINIMA (CVPR '25)| [Official](https://github.com/LSXI7/MINIMA/tree/main) | [arxiv](https://arxiv.org/abs/2412.19412) | | 11.32 / 7.355 / 96.6 / 0.561
 | XoFTR (CVPR IMW '24) | [Official](https://github.com/OnderT/XoFTR?tab=readme-ov-file) | [pdf](https://openaccess.thecvf.com/content/CVPR2024W/IMW/papers/Tuzcuoglu_XoFTR_Cross-modal_Feature_Matching_Transformer_CVPRW_2024_paper.pdf) | | 8.954 |
 | Affine Steerers (ECCV '24) | [Official](https://github.com/georg-bn/affine-steerers?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2408.14186)| 0.677 | ❌ |
 | Keypt2Subpx* (ECCV '24) | [Official](https://github.com/KimSinjeong/keypt2subpx) | [arxiv](https://arxiv.org/abs/2407.11668)| 0.055 /0.164 / 0.033 / 0.291  | -- |
-| MASt3R (ArXiv '24) | [Official](https://github.com/naver/mast3r?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2406.09756) | 0.699 | -- |
+| MASt3R (ECCV '24) | [Official](https://github.com/naver/mast3r?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2406.09756) | 0.699 | 22.27 |
 | Efficient-LoFTR (CVPR '24) | [Official](https://github.com/zju3dv/efficientloftr) | [pdf](https://zju3dv.github.io/efficientloftr/files/EfficientLoFTR.pdf) | 0.1026 | 2.117 |
 | OmniGlue (CVPR '24) | [Official](https://github.com/google-research/omniglue) | [arxiv](https://arxiv.org/abs/2405.12979) | ❌ | 6.351 |
 | xFeat-Steerers | [Official](https://colab.research.google.com/drive/1ZFifMqUAOQhky1197-WAquEV1K-LhDYP?usp=sharing) | [Discussion](https://github.com/verlab/accelerated_features/issues/32) | 0.037 | 0.124 | 
