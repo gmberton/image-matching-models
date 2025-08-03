@@ -76,6 +76,7 @@ available_models = [
     "rdd-aliked",
     "ufm",
     "minima-xoftr",
+    "edm",
 ]
 
 
@@ -95,6 +96,8 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import keypt2subpx
 
         detector_name = matcher_name.removesuffix("-subpx")
+
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
 
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name=detector_name, *args, **kwargs)
 
@@ -344,6 +347,10 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return ufm.UFMMatcher(device, *args, **kwargs)
 
+    elif matcher_name == "edm":
+        from matching.im_models import edm
+
+        return edm.EDMMatcher(device, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
