@@ -142,9 +142,9 @@ python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg
 ## Available Models
 You can choose any of the following methods (input to `get_matcher()`):
 
-**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma, rdd-dense```
+**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma```
 
-**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], ```
+**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], rdd-star```
 
 **Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, rdd-[sparse,lg, aliked]```
 
@@ -202,7 +202,7 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 
 \* `MINIMA` model runtimes are listed in the order: `superpoint-lg, LoFTR, RoMa (large), RoMa (tiny)`
 
-\* `RDD` model runtimes are listed in the order: `sparse, dense, lg, aliked`
+\* `RDD` model runtimes are listed in the order: `sparse, star (semi-dense), lg, aliked`
 ##
 
 ### Adding a new method

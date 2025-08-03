@@ -70,6 +70,9 @@ available_models = [
     "minima-splg",
     "minima-loftr",
     "rdd",
+    "rdd-star",
+    "rdd-lg",
+    "rdd-aliked",
 ]
 
 
@@ -336,7 +339,7 @@ def get_matcher(
         if "aliked" in matcher_name:
             return rdd.RDD_ThirdPartyMatcher(device, detector="aliked", *args, **kwargs)
 
-        if "dense" in matcher_name:
+        if "dense" in matcher_name or "star" in matcher_name:
             kwargs["mode"] = "dense"
         else:
             kwargs["mode"] = "sparse"
