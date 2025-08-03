@@ -26,3 +26,4 @@ roma
 loguru
 timm
 omegaconf
+poselib

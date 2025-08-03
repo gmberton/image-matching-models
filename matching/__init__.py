@@ -70,6 +70,10 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "rdd",
+    "rdd-star",
+    "rdd-lg",
+    "rdd-aliked",
     "ufm",
     "minima-xoftr",
 ]
@@ -319,6 +323,21 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
         if kwargs["model_type"] == "xoftr":
             return minima.MINIMAXoFTRMatcher(device, *args, **kwargs)
+
+    elif "rdd" in matcher_name:
+        from matching.im_models import rdd
+
+        if "lg" in matcher_name:
+            return rdd.RDD_LGMatcher(device, *args, **kwargs)
+
+        if "aliked" in matcher_name:
+            return rdd.RDD_ThirdPartyMatcher(device, detector="aliked", *args, **kwargs)
+
+        if "dense" in matcher_name or "star" in matcher_name:
+            kwargs["mode"] = "dense"
+        else:
+            kwargs["mode"] = "sparse"
+        return rdd.RDDMatcher(device, *args, **kwargs)
 
     elif matcher_name == "ufm":
         from matching.im_models import ufm
