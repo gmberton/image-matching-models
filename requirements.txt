@@ -27,3 +27,4 @@ loguru
 timm
 omegaconf
 poselib
+lightning==2.0.0 # from EDM
