@@ -327,9 +327,13 @@ def get_matcher(
         if kwargs["model_type"] == "roma":
             return minima.MINIMARomaMatcher(device, *args, **kwargs)
 
-    elif matcher_name == "rdd":
+    elif "rdd" in matcher_name:
         from matching.im_models import rdd
 
+        if "dense" in matcher_name:
+            kwargs["mode"] = "dense"
+        else:
+            kwargs["mode"] = "sparse"
         return rdd.RDDMatcher(device, *args, **kwargs)
 
     else:

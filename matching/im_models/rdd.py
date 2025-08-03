@@ -8,6 +8,7 @@ from matching.utils import to_numpy, resize_to_divisible, add_to_path
 add_to_path(THIRD_PARTY_DIR.joinpath("rdd"))
 from RDD.RDD import build
 from RDD.RDD_helper import RDD_helper
+from RDD.utils.misc import read_config
 
 
 class RDDMatcher(BaseMatcher):
@@ -20,26 +21,25 @@ class RDDMatcher(BaseMatcher):
         "https://drive.google.com/file/d/1UN6jO5vDQCZcPyVOhRv_Qfvs9onzlJMO/view"
     )
     model_path = WEIGHTS_DIR.joinpath("rdd_v2.ckpt")
-    divisible_size = 32
 
-    config_path = THIRD_PARTY_DIR.joinpath("rdd/configs/rdd_config.yaml")
+    config_path = THIRD_PARTY_DIR.joinpath("rdd/configs/default.yaml")
 
-    def __init__(self, device="cpu", mode="sparse", *args, **kwargs):
+    def __init__(self, device="cpu", mode="sparse", anchor="mnn", *args, **kwargs):
         super().__init__(device, **kwargs)
 
         assert mode in ["sparse", "dense"], "Mode must be 'sparse' or 'dense'"
         self.mode = mode
 
         self.thresh = 0.01
+        self.anchor = anchor
 
         self.download_weights()
 
-        self.matcher = build().eval().to(self.device)
-        self.matcher = RDD_helper(self.matcher)
-
-        self.matcher.load_state_dict(
-            torch.load(self.model_path, map_location=torch.device("cpu"))["state_dict"]
-        )
+        config = read_config(self.config_path)
+        config["device"] = device
+        self._matcher = build(config=config, weights=self.model_path)
+        self._matcher.eval()
+        self.matcher = RDD_helper(self._matcher)
 
     def download_weights(self):
         # check if weights exist, otherwise download them
@@ -62,9 +62,15 @@ class RDDMatcher(BaseMatcher):
                 fuzzy=True,
             )
 
-    def preprocess(self, img):
-        img = self.matcher.parse_input(img)
-        return img, img.shape
+    def preprocess(self, img: torch.Tensor):
+        # need "batch" dimension for RDD
+        if len(img.shape) == 3:
+            img = img[None, ...]
+        if img.max() > 1.0:
+            img = img / 255.0
+        _, _, h, w = img.shape
+        orig_shape = h, w
+        return img, orig_shape
 
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
@@ -72,21 +78,26 @@ class RDDMatcher(BaseMatcher):
 
         # run through model to get outputs
         if self.mode == "sparse":
-            mkpts0, mkpts1 = self.matcher.match(img0, img1)
+            out0 = self.matcher.RDD.extract(img0)[0]
+            out1 = self.matcher.RDD.extract(img1)[0]
+            mkpts0, mkpts1, conf = self.matcher.matcher(out0, out1, self.thresh)
+
         elif self.mode == "dense":
-            out0 = self.RDD.extract_dense(img0)[0]
-            out1 = self.RDD.extract_dense(img1)[0]
-
+            out0 = self.matcher.RDD.extract_dense(img0)[0]
+            out1 = self.matcher.RDD.extract_dense(img1)[0]
             # get top_k confident matches
-            mkpts0, mkpts1, conf = self.dense_matcher(
-                out0, out1, self.thresh, err_thr=self.RDD.stride, anchor=anchor
+            mkpts0, mkpts1, conf = self.matcher.dense_matcher(
+                out0,
+                out1,
+                self.thresh,
+                err_thr=self.matcher.RDD.stride,
+                anchor=self.anchor,
             )
-
-            scale0 = 1.0 / scale0
-            scale1 = 1.0 / scale1
-
-            mkpts0 = mkpts0 * scale0
-            mkpts1 = mkpts1 * scale1  # postprocess model output to get kpts, desc, etc
+        # collect pre-matched keypoints and descriptors
+        keypoints_0 = out0["keypoints"]
+        keypoints_1 = out1["keypoints"]
+        desc0 = out0["descriptors"]
+        desc1 = out1["descriptors"]
 
         # if we had to resize the img to divisible, then rescale the kpts back to input img size
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
