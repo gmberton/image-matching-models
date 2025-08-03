@@ -1,6 +1,6 @@
 # Image Matching Models (IMM)
 
-A unified API for quickly and easily trying 34 (and growing!) image matching models.
+A unified API for quickly and easily trying 37 (and growing!) image matching models.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alexstoken/image-matching-models/blob/main/demo.ipynb)
 
@@ -144,9 +144,9 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma```
 
-**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, minima-xoftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], ```
+**Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], rdd-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked]```
 
 
 > [!TIP]
@@ -160,6 +160,7 @@ Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#mo
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
+| RDD (CVPR '25) | [Official](https://github.com/xtcpete/rdd?tab=readme-ov-file)| [Project page](https://xtcpete.github.io/rdd/) | | 6.73 / 7.85 / 9.18 / 15.75 
 | LiftFeat (ICRA '25) | [Official](https://github.com/lyp-deeplearning/LiftFeat) | [arxiv](https://www.arxiv.org/abs/2505.03422) | 0.514   | 2.577
 | MINIMA (CVPR '25)| [Official](https://github.com/LSXI7/MINIMA/tree/main) | [arxiv](https://arxiv.org/abs/2412.19412) | | 11.32 / 7.355 / 96.6 / 0.561
 | XoFTR (CVPR IMW '24) | [Official](https://github.com/OnderT/XoFTR?tab=readme-ov-file) | [pdf](https://openaccess.thecvf.com/content/CVPR2024W/IMW/papers/Tuzcuoglu_XoFTR_Cross-modal_Feature_Matching_Transformer_CVPRW_2024_paper.pdf) | | 8.954 |
@@ -194,13 +195,15 @@ Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are base
 
 Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in the `assets/example_pairs` folder at image size 512x512. Benchmark is done using `benchmark.py` on an NVIDIA RTX A4000 GPU. Results rounded to the hundredths place.
 
-\* `SphereGlue` model runtimes are listed in the order: SIFT, SuperPoint
+\* `SphereGlue` model runtimes are listed in the order: `SIFT, SuperPoint`
 
-\* `LightGlue` model runtimes are listed in the order: SIFT, SuperPoint, Disk, ALIKED
+\* `LightGlue` model runtimes are listed in the order: `SIFT, SuperPoint, Disk, ALIKED`
 
-\* `Keypt2Subpx` model runtimes are listed in the order: superpoint-lg, aliked-lg, xfeat, dedode
+\* `Keypt2Subpx` model runtimes are listed in the order: `superpoint-lg, aliked-lg, xfeat, dedode`
 
-\* `MINIMA` model runtimes are listed in the order: superpoint-lg, LoFTR, RoMa (large), RoMa (tiny)
+\* `MINIMA` model runtimes are listed in the order: `superpoint-lg, LoFTR, RoMa (large), RoMa (tiny)`
+
+\* `RDD` model runtimes are listed in the order: `sparse, star (semi-dense), lg, aliked`
 ##
 
 ### Adding a new method
