@@ -8,12 +8,12 @@ from lisrd.models.lisrd import Lisrd
 from lisrd.models.base_model import Mode
 from lisrd.models.keypoint_detectors import SP_detect, load_SP_net
 from lisrd.utils.geometry_utils import extract_descriptors, lisrd_matcher
-from lightglue import ALIKED
+from lightglue import ALIKED, SuperPoint, SIFT
 
 
 class LISRDMatcher(BaseMatcher):
 
-    model_path = THIRD_PARTY_DIR.joinpath("LISRD", "weights", "lisrd_aachen.pth")
+    model_path = THIRD_PARTY_DIR.joinpath("LISRD", "weights", "lisrd_vidit.pth")
 
     # Load the LISRD model
     model_config = {
@@ -27,7 +27,14 @@ class LISRDMatcher(BaseMatcher):
         "freeze_local_desc": False,
     }
 
-    def __init__(self, device="cpu", max_num_keypoints=4096, *args, **kwargs):
+    def __init__(
+        self,
+        device="cpu",
+        detector="superpoint",
+        max_num_keypoints=4096,
+        *args,
+        **kwargs,
+    ):
         super().__init__(device, **kwargs)
 
         self.model = Lisrd(None, self.model_config, device)
@@ -36,9 +43,15 @@ class LISRDMatcher(BaseMatcher):
         print("LISRD model loaded successfully.")
         self.model._net.eval()
         print("LISRD model is in evaluation mode.")
-        self.extractor = (
-            ALIKED(max_num_keypoints=max_num_keypoints).eval().to(self.device)
-        )
+        detector = detector.lower()
+        print(f"using {detector} detector")
+        if detector == "aliked":
+            self.extractor = ALIKED(max_num_keypoints=max_num_keypoints)
+        elif detector == "sift":
+            self.extractor = SIFT(max_num_keypoints=max_num_keypoints)
+        else:
+            self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints)
+        self.extractor = self.extractor.eval().to(device)
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
         _, h, w = img.shape
@@ -49,8 +62,8 @@ class LISRDMatcher(BaseMatcher):
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
         # Keypoint detection
-        keypoints0 = self.extractor.extract(img0)["keypoints"]
-        keypoints1 = self.extractor.extract(img1)["keypoints"]
+        keypoints0 = self.extractor.extract(img0)["keypoints"].squeeze()
+        keypoints1 = self.extractor.extract(img1)["keypoints"].squeeze()
 
         print(keypoints0.shape, keypoints1.shape)
 
