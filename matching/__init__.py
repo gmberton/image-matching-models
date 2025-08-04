@@ -80,6 +80,7 @@ available_models = [
     "lisrd-sp",
     "lisrd",
     "lisrd-sift",
+    "ripe",
 ]
 
 
@@ -377,6 +378,11 @@ def get_matcher(
             detector = "superpoint"
 
         return lisrd.LISRDMatcher(device, detector, max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "ripe":
+        from matching.im_models import ripe
+
+        return ripe.RIPEMatcher(device, max_num_keypoints, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"

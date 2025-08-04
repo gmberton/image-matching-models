@@ -67,3 +67,6 @@
 [submodule "matching/third_party/LISRD"]
 	path = matching/third_party/LISRD
 	url = https://github.com/rpautrat/LISRD.git
+[submodule "matching/third_party/RIPE"]
+	path = matching/third_party/RIPE
+	url = https://github.com/fraunhoferhhi/RIPE.git
