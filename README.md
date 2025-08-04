@@ -146,7 +146,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked]```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked], ripe, lisrd```
 
 
 > [!TIP]
@@ -160,6 +160,7 @@ Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#mo
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
+| RIPE (ICCV '25) | [Official](https://github.com/fraunhoferhhi/RIPE) | [arxiv](https://arxiv.org/abs/2507.04839) |  | 2.772
 | RDD (CVPR '25) | [Official](https://github.com/xtcpete/rdd?tab=readme-ov-file)| [Project page](https://xtcpete.github.io/rdd/) | | 6.73 / 7.85 / 9.18 / 15.75 
 | EDM (arXiv ''25) | [Official](https://github.com/chicleee/EDM) | [arxiv](https://arxiv.org/abs/2503.05122)| | 0.493
 | LiftFeat (ICRA '25) | [Official](https://github.com/lyp-deeplearning/LiftFeat) | [arxiv](https://www.arxiv.org/abs/2505.03422) | 0.514   | 2.577
