@@ -36,15 +36,15 @@ class LISRDMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-
+        print("WARNING: LISRD may take awhile to load.")
         self.model = Lisrd(None, self.model_config, device)
-        print("Loading LISRD model from:", self.model_path)
+
         self.model.load(self.model_path, Mode.EXPORT)
-        print("LISRD model loaded successfully.")
+
         self.model._net.eval()
-        print("LISRD model is in evaluation mode.")
+
         detector = detector.lower()
-        print(f"using {detector} detector")
+
         if detector == "aliked":
             self.extractor = ALIKED(max_num_keypoints=max_num_keypoints)
         elif detector == "sift":
@@ -64,8 +64,6 @@ class LISRDMatcher(BaseMatcher):
         # Keypoint detection
         keypoints0 = self.extractor.extract(img0)["keypoints"].squeeze()
         keypoints1 = self.extractor.extract(img1)["keypoints"].squeeze()
-
-        print(keypoints0.shape, keypoints1.shape)
 
         # Descriptor inference
         outputs0 = self.model._forward({"image0": img0}, Mode.EXPORT, self.model_config)
