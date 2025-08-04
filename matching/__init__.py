@@ -76,6 +76,10 @@ available_models = [
     "rdd-aliked",
     "minima-xoftr",
     "edm",
+    "lisrd-aliked",
+    "lisrd-sp",
+    "lisrd",
+    "lisrd-sift",
 ]
 
 
@@ -85,7 +89,7 @@ def get_version(pkg):
     return major, minor, patch
 
 
-@supress_stdout
+# @supress_stdout
 def get_matcher(
     matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
 ):
@@ -361,6 +365,18 @@ def get_matcher(
         from matching.im_models import edm
 
         return edm.EDMMatcher(device, *args, **kwargs)
+
+    elif "lisrd" in matcher_name:
+        from matching.im_models import lisrd
+
+        if "sift" in matcher_name:
+            detector = "sift"
+        elif "aliked" in matcher_name:
+            detector = "aliked"
+        else:
+            detector = "superpoint"
+
+        return lisrd.LISRDMatcher(device, detector, max_num_keypoints, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
