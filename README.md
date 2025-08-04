@@ -184,6 +184,7 @@ Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#mo
 | Matchformer (ACCV '22) | [Official](https://github.com/jamycheung/MatchFormer) | [arxiv](https://arxiv.org/abs/2203.09645) | 0.232 | 6.101 | 
 | LoFTR (CVPR '21) | [Official](https://github.com/zju3dv/LoFTR) / [Kornia](https://kornia.readthedocs.io/en/stable/feature.html#kornia.feature.LoFTR) | [arxiv](https://arxiv.org/abs/2104.00680) | 0.722 | 2.36 | 
 | Patch2Pix (CVPR '21) | [Official](https://github.com/GrumpyZhou/patch2pix)  / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox) | [arxiv](https://arxiv.org/abs/2012.01909) | 0.145 | 4.97 | 
+|LISRD (ECCV '20) | [Official](https://github.com/rpautrat/LISRD) | [arxiv](https://arxiv.org/abs/2007.08988) | 12.319 / 3.823/ 12.305 | 0.187 / 1.191 / 0.165
 | SuperGlue (CVPR '20) | [Official](https://github.com/magicleap/SuperGluePretrainedNetwork) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/superglue.py) | [arxiv](https://arxiv.org/abs/1911.11763)  | 0.0894 | 2.178 | 
 | R2D2 (NeurIPS '19) | [Official](https://github.com/naver/r2d2) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/r2d2.py) | [arxiv](https://arxiv.org/abs/1906.06195) | 0.429 | 6.79 | 
 | D2Net (CVPR '19) | [Official](https://github.com/mihaidusmanu/d2-net) / [IMT](https://github.com/GrumpyZhou/image-matching-toolbox/blob/main/immatch/modules/d2net.py) | [arxiv](https://arxiv.org/abs/1905.03561) | 0.600 | 1.324 | 
