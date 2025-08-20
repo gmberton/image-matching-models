@@ -167,7 +167,7 @@ def get_matcher(
 
         return lightglue.DognetLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif "roma" in matcher_name:
+    elif matcher_name in ["roma", "tiny-roma"]:
         from matching.im_models import roma
 
         if "tiny" in matcher_name:
