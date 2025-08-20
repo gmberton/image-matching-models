@@ -45,7 +45,7 @@
 	url = https://github.com/KimSinjeong/keypt2subpx.git
 [submodule "matching/third_party/SphereGlue"]
 	path = matching/third_party/SphereGlue
-	url = https://github.com/vishalsharbidar/SphereGlue
+	url = https://github.com/alexstoken/SphereGlue.git
 [submodule "matching/third_party/affine-steerers"]
 	path = matching/third_party/affine-steerers
 	url = https://github.com/georg-bn/affine-steerers.git
