@@ -1,6 +1,6 @@
 # Image Matching Models (IMM)
 
-A unified API for quickly and easily trying 37 (and growing!) image matching models.
+A unified API for quickly and easily trying 38 (and growing!) image matching models.
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alexstoken/image-matching-models/blob/main/demo.ipynb)
 
@@ -146,7 +146,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked], ripe, lisrd```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked], ripe, lisrd, DTM```
 
 
 > [!TIP]
@@ -160,6 +160,7 @@ Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](#mo
 
 | Model | Code | Paper | GPU Runtime (s/img)| CPU Runtime (s/img) |
 |-------|------|-------|----|----|
+| DTM (TPAMI '22) | [Official](https://github.com/fb82/DTM?tab=readme-ov-file) | [arxiv](https://arxiv.org/abs/2106.09584) | | 
 | RIPE (ICCV '25) | [Official](https://github.com/fraunhoferhhi/RIPE) | [arxiv](https://arxiv.org/abs/2507.04839) |  | 2.772
 | RDD (CVPR '25) | [Official](https://github.com/xtcpete/rdd?tab=readme-ov-file)| [Project page](https://xtcpete.github.io/rdd/) | | 6.73 / 7.85 / 9.18 / 15.75 
 | EDM (arXiv ''25) | [Official](https://github.com/chicleee/EDM) | [arxiv](https://arxiv.org/abs/2503.05122)| | 0.493

@@ -81,6 +81,7 @@ available_models = [
     "lisrd",
     "lisrd-sift",
     "ripe",
+    "dtm",
 ]
 
 
@@ -383,6 +384,11 @@ def get_matcher(
         from matching.im_models import ripe
 
         return ripe.RIPEMatcher(device, max_num_keypoints, *args, **kwargs)
+    elif matcher_name == "dtm":
+        from matching.im_models import dtm
+
+        return dtm.DTMMatcher(device, max_num_keypoints, *args, **kwargs)
+
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
