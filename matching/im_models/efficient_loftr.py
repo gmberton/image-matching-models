@@ -1,6 +1,6 @@
 import torch
-from pathlib import Path
-import gdown
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 from copy import deepcopy
 import torchvision.transforms as tfm
 
@@ -14,8 +14,8 @@ from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 
 
 class EfficientLoFTRMatcher(BaseMatcher):
-    weights_src = "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
-    model_path = WEIGHTS_DIR.joinpath("eloftr_outdoor.ckpt")
+    repo_id = "ariG23498/eloftr"
+    weight_filename = "eloftr_outdoors.safetensors"
     divisible_size = 32
 
     def __init__(self, device="cpu", cfg="full", **kwargs):
@@ -23,24 +23,25 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         self.precision = kwargs.get("precision", self.get_precision())
 
-        self.download_weights()
+        model_path = self.download_weights()
 
         self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg))
 
-        self.matcher.load_state_dict(torch.load(self.model_path, map_location=torch.device("cpu"))["state_dict"])
+        state_dict = load_file(model_path)
+        self.matcher.load_state_dict(state_dict)
+        
         self.matcher = reparameter(self.matcher).to(self.device).eval()
 
     def get_precision(self):
         return "fp16"
 
     def download_weights(self):
-        if not Path(EfficientLoFTRMatcher.model_path).is_file():
-            print("Downloading eLoFTR outdoor... (takes a while)")
-            gdown.download(
-                EfficientLoFTRMatcher.weights_src,
-                output=str(EfficientLoFTRMatcher.model_path),
-                fuzzy=True,
-            )
+        model_path = hf_hub_download(
+            repo_id=EfficientLoFTRMatcher.repo_id,
+            filename=EfficientLoFTRMatcher.weight_filename,
+            local_dir=WEIGHTS_DIR,
+        )
+        return model_path
 
     def preprocess(self, img):
         _, h, w = img.shape
