@@ -1,6 +1,7 @@
 Thanks for your interest in contributing to IMM!
 
-To add a new method:
+## To add a new method:
+
 1. Create a new file in the `matching/im_models` folder called `[method].py`
 2. If the method requires external modules, add them to `./matching/third_party` with `git submodule add`: for example, I've used this command to add the LightGlue module which is automatically downloaded when using `--recursive`
 
@@ -30,3 +31,45 @@ To update a submodule to the head of the remote, run
 ```bash
 git submodule update --remote matching/third_party/[submodule_name]
 ```
+
+## Adding models to the Hugging Face Hub:
+
+Although not mandatory, we encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/image-matching-models). This will increase model visibility and help track usage of each model.
+
+Here are the steps that we took to add the ELoFTR model:
+
+1. Dowloaded the model from Google Drive (any other storage)
+```py
+!pip install -q pytorch_lightning  # Needed for the ELoFTR download
+from pathlib import Path
+from safetensors.torch import save_file
+from huggingface_hub import upload_file
+import gdown
+import torch
+
+weights_src = "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
+model_path = "eloftr_outdoor.ckpt"
+gdown.download(weights_src, output=model_path, fuzzy=True)
+```
+
+2. Save the state dict as a [safetensor](https://huggingface.co/docs/safetensors/en/index)
+```py
+state_dict = torch.load(model_path, map_location=torch.device("cpu"), weights_only=False)["state_dict"]
+save_file(state_dict, "eloftr_outdoors.safetensors")
+```
+
+3. Upload the safetensor file to the Hub (you can upload it to your personal account and later transfer to the organization)
+```
+from huggingface_hub import HfApi
+
+api = HfApi()
+api.upload_file(
+    path_or_fileobj="eloftr_outdoors.safetensors",
+    path_in_repo="eloftr_outdoors.safetensors ",
+    repo_id="ariG23498/eloftr", # personal repository
+)
+```
+
+You can access the weights here: https://huggingface.co/ariG23498/eloftr
+
+You can now see in this [PR](https://github.com/alexstoken/image-matching-models/pull/46) how we can move holistically to the Hub.
