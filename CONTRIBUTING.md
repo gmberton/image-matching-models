@@ -34,30 +34,22 @@ git submodule update --remote matching/third_party/[submodule_name]
 
 ## Adding models to the Hugging Face Hub:
 
-We encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/image-matching-models)
+Although not mandatory, we encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/image-matching-models). This will increase model visibility and help track usage of each model.
 
 Here are the steps that we took to add the ELoFTR model:
 
 1. Dowloaded the model from Google Drive (any other storage)
 ```py
-!pip install -q pytorch_lightning # necessary for the download
+!pip install -q pytorch_lightning  # Needed for the ELoFTR download
 from pathlib import Path
 from safetensors.torch import save_file
 from huggingface_hub import upload_file
 import gdown
 import torch
 
-def download_weights(weights_src, model_path):
-    gdown.download(
-        weights_src,
-        output=model_path,
-        fuzzy=True,
-    )
-
 weights_src = "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
 model_path = "eloftr_outdoor.ckpt"
-
-download_weights(weights_src=weights_src, model_path=model_path)
+gdown.download(weights_src, output=model_path, fuzzy=True)
 ```
 
 2. Save the state dict as a [safetensor](https://huggingface.co/docs/safetensors/en/index)
