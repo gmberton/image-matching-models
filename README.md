@@ -139,7 +139,20 @@ python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg
 ```
 
 ### MatchAnything variants (ELoFTR / RoMa)
-MatchAnything is vendored under `matching/third_party/MatchAnything` (code + weights). Run either variant via:
+MatchAnything (HF Space: https://huggingface.co/spaces/LittleFrog/MatchAnything) is tracked as a git submodule at `matching/third_party/MatchAnything` (code lives under `imcui/third_party/MatchAnything`). Init/update it with:
+```bash
+git submodule update --init --recursive matching/third_party/MatchAnything
+```
+Download checkpoints (kept out of git) into the nested MatchAnything folder. PowerShell example:
+```powershell
+cd matching/third_party/MatchAnything/imcui/third_party/MatchAnything
+python -m pip install gdown
+python -m gdown 12L3g9-w8rR9K2L4rYaGaDJ7NqX1D713d --fuzzy -O weights.zip
+tar -xf weights.zip  # or: unzip weights.zip
+Remove-Item weights.zip
+# weights/matchanything_eloftr.ckpt and weights/matchanything_roma.ckpt should now exist
+```
+Run either variant via:
 ```bash
 # ELoFTR backbone (defaults to 832px NPE size)
 python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
@@ -147,10 +160,10 @@ python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 83
 # RoMa backbone (AMP disabled on CPU automatically)
 python main_matcher.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
 ```
-Weights should be at `matching/third_party/MatchAnything/weights/matchanything_eloftr.ckpt` and `matching/third_party/MatchAnything/weights/matchanything_roma.ckpt`.
-The RoMa variant uses the vendored ROMA package; if your env cannot import `roma`, install it in editable mode:
+Weights should be at `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_eloftr.ckpt` and `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_roma.ckpt`.
+The RoMa variant uses the vendored ROMA package (inside the submodule); if your env cannot import `roma`, install it in editable mode:
 ```bash
-python -m pip install -e matching/third_party/MatchAnything/third_party/ROMA
+python -m pip install -e matching/third_party/MatchAnything/imcui/third_party/MatchAnything/third_party/ROMA
 ```
 Lightning 1.4.9 (MatchAnything dependency) also expects `torchmetrics==0.6.0`, `wandb==0.15.12`, and `pydantic==1.10.x`; these are pinned in `requirements.txt`.
 
