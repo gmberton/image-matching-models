@@ -138,6 +138,22 @@ As with matching, you can also run extraction from the command line
 python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg --n_kpts 2048
 ```
 
+### MatchAnything variants (ELoFTR / RoMa)
+MatchAnything is vendored under `matching/third_party/MatchAnything` (code + weights). Run either variant via:
+```bash
+# ELoFTR backbone (defaults to 832px NPE size)
+python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
+
+# RoMa backbone (AMP disabled on CPU automatically)
+python main_matcher.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
+```
+Weights should be at `matching/third_party/MatchAnything/weights/matchanything_eloftr.ckpt` and `matching/third_party/MatchAnything/weights/matchanything_roma.ckpt`.
+The RoMa variant uses the vendored ROMA package; if your env cannot import `roma`, install it in editable mode:
+```bash
+python -m pip install -e matching/third_party/MatchAnything/third_party/ROMA
+```
+Lightning 1.4.9 (MatchAnything dependency) also expects `torchmetrics==0.6.0`, `wandb==0.15.12`, and `pydantic==1.10.x`; these are pinned in `requirements.txt`.
+
 
 ## Available Models
 You can choose any of the following methods (input to `get_matcher()`):

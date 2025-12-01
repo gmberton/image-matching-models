@@ -28,3 +28,8 @@ timm
 omegaconf
 poselib
 lightning==2.0.0 # from EDM
+pytorch-lightning==1.4.9  # MatchAnything dependency
+pynvml  # used by MatchAnything lightning wrapper
+torchmetrics==0.6.0  # lightning 1.4.9 compatibility
+pydantic==1.10.14  # lightning 1.4.9 / wandb compatibility
+wandb==0.15.12  # lightning 1.4.9 compatibility
