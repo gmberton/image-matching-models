@@ -40,6 +40,7 @@ class DTMMatcher(BaseMatcher):
         # currently not done
         self.guided_matching_iters = 0  # 1
 
+        self.dtm_show_in_progress = False
         # RANSAC fundamental matrix estimation parameters
         self.poselib_params = {
             "max_iterations": 100000,
@@ -65,15 +66,11 @@ class DTMMatcher(BaseMatcher):
 
         # Hz+
         if "Hz+" in self.detectors:
-            hz0, _ = hz.hz_plus(
-                hz.load_to_tensor(img[0]).to(torch.float), output_format="laf"
-            )
+            hz0, _ = hz.hz_plus(img0.to(torch.float), output_format="laf")
             hz0 = KF.ellipse_to_laf(hz0[None]).to(self.device).to(torch.float)
             laf0 = torch.concat((laf0, hz0), dim=1)
 
-            hz1, _ = hz.hz_plus(
-                hz.load_to_tensor(img[1]).to(torch.float), output_format="laf"
-            )
+            hz1, _ = hz.hz_plus(img1.to(torch.float), output_format="laf")
             hz1 = KF.ellipse_to_laf(hz1[None]).to(self.device).to(torch.float)
             laf1 = torch.concat((laf1, hz1), dim=1)
 
@@ -96,10 +93,10 @@ class DTMMatcher(BaseMatcher):
             laf1 = torch.concat((laf1, dog1), dim=1)
 
         # Kornia image load
-        timg0 = K.io.load_image(
+        img0_gray = K.io.load_image(
             img[0], K.io.ImageLoadType.GRAY32, device=self.device
         ).unsqueeze(0)
-        timg1 = K.io.load_image(
+        img1_gray = K.io.load_image(
             img[1], K.io.ImageLoadType.GRAY32, device=self.device
         ).unsqueeze(0)
 
@@ -107,19 +104,19 @@ class DTMMatcher(BaseMatcher):
         if "AffNet" in self.patchers:
             affnet = K.feature.LAFAffNetShapeEstimator(pretrained=True).to(self.device)
 
-            laf0 = affnet(laf0, timg0)
-            laf1 = affnet(laf1, timg1)
+            laf0 = affnet(laf0, img0_gray)
+            laf1 = affnet(laf1, img1_gray)
 
         if "OriNet" in self.patchers:
             orinet = K.feature.LAFOrienter(
                 angle_detector=K.feature.OriNet(pretrained=True).to(self.device)
             )
 
-            laf0 = orinet(laf0, timg0)
-            laf1 = orinet(laf1, timg1)
+            laf0 = orinet(laf0, img0_gray)
+            laf1 = orinet(laf1, img1_gray)
 
-        desc0 = self.hardnet(timg0, laf0).squeeze(0)
-        desc1 = self.hardnet(timg1, laf1).squeeze(0)
+        desc0 = self.hardnet(img0_gray, laf0).squeeze(0)
+        desc1 = self.hardnet(img1_gray, laf1).squeeze(0)
 
         # Keypoints
         keypoints_0 = laf0[:, :, :, 2].to(torch.float).squeeze(0)
