@@ -1,12 +1,15 @@
-import numpy as np
-from pathlib import Path
-from PIL import Image
 import cv2
+import gdown
+import numpy as np
+import shutil
+import tarfile
+import zipfile
+from PIL import Image
 import torch
 import torch.nn.functional as F
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
-from matching.utils import add_to_path
+from matching.utils import add_to_path, dict_to_device
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
@@ -66,14 +69,51 @@ class MatchAnythingMatcher(BaseMatcher):
         self.net.eval().to(self.device)
 
     def download_weights(self):
-        """Ensure weights exist locally."""
+        """Ensure weights exist locally; downloads and extracts if missing."""
+        weights_dir = self.model_path.parent
+        weights_dir.mkdir(parents=True, exist_ok=True)
+
         if self.model_path.is_file():
             return
 
-        raise FileNotFoundError(
-            f"Missing weights for {self.model_name}. "
-            f"Place the checkpoint at {self.model_path}"
-        )
+        archive_path = MATCHANYTHING_DIR.joinpath("weights.zip")
+        if not archive_path.is_file():
+            gdown.download(
+                id="12L3g9-w8rR9K2L4rYaGaDJ7NqX1D713d",
+                output=str(archive_path),
+                fuzzy=True,
+            )
+
+        self._extract_weights_archive(archive_path, weights_dir)
+
+        # Some archives include a top-level "weights/" folder; flatten if needed.
+        nested_path = weights_dir.joinpath("weights", self.model_path.name)
+        if nested_path.is_file() and not self.model_path.is_file():
+            shutil.move(str(nested_path), str(self.model_path))
+
+        if not self.model_path.is_file():
+            raise FileNotFoundError(
+                f"Missing weights for {self.model_name}. "
+                f"Place the checkpoint at {self.model_path}"
+            )
+
+    @staticmethod
+    def _extract_weights_archive(archive_path, target_dir):
+        """Extract weights archive (zip or tar) into target_dir and clean up."""
+        if not archive_path.exists():
+            return
+
+        if zipfile.is_zipfile(archive_path):
+            with zipfile.ZipFile(archive_path, "r") as zip_ref:
+                zip_ref.extractall(target_dir)
+        else:
+            try:
+                with tarfile.open(archive_path) as tar_ref:
+                    tar_ref.extractall(target_dir)
+            except tarfile.TarError:
+                raise ValueError(f"Unsupported weights archive format: {archive_path}")
+
+        archive_path.unlink(missing_ok=True)
 
     def _preprocess_single(self, img):
         img_np = img.cpu().numpy().squeeze() * 255
@@ -126,6 +166,7 @@ class MatchAnythingMatcher(BaseMatcher):
         return mkpts0, mkpts1, None, None, None, None
 
 
+# Custom resize logic from MatchAnything to preserve padding/masks expected by the upstream config.
 def resize(img, resize=None, df=8, padding=True):
     w, h = img.shape[1], img.shape[0]
     w_new, h_new = process_resize(w, h, resize=resize, df=df, resize_no_larger_than=False)
@@ -194,31 +235,3 @@ def pad_bottom_right(inp, pad_size, ret_mask=False):
     else:
         raise NotImplementedError()
     return padded, mask
-
-
-def dict_to_device(data_dict, device="cuda"):
-    data_dict_device = {}
-    for k, v in data_dict.items():
-        if isinstance(v, torch.Tensor):
-            data_dict_device[k] = v.to(device)
-        elif isinstance(v, dict):
-            data_dict_device[k] = dict_to_device(v, device=device)
-        elif isinstance(v, list):
-            data_dict_device[k] = list_to_device(v, device=device)
-        else:
-            data_dict_device[k] = v
-    return data_dict_device
-
-
-def list_to_device(data_list, device="cuda"):
-    data_list_device = []
-    for obj in data_list:
-        if isinstance(obj, torch.Tensor):
-            data_list_device.append(obj.to(device))
-        elif isinstance(obj, dict):
-            data_list_device.append(dict_to_device(obj, device=device))
-        elif isinstance(obj, list):
-            data_list_device.append(list_to_device(obj, device=device))
-        else:
-            data_list_device.append(obj)
-    return data_list_device

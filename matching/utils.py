@@ -90,6 +90,36 @@ def to_tensor(x: np.ndarray | torch.Tensor, device: str = None) -> torch.Tensor:
         return x.to(device)
 
 
+def dict_to_device(data_dict, device: str = "cuda"):
+    """Recursively move tensor values in a dict to `device`."""
+    data_dict_device = {}
+    for k, v in data_dict.items():
+        if isinstance(v, torch.Tensor):
+            data_dict_device[k] = v.to(device)
+        elif isinstance(v, dict):
+            data_dict_device[k] = dict_to_device(v, device=device)
+        elif isinstance(v, list):
+            data_dict_device[k] = list_to_device(v, device=device)
+        else:
+            data_dict_device[k] = v
+    return data_dict_device
+
+
+def list_to_device(data_list, device: str = "cuda"):
+    """Recursively move tensor values in a list to `device`."""
+    data_list_device = []
+    for obj in data_list:
+        if isinstance(obj, torch.Tensor):
+            data_list_device.append(obj.to(device))
+        elif isinstance(obj, dict):
+            data_list_device.append(dict_to_device(obj, device=device))
+        elif isinstance(obj, list):
+            data_list_device.append(list_to_device(obj, device=device))
+        else:
+            data_list_device.append(obj)
+    return data_list_device
+
+
 def to_normalized_coords(pts: np.ndarray | torch.Tensor, height: int, width: int):
     """normalize kpt coords from px space to [0,1]
     Assumes pts are in x, y order in array/tensor shape (N, 2)

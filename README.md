@@ -143,14 +143,12 @@ MatchAnything (HF Space: https://huggingface.co/spaces/LittleFrog/MatchAnything)
 ```bash
 git submodule update --init --recursive matching/third_party/MatchAnything
 ```
-Download checkpoints (kept out of git) into the nested MatchAnything folder. PowerShell example:
+Checkpoints download automatically on first MatchAnything use and are stored in `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights`. To prefetch manually:
 ```powershell
 cd matching/third_party/MatchAnything/imcui/third_party/MatchAnything
-python -m pip install gdown
 python -m gdown 12L3g9-w8rR9K2L4rYaGaDJ7NqX1D713d --fuzzy -O weights.zip
 tar -xf weights.zip  # or: unzip weights.zip
 Remove-Item weights.zip
-# weights/matchanything_eloftr.ckpt and weights/matchanything_roma.ckpt should now exist
 ```
 Run either variant via:
 ```bash
@@ -160,8 +158,8 @@ python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 83
 # RoMa backbone (AMP disabled on CPU automatically)
 python main_matcher.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
 ```
-Weights should be at `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_eloftr.ckpt` and `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_roma.ckpt`.
-The RoMa variant uses the vendored ROMA package (inside the submodule); if your env cannot import `roma`, install it in editable mode:
+Weights are stored at `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_eloftr.ckpt` and `matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/matchanything_roma.ckpt`.
+The RoMa variant uses the vendored `romatch` package. If you hit import errors, install from PyPI (`python -m pip install romatch`) or fall back to the editable submodule:
 ```bash
 python -m pip install -e matching/third_party/MatchAnything/imcui/third_party/MatchAnything/third_party/ROMA
 ```
