@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
-from matching.utils import add_to_path
+from matching.utils import add_to_path, install_package
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RoMa"))
 from romatch import roma_outdoor, tiny_roma_v1_outdoor
@@ -19,14 +19,6 @@ from skimage.util import img_as_ubyte
 
 import subprocess
 import sys
-
-def install_package(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", str(THIRD_PARTY_DIR.joinpath("RoMaV2")])
-
-install_package("requests")
-from romav2 import RoMaV2
-
-add_to_path()
 
 
 class RomaMatcher(BaseMatcher):
@@ -118,6 +110,13 @@ class TinyRomaMatcher(BaseMatcher):
 
 class Romav2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
+        try:
+            from romav2 import RoMaV2
+        except ModuleNotFoundError as e:
+            print("romav2 not found, installing...")
+            install_package(str(THIRD_PARTY_DIR.joinpath("RoMaV2")), editable=True)
+            from romav2 import RoMaV2
+
         super().__init__(device, **kwargs)
         self.model = RoMaV2(device=device)
         self.max_keypoints = max_num_keypoints

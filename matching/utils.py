@@ -6,6 +6,7 @@ import torchvision.transforms as tfm
 import os, contextlib
 from yacs.config import CfgNode as CN
 import sys
+import subprocess
 
 logger = logging.getLogger()
 logger.setLevel(31)  # Avoid printing useless low-level logs
@@ -185,6 +186,14 @@ def load_module(module_name: str, module_path: Path | str) -> None:
     spec.loader.exec_module(module)
 
 
+def install_package(package, editable=False):
+    cmd = [sys.executable, "-m", "pip", "install"]
+    if editable:
+        cmd.append("-e")
+    cmd.append(package)
+    subprocess.check_call(cmd)
+
+
 def add_to_path(path: str | Path, insert=None) -> None:
     path = str(path)
     if path in sys.path:
@@ -193,6 +202,7 @@ def add_to_path(path: str | Path, insert=None) -> None:
         sys.path.append(path)
     else:
         sys.path.insert(insert, path)
+
 
 def get_default_device():
     device = "cpu"
