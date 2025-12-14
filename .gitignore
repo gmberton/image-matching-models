@@ -2,8 +2,7 @@
 .idea
 __pycache__
 model_weights
+matching/model_weights
 outputs_*
 *.egg-info/*
 build
-matching/third_party/MatchAnything/weights/*.ckpt
-matching/third_party/MatchAnything/imcui/third_party/MatchAnything/weights/*.ckpt

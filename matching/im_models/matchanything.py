@@ -8,15 +8,23 @@ from PIL import Image
 import torch
 import torch.nn.functional as F
 
-from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
 from matching.utils import add_to_path, dict_to_device
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
 add_to_path(MATCHANYTHING_DIR)
 
-from src.lightning.lightning_loftr import PL_LoFTR  # noqa: E402
+from yacs.config import CfgNode as CN  # noqa: E402
+from src.loftr import LoFTR  # noqa: E402
 from src.config.default import get_cfg_defaults  # noqa: E402
+from third_party.ROMA.roma.matchanything_roma_model import MatchAnything_Model  # noqa: E402
+
+
+def _lower_config(yacs_cfg):
+    if not isinstance(yacs_cfg, CN):
+        return yacs_cfg
+    return {k.lower(): _lower_config(v) for k, v in yacs_cfg.items()}
 
 
 class MatchAnythingMatcher(BaseMatcher):
@@ -41,8 +49,21 @@ class MatchAnythingMatcher(BaseMatcher):
         self.img_resize = img_resize
 
         self.model_name = f"matchanything_{self.variant}"
-        self.model_path = MATCHANYTHING_DIR.joinpath("weights", f"{self.model_name}.ckpt")
+        self.model_path = WEIGHTS_DIR.joinpath("matchanything", f"{self.model_name}.ckpt")
         self._load_model()
+
+    def _try_migrate_legacy_weights(self):
+        legacy_weights_dir = MATCHANYTHING_DIR.joinpath("weights")
+        legacy_candidates = [
+            legacy_weights_dir.joinpath(self.model_path.name),
+            legacy_weights_dir.joinpath("weights", self.model_path.name),
+        ]
+        for legacy_path in legacy_candidates:
+            if legacy_path.is_file():
+                self.model_path.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(str(legacy_path), str(self.model_path))
+                return True
+        return False
 
     def _load_model(self):
         self.model_path.parent.mkdir(parents=True, exist_ok=True)
@@ -65,7 +86,19 @@ class MatchAnythingMatcher(BaseMatcher):
         cfg.METHOD = self.model_name
         cfg.LOFTR.MATCH_COARSE.THR = self.match_threshold
 
-        self.net = PL_LoFTR(cfg, pretrained_ckpt=self.model_path, test_mode=True).matcher
+        cfg_lower = _lower_config(cfg)
+        if self.variant == "eloftr":
+            self.net = LoFTR(config=cfg_lower["loftr"])
+        else:
+            self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
+
+        checkpoint = torch.load(self.model_path, map_location="cpu")
+        state_dict = checkpoint.get("state_dict", checkpoint)
+        if self.variant == "eloftr" and any(k.startswith("matcher.") for k in state_dict):
+            state_dict = {
+                (k.replace("matcher.", "", 1) if k.startswith("matcher.") else k): v for k, v in state_dict.items()
+            }
+        self.net.load_state_dict(state_dict, strict=False)
         self.net.eval().to(self.device)
 
     def download_weights(self):
@@ -75,8 +108,10 @@ class MatchAnythingMatcher(BaseMatcher):
 
         if self.model_path.is_file():
             return
+        if self._try_migrate_legacy_weights():
+            return
 
-        archive_path = MATCHANYTHING_DIR.joinpath("weights.zip")
+        archive_path = weights_dir.joinpath("weights.zip")
         if not archive_path.is_file():
             gdown.download(
                 id="12L3g9-w8rR9K2L4rYaGaDJ7NqX1D713d",
@@ -87,9 +122,16 @@ class MatchAnythingMatcher(BaseMatcher):
         self._extract_weights_archive(archive_path, weights_dir)
 
         # Some archives include a top-level "weights/" folder; flatten if needed.
-        nested_path = weights_dir.joinpath("weights", self.model_path.name)
-        if nested_path.is_file() and not self.model_path.is_file():
-            shutil.move(str(nested_path), str(self.model_path))
+        nested_dir = weights_dir.joinpath("weights")
+        if nested_dir.is_dir():
+            for ckpt_path in nested_dir.glob("*.ckpt"):
+                target = weights_dir.joinpath(ckpt_path.name)
+                if not target.is_file():
+                    shutil.move(str(ckpt_path), str(target))
+            try:
+                nested_dir.rmdir()
+            except OSError:
+                pass
 
         if not self.model_path.is_file():
             raise FileNotFoundError(
@@ -115,7 +157,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
         archive_path.unlink(missing_ok=True)
 
-    def _preprocess_single(self, img):
+    def preprocess(self, img):
         img_np = img.cpu().numpy().squeeze() * 255
         img_np = img_np.transpose(1, 2, 0).astype("uint8")
 
@@ -127,8 +169,8 @@ class MatchAnythingMatcher(BaseMatcher):
         return img_tensor, img_size, scale_hw, mask, img
 
     def _forward(self, img0, img1):
-        img0_proc, img0_size, img0_scale, mask0, img0_orig = self._preprocess_single(img0)
-        img1_proc, img1_size, img1_scale, mask1, img1_orig = self._preprocess_single(img1)
+        img0_proc, img0_size, img0_scale, mask0, img0_orig = self.preprocess(img0)
+        img1_proc, img1_size, img1_scale, mask1, img1_orig = self.preprocess(img1)
 
         batch = {
             "image0": img0_proc,
