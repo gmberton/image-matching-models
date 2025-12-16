@@ -57,7 +57,7 @@ git clone --recursive https://github.com/alexstoken/image-matching-models
 cd image-matching-models
 pip install -e .
 ```
-Some models (`omniglue`, LoFTR family) require one-off dependencies (`tensorflow`, `pytorch-lightning`), which are not included in the default list. To install these, use 
+Some models require additional optional dependencies which are not included in the default list. To install these, use 
 ```
 pip install .[all]
 ```
@@ -137,6 +137,18 @@ As with matching, you can also run extraction from the command line
 ```bash
 python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg --n_kpts 2048
 ```
+
+### MatchAnything variants (ELoFTR / RoMa)
+Run either variant via:
+```bash
+# ELoFTR backbone (defaults to 832px NPE size)
+python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
+
+# RoMa backbone (AMP disabled on CPU automatically)
+python main_matcher.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
+```
+Weights download automatically on first MatchAnything use and are cached under `matching/model_weights/matchanything`.
+For submodule setup and troubleshooting, see [docs/matchanything.md](docs/matchanything.md).
 
 
 ## Available Models
