@@ -26,6 +26,8 @@ available_models = [
     "se2loftr",
     "xoftr",
     "aspanformer",
+    "matchanything-eloftr",
+    "matchanything-roma",
     "matchformer",
     "sift-lg",
     "superpoint-lg",
@@ -121,6 +123,16 @@ def get_matcher(
         from matching.im_models import efficient_loftr
 
         return efficient_loftr.EfficientLoFTRMatcher(device, *args, **kwargs)
+
+    if matcher_name in ["matchanything-eloftr", "matchanything_eloftr"]:
+        from matching.im_models import matchanything
+
+        return matchanything.MatchAnythingMatcher(device, variant="eloftr", *args, **kwargs)
+
+    if matcher_name in ["matchanything-roma", "matchanything_roma"]:
+        from matching.im_models import matchanything
+
+        return matchanything.MatchAnythingMatcher(device, variant="roma", *args, **kwargs)
 
     if matcher_name == "se2loftr":
         from matching.im_models import se2loftr
