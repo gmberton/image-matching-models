@@ -70,7 +70,7 @@ def parse_args():
     parser.add_argument(
         "--input",
         type=Path,
-        default=[Path("assets/example_pairs")],
+        default=Path("assets/example_pairs"),
         help="path to image or directory with images (the search is recursive over jpg and png images)",
     )
     parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
