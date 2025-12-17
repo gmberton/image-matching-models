@@ -93,53 +93,68 @@ def get_version(pkg):
 
 
 # @supress_stdout
-def get_matcher(
-    matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs
-):
+def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
         from matching.im_models.base_matcher import EnsembleMatcher
 
         return EnsembleMatcher(matcher_name, device, *args, **kwargs)
-    if "subpx" in matcher_name:
+
+    elif matcher_name == "xfeat-subpx":
         from matching.im_models import keypt2subpx
 
-        detector_name = matcher_name.removesuffix("-subpx")
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="xfeat", *args, **kwargs)
 
-        return keypt2subpx.Keypt2SubpxMatcher(
-            device, detector_name=detector_name, *args, **kwargs
-        )
+    elif matcher_name == "xfeat-lg-subpx":
+        from matching.im_models import keypt2subpx
 
-    if matcher_name == "liftfeat":
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="xfeat-lg", *args, **kwargs)
+
+    elif matcher_name == "dedode-subpx":
+        from matching.im_models import keypt2subpx
+
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="dedode", *args, **kwargs)
+
+    elif matcher_name == "splg-subpx":
+        from matching.im_models import keypt2subpx
+
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="splg", *args, **kwargs)
+
+    elif matcher_name == "aliked-subpx":
+        from matching.im_models import keypt2subpx
+
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="aliked", *args, **kwargs)
+
+    elif matcher_name == "liftfeat":
         from matching.im_models import liftfeat
 
         return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
 
-    if matcher_name == "loftr":
+    elif matcher_name == "loftr":
         from matching.im_models import loftr
 
         return loftr.LoftrMatcher(device, *args, **kwargs)
 
-    if matcher_name == "eloftr":
+    elif matcher_name == "eloftr":
         from matching.im_models import efficient_loftr
 
         return efficient_loftr.EfficientLoFTRMatcher(device, *args, **kwargs)
 
-    if matcher_name in ["matchanything-eloftr", "matchanything_eloftr"]:
+    elif matcher_name == "matchanything-eloftr":
         from matching.im_models import matchanything
 
         return matchanything.MatchAnythingMatcher(device, variant="eloftr", *args, **kwargs)
 
-    if matcher_name in ["matchanything-roma", "matchanything_roma"]:
+    elif matcher_name == "matchanything-roma":
         from matching.im_models import matchanything
 
         return matchanything.MatchAnythingMatcher(device, variant="roma", *args, **kwargs)
 
-    if matcher_name == "se2loftr":
+    elif matcher_name == "se2loftr":
         from matching.im_models import se2loftr
 
         return se2loftr.Se2LoFTRMatcher(device, *args, **kwargs)
 
-    if matcher_name == "xoftr":
+    elif matcher_name == "xoftr":
         from matching.im_models import xoftr
 
         return xoftr.XoFTRMatcher(device, *args, **kwargs)
@@ -179,13 +194,15 @@ def get_matcher(
 
         return lightglue.DognetLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name in ["roma", "tiny-roma"]:
+    elif matcher_name == "roma":
         from matching.im_models import roma
 
-        if "tiny" in matcher_name:
-            return roma.TinyRomaMatcher(device, max_num_keypoints, *args, **kwargs)
-        else:
-            return roma.RomaMatcher(device, max_num_keypoints, *args, **kwargs)
+        return roma.RomaMatcher(device, max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "tiny-roma":
+        from matching.im_models import roma
+
+        return roma.TinyRomaMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "dedode":
         from matching.im_models import dedode
@@ -202,12 +219,10 @@ def get_matcher(
 
         return steerers.SteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name in ["aff-steerers", "affine-steerers"]:
+    elif matcher_name == "affine-steerers":
         from matching.im_models import aff_steerers
 
-        return aff_steerers.AffSteererMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return aff_steerers.AffSteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "sift-nn":
         from matching.im_models import handcrafted
@@ -227,9 +242,7 @@ def get_matcher(
     elif matcher_name == "superglue":
         from matching.im_models import matching_toolbox
 
-        return matching_toolbox.SuperGlueMatcher(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "r2d2":
         from matching.im_models import matching_toolbox
@@ -241,12 +254,12 @@ def get_matcher(
 
         return matching_toolbox.D2netMatcher(device, *args, **kwargs)
 
-    elif matcher_name in ["duster", "dust3r"]:
+    elif matcher_name == "duster":
         from matching.im_models import duster
 
         return duster.Dust3rMatcher(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name in ["master", "mast3r"]:
+    elif matcher_name == "master":
         from matching.im_models import master
 
         return master.Mast3rMatcher(device, max_num_keypoints, *args, **kwargs)
@@ -254,44 +267,50 @@ def get_matcher(
     elif matcher_name == "doghardnet-nn":
         from matching.im_models import matching_toolbox
 
-        return matching_toolbox.DogAffHardNNMatcher(
-            device, max_num_keypoints=max_num_keypoints, *args, **kwargs
+        return matching_toolbox.DogAffHardNNMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "xfeat":
+        from matching.im_models import xfeat
+
+        return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, mode="sparse", *args, **kwargs)
+
+    elif matcher_name == "xfeat-star":
+        from matching.im_models import xfeat
+
+        return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, mode="semi-dense", *args, **kwargs)
+
+    elif matcher_name == "xfeat-lg":
+        from matching.im_models import xfeat
+
+        return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, mode="lighterglue", *args, **kwargs)
+
+    elif matcher_name == "xfeat-steerers-perm":
+        from matching.im_models import xfeat_steerers
+
+        return xfeat_steerers.xFeatSteerersMatcher(
+            device, max_num_keypoints, mode="sparse", steerer_type="perm", *args, **kwargs
         )
 
-    elif "xfeat" in matcher_name:
-        if "steerers" in matcher_name:
-            from matching.im_models import xfeat_steerers
+    elif matcher_name == "xfeat-steerers-learned":
+        from matching.im_models import xfeat_steerers
 
-            if kwargs.get("mode", None) is None:
-                # only use matcher_name to assign mode if mode is not a given kwarg
-                kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
+        return xfeat_steerers.xFeatSteerersMatcher(
+            device, max_num_keypoints, mode="sparse", steerer_type="learned", *args, **kwargs
+        )
 
-            if kwargs.get("steerer_type", None) is None:
-                if "perm" in matcher_name:
-                    kwargs["steerer_type"] = "perm"
-                else:
-                    kwargs["steerer_type"] = (
-                        "learned"  # learned performs better, should be default
-                    )
+    elif matcher_name == "xfeat-star-steerers-perm":
+        from matching.im_models import xfeat_steerers
 
-            return xfeat_steerers.xFeatSteerersMatcher(
-                device, max_num_keypoints, *args, **kwargs
-            )
+        return xfeat_steerers.xFeatSteerersMatcher(
+            device, max_num_keypoints, mode="semi-dense", steerer_type="perm", *args, **kwargs
+        )
 
-        else:
-            from matching.im_models import xfeat
+    elif matcher_name == "xfeat-star-steerers-learned":
+        from matching.im_models import xfeat_steerers
 
-            kwargs["mode"] = "semi-dense" if "star" in matcher_name else "sparse"
-
-            if matcher_name.removeprefix("xfeat").removeprefix("-") in [
-                "lg",
-                "lightglue",
-                "lighterglue",
-            ]:
-                kwargs["mode"] = "lighterglue"
-            return xfeat.xFeatMatcher(
-                device, max_num_keypoints=max_num_keypoints, *args, **kwargs
-            )
+        return xfeat_steerers.xFeatSteerersMatcher(
+            device, max_num_keypoints, mode="semi-dense", steerer_type="learned", *args, **kwargs
+        )
 
     elif matcher_name == "dedode-lg":
         from matching.im_models import kornia
@@ -326,70 +345,82 @@ def get_matcher(
     elif matcher_name == "superpoint-sphereglue":
         from matching.im_models import sphereglue
 
-        return sphereglue.SuperpointSphereGlue(
-            device, max_num_keypoints, *args, **kwargs
-        )
+        return sphereglue.SuperpointSphereGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif "minima" in matcher_name:
+    elif matcher_name == "minima":
         from matching.im_models import minima
 
-        if "model_type" not in kwargs.keys():
-            if "lg" in matcher_name:
-                kwargs["model_type"] = "sp_lg"
-            elif "roma" in matcher_name:
-                kwargs["model_type"] = "roma"
-                if "tiny" in matcher_name:
-                    kwargs["model_size"] = "tiny"
-                else:
-                    kwargs["model_size"] = "large"
-            elif "loftr" in matcher_name:
-                kwargs["model_type"] = "loftr"
-            elif "xoftr" in matcher_name:
-                kwargs["model_type"] = "xoftr"
-            else:  # set default to sp_lg
-                print("no model type set. Using sp-lg as default...")
-                kwargs["model_type"] = "sp_lg"
+        return minima.MINIMASpLgMatcher(device, *args, **kwargs)
 
-        if kwargs["model_type"] == "sp_lg":
-            return minima.MINIMASpLgMatcher(device, *args, **kwargs)
-        if kwargs["model_type"] == "loftr":
-            return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
-        if kwargs["model_type"] == "roma":
-            return minima.MINIMARomaMatcher(device, *args, **kwargs)
-        if kwargs["model_type"] == "xoftr":
-            return minima.MINIMAXoFTRMatcher(device, *args, **kwargs)
+    elif matcher_name == "minima-splg":
+        from matching.im_models import minima
 
-    elif "rdd" in matcher_name:
+        return minima.MINIMASpLgMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "minima-roma":
+        from matching.im_models import minima
+
+        return minima.MINIMARomaMatcher(device, model_size="large", *args, **kwargs)
+
+    elif matcher_name == "minima-roma-tiny":
+        from matching.im_models import minima
+
+        return minima.MINIMARomaMatcher(device, model_size="tiny", *args, **kwargs)
+
+    elif matcher_name == "minima-loftr":
+        from matching.im_models import minima
+
+        return minima.MINIMALoFTRMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "minima-xoftr":
+        from matching.im_models import minima
+
+        return minima.MINIMAXoFTRMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "rdd":
         from matching.im_models import rdd
 
-        if "lg" in matcher_name:
-            return rdd.RDD_LGMatcher(device, *args, **kwargs)
+        return rdd.RDDMatcher(device, mode="sparse", *args, **kwargs)
 
-        if "aliked" in matcher_name:
-            return rdd.RDD_ThirdPartyMatcher(device, detector="aliked", *args, **kwargs)
+    elif matcher_name == "rdd-star":
+        from matching.im_models import rdd
 
-        if "dense" in matcher_name or "star" in matcher_name:
-            kwargs["mode"] = "dense"
-        else:
-            kwargs["mode"] = "sparse"
-        return rdd.RDDMatcher(device, *args, **kwargs)
+        return rdd.RDDMatcher(device, mode="dense", *args, **kwargs)
+
+    elif matcher_name == "rdd-lg":
+        from matching.im_models import rdd
+
+        return rdd.RDD_LGMatcher(device, *args, **kwargs)
+
+    elif matcher_name == "rdd-aliked":
+        from matching.im_models import rdd
+
+        return rdd.RDD_ThirdPartyMatcher(device, detector="aliked", *args, **kwargs)
 
     elif matcher_name == "edm":
         from matching.im_models import edm
 
         return edm.EDMMatcher(device, *args, **kwargs)
 
-    elif "lisrd" in matcher_name:
+    elif matcher_name == "lisrd":
         from matching.im_models import lisrd
 
-        if "sift" in matcher_name:
-            detector = "sift"
-        elif "aliked" in matcher_name:
-            detector = "aliked"
-        else:
-            detector = "superpoint"
+        return lisrd.LISRDMatcher(device, "superpoint", max_num_keypoints, *args, **kwargs)
 
-        return lisrd.LISRDMatcher(device, detector, max_num_keypoints, *args, **kwargs)
+    elif matcher_name == "lisrd-sp":
+        from matching.im_models import lisrd
+
+        return lisrd.LISRDMatcher(device, "superpoint", max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "lisrd-sift":
+        from matching.im_models import lisrd
+
+        return lisrd.LISRDMatcher(device, "sift", max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "lisrd-aliked":
+        from matching.im_models import lisrd
+
+        return lisrd.LISRDMatcher(device, "aliked", max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "ripe":
         from matching.im_models import ripe
