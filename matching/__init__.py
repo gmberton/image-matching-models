@@ -97,7 +97,7 @@ def get_version(pkg):
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
-        from matching.im_models.base_matcher import EnsembleMatcher
+        from matching.base_matcher import EnsembleMatcher
 
         return EnsembleMatcher(matcher_name, device, *args, **kwargs)
 
