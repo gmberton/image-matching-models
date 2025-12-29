@@ -2,10 +2,12 @@ from matching import get_matcher, available_models, get_default_device
 from argparse import ArgumentParser
 import cv2
 import time
-import torch
 import numpy as np
 import warnings
 import os
+import subprocess
+import sys
+import json
 from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
 
@@ -15,11 +17,31 @@ def parse_args():
     parser.add_argument("--matchers", type=str, nargs="+", default="all", help="models to benchmark")
     parser.add_argument("--img-size", type=int, default=512, help="image size")
     parser.add_argument("--device", type=str, default=get_default_device(), help="device")
+    parser.add_argument(
+        "--single-matcher-json", type=str, help="Run single matcher and output JSON (for subprocess use)"
+    )
     args = parser.parse_args()
 
     if args.matchers == "all":
         args.matchers = available_models
     return args
+
+
+def run_single_matcher(matcher_name, img_size, device):
+    """Run a single matcher test and return results as dict."""
+    warnings.filterwarnings("ignore")
+    os.environ["PYTHONWARNINGS"] = "ignore"
+
+    f_stdout, f_stderr = StringIO(), StringIO()
+    try:
+        with redirect_stdout(f_stdout), redirect_stderr(f_stderr):
+            matcher = get_matcher(matcher_name, device=device)
+            avg_runtime, error = benchmark_and_test(matcher, img_size=img_size, runs=5)
+        passing = error < 0.05
+        return {"success": True, "runtime": float(avg_runtime), "passed": bool(passing), "error": float(error)}
+    except Exception as e:
+        error_str = str(e).strip().replace("\n", " ")
+        return {"success": False, "error": error_str}
 
 
 def benchmark_and_test(matcher, img_size=512, runs=5):
@@ -52,6 +74,13 @@ def benchmark_and_test(matcher, img_size=512, runs=5):
 
 
 def main(args):
+    # Handle single matcher mode (for subprocess calls)
+    if args.single_matcher_json:
+        result = run_single_matcher(args.single_matcher_json, args.img_size, args.device)
+        print(json.dumps(result))
+        return
+
+    # Normal mode: run all matchers in subprocesses
     warnings.filterwarnings("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
 
@@ -60,20 +89,33 @@ def main(args):
 
     for matcher_name in args.matchers:
         print("\033[0m", end="")
-        f_stdout, f_stderr = StringIO(), StringIO()
+
+        # Run each matcher in a subprocess for isolation
+        cmd = [
+            sys.executable,
+            __file__,
+            "--single-matcher-json",
+            matcher_name,
+            "--img-size",
+            str(args.img_size),
+            "--device",
+            args.device,
+        ]
+
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
         try:
-            with redirect_stdout(f_stdout), redirect_stderr(f_stderr):
-                matcher = get_matcher(matcher_name, device=args.device)
-                avg_runtime, error = benchmark_and_test(matcher, img_size=args.img_size, runs=5)
-
-            passing = error < 0.05
-            print(f"{matcher_name:<30} {avg_runtime:.3f}      {'passed' if passing else 'failed':<15}")
-
-        except Exception as error_str:
-            error_str = str(error_str).strip().replace("\n", " ")
-            pretty_print_error = error_str if len(error_str) < 100 else error_str[:100] + "..."
-            print(f"{matcher_name:<30} error: {pretty_print_error}")
+            output = json.loads(result.stdout)
+            if output["success"]:
+                status = "passed" if output["passed"] else "failed"
+                status_with_error = f"{status}: err {output['error']:.2f}"
+                print(f"{matcher_name:<30} {output['runtime']:.3f}      {status_with_error:<15}")
+            else:
+                error_msg = output["error"]
+                pretty_error = error_msg if len(error_msg) < 100 else error_msg[:100] + "..."
+                print(f"{matcher_name:<30} error: {pretty_error}")
+        except (json.JSONDecodeError, KeyError, subprocess.TimeoutExpired):
+            print(f"{matcher_name:<30} error: subprocess failed or timed out")
 
 
 if __name__ == "__main__":
