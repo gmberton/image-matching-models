@@ -7,7 +7,15 @@ import os
 import shutil
 import torchvision.transforms as tfm
 import gdown
+import torch
 
+# Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
+_original_torch_load = torch.load
+def _patched_torch_load(*args, **kwargs):
+    if 'weights_only' not in kwargs:
+        kwargs['weights_only'] = False
+    return _original_torch_load(*args, **kwargs)
+torch.load = _patched_torch_load
 
 from matching.utils import add_to_path, resize_to_divisible
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
