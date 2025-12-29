@@ -35,9 +35,9 @@ class EDMMatcher(BaseMatcher):
     def build_matcher(self):
         # Get default configurations
         config = get_cfg_defaults()
-        config.merge_from_file(THIRD_PARTY_DIR / "edm/configs/edm/outdoor/edm_base.py")
+        config.merge_from_file(THIRD_PARTY_DIR / "EDM/configs/edm/outdoor/edm_base.py")
         config.merge_from_file(
-            THIRD_PARTY_DIR / "edm/configs/data/megadepth_test_1500.py"
+            THIRD_PARTY_DIR / "EDM/configs/data/megadepth_test_1500.py"
         )
 
         config.EDM.COARSE.MCONF_THR = self.thresh
