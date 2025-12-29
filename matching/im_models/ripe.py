@@ -1,4 +1,6 @@
 from pathlib import Path
+import ssl
+import urllib.request
 
 import torch
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
@@ -36,10 +38,15 @@ class RIPEMatcher(BaseMatcher):
         if not Path(RIPEMatcher.model_path).is_file():
             print("Downloading model... (takes a while)")
 
-            torch.hub.download_url_to_file(
-                RIPEMatcher.weights_src,
-                str(RIPEMatcher.model_path),
-            )
+            # Create unverified SSL context to bypass certificate verification
+            ssl_context = ssl.create_default_context()
+            ssl_context.check_hostname = False
+            ssl_context.verify_mode = ssl.CERT_NONE
+
+            # Download with SSL context
+            with urllib.request.urlopen(RIPEMatcher.weights_src, context=ssl_context) as response:
+                with open(RIPEMatcher.model_path, 'wb') as out_file:
+                    out_file.write(response.read())
 
     def preprocess(self, img):
         _, h, w = img.shape
