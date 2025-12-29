@@ -102,7 +102,7 @@ def main(args):
             args.device,
         ]
 
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
 
         try:
             output = json.loads(result.stdout)
