@@ -118,9 +118,9 @@ class _rdd_lg_wrapper(LightGlue):
     """
 
     def __init__(self, *args, **kwargs):
+        # Fix the hardcoded path BEFORE parent init so it uses the correct weights
+        LightGlue.features["rdd"]["weights"] = RDD_LGMatcher.model_path_lg
         super().__init__(*args, **kwargs)
-
-        self.features["rdd"]["weights"] = RDD_LGMatcher.model_path_lg
 
 
 class RDD_LGMatcher(RDDMatcher):
