@@ -15,6 +15,11 @@ from matching.utils import add_to_path, dict_to_device
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
 add_to_path(MATCHANYTHING_DIR)
 
+# Also add ROMA to path for its internal imports (e.g., "from roma.models import ...")
+# Use insert=0 to give it priority over other potential 'roma' modules
+ROMA_DIR = MATCHANYTHING_DIR.joinpath("third_party", "ROMA")
+add_to_path(ROMA_DIR, insert=0)
+
 from yacs.config import CfgNode as CN  # noqa: E402
 from src.loftr import LoFTR  # noqa: E402
 from src.config.default import get_cfg_defaults  # noqa: E402
