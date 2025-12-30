@@ -6,7 +6,6 @@ from matching.utils import add_to_path
 add_to_path(THIRD_PARTY_DIR.joinpath("LISRD"))
 from lisrd.models.lisrd import Lisrd
 from lisrd.models.base_model import Mode
-from lisrd.models.keypoint_detectors import SP_detect, load_SP_net
 from lisrd.utils.geometry_utils import extract_descriptors, lisrd_matcher
 from lightglue import ALIKED, SuperPoint, SIFT
 

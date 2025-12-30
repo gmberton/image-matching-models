@@ -1,13 +1,14 @@
 import torch
 from pathlib import Path
-import gdown, py3_wget
+import gdown
+import py3_wget
 
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, add_to_path
+from matching.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("path/to/submodule"))
 
-from submodule import model, other_components
+from submodule import model
 
 
 class NewMatcher(BaseMatcher):

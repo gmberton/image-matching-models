@@ -1,17 +1,15 @@
-import torch
 from pathlib import Path
 import py3_wget
 import torchvision.transforms as tfm
 from argparse import Namespace
-import kornia
 
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, add_to_path
+from matching.utils import to_numpy, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"), insert=0)
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA/third_party/RoMa"))
 
-from src.utils.load_model import load_model, load_sp_lg, load_loftr, load_roma, load_xoftr
+from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr
 
 
 class MINIMAMatcher(BaseMatcher):

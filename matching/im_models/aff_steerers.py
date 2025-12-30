@@ -1,5 +1,4 @@
 import torch
-import os
 import torchvision.transforms as tfm
 import py3_wget
 from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
@@ -13,7 +12,7 @@ from matching.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("affine-steerers"))
 from affine_steerers.utils import build_affine
-from affine_steerers.matchers.dual_softmax_matcher import DualSoftMaxMatcher, MaxSimilarityMatcher
+from affine_steerers.matchers.dual_softmax_matcher import MaxSimilarityMatcher
 from affine_steerers import dedode_detector_L, dedode_descriptor_B, dedode_descriptor_G
 
 class AffSteererMatcher(BaseMatcher):
@@ -229,11 +228,11 @@ class AffSteererMatcher(BaseMatcher):
 
         batch_0 = {"image": img0}
         detections_0 = self.detector.detect(batch_0, num_keypoints=self.max_keypoints)
-        keypoints_0, P_0 = detections_0["keypoints"], detections_0["confidence"]
+        keypoints_0, _ = detections_0["keypoints"], detections_0["confidence"]
 
         batch_1 = {"image": img1}
         detections_1 = self.detector.detect(batch_1, num_keypoints=self.max_keypoints)
-        keypoints_1, P_1 = detections_1["keypoints"], detections_1["confidence"]
+        keypoints_1, _ = detections_1["keypoints"], detections_1["confidence"]
 
         description_0 = self.descriptor.describe_keypoints(batch_0, keypoints_0)["descriptions"]
         description_1 = self.descriptor.describe_keypoints(batch_1, keypoints_1)["descriptions"]

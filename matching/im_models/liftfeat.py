@@ -2,7 +2,7 @@ import torch
 import numpy as np
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, add_to_path
+from matching.utils import to_numpy, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LiftFeat"))
 from models.liftfeat_wrapper import LiftFeat, MODEL_PATH

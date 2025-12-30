@@ -5,8 +5,8 @@ warnings due to unused modules.
 """
 
 from pathlib import Path
-from .utils import supress_stdout, add_to_path, get_default_device
-from .base_matcher import BaseMatcher
+from .utils import add_to_path, get_default_device  # for quick import later 'from matching import get_default_device'
+from .base_matcher import BaseMatcher  # for quick import later 'from matching import BaseMatcher'
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")

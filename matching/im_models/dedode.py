@@ -1,7 +1,6 @@
 import os
 import torch
 import py3_wget
-from pathlib import Path
 import torchvision.transforms as tfm
 from kornia.feature import DeDoDe
 import kornia
