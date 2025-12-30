@@ -14,12 +14,8 @@ from src.utils.misc import lower_config
 
 
 class XoFTRMatcher(BaseMatcher):
-    weights_src_640 = (
-        "https://drive.google.com/file/d/1oRkEGsLpPIxlulc6a7c2q5H1XTNbfkVj/view"
-    )
-    weights_src_840 = (
-        "https://drive.google.com/file/d/1bexiQGcbZWESb2lp1cTsa7r5al9M4xzj/view"
-    )
+    weights_src_640 = "https://drive.google.com/file/d/1oRkEGsLpPIxlulc6a7c2q5H1XTNbfkVj/view"
+    weights_src_840 = "https://drive.google.com/file/d/1bexiQGcbZWESb2lp1cTsa7r5al9M4xzj/view"
 
     model_path_640 = WEIGHTS_DIR.joinpath("weights_xoftr_640.ckpt")
     model_path_840 = WEIGHTS_DIR.joinpath("weights_xoftr_840.ckpt")
@@ -54,22 +50,15 @@ class XoFTRMatcher(BaseMatcher):
 
         matcher = XoFTR(config=config["xoftr"])
 
-        ckpt = (
-            self.model_path_640 if self.pretrained_size == 640 else self.model_path_840
-        )
+        ckpt = self.model_path_640 if self.pretrained_size == 640 else self.model_path_840
 
         # Load model
-        matcher.load_state_dict(
-            torch.load(ckpt, map_location="cpu")["state_dict"], strict=True
-        )
+        matcher.load_state_dict(torch.load(ckpt, map_location="cpu")["state_dict"], strict=True)
 
         return matcher.eval().to(self.device)
 
     def download_weights(self):
-        if (
-            not Path(XoFTRMatcher.model_path_640).is_file()
-            and self.pretrained_size == 640
-        ):
+        if not Path(XoFTRMatcher.model_path_640).is_file() and self.pretrained_size == 640:
             print("Downloading XoFTR outdoor... (takes a while)")
             gdown.download(
                 XoFTRMatcher.weights_src_640,
@@ -77,10 +66,7 @@ class XoFTRMatcher(BaseMatcher):
                 fuzzy=True,
             )
 
-        if (
-            not Path(XoFTRMatcher.model_path_840).is_file()
-            and self.pretrained_size == 840
-        ):
+        if not Path(XoFTRMatcher.model_path_840).is_file() and self.pretrained_size == 840:
             print("Downloading XoFTR outdoor... (takes a while)")
             gdown.download(
                 XoFTRMatcher.weights_src_840,

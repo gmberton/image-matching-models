@@ -6,14 +6,14 @@ from matching.im_models.lightglue import SIFT, SuperPoint
 from matching.utils import add_to_path
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 
-add_to_path(THIRD_PARTY_DIR.joinpath('SphereGlue'))
+add_to_path(THIRD_PARTY_DIR.joinpath("SphereGlue"))
 
 from model.sphereglue import SphereGlue
 from utils.Utils import sphericalToCartesian
 
 
 def unit_cartesian(points):
-    phi, theta =  torch.split(torch.as_tensor(points), 1, dim=1)
+    phi, theta = torch.split(torch.as_tensor(points), 1, dim=1)
     unitCartesian = sphericalToCartesian(phi, theta, 1).squeeze(dim=2)
     return unitCartesian
 
@@ -89,11 +89,7 @@ class SiftSphereGlue(SphereGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.download_weights()
-        self.sphereglue_cfg.update({
-            "descriptor_dim": 128,
-            "output_dim": 128*2,
-            "max_kpts": max_num_keypoints
-        })
+        self.sphereglue_cfg.update({"descriptor_dim": 128, "output_dim": 128 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
         self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])
@@ -101,16 +97,14 @@ class SiftSphereGlue(SphereGlueBase):
 
 class SuperpointSphereGlue(SphereGlueBase):
     model_path = WEIGHTS_DIR.joinpath("superpoint-sphereglue.pt")
-    weights_url = "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/superpoint/autosaved.pt"
+    weights_url = (
+        "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/superpoint/autosaved.pt"
+    )
 
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.download_weights()
-        self.sphereglue_cfg.update({
-            "descriptor_dim": 256,
-            "output_dim": 256*2,
-            "max_kpts": max_num_keypoints
-        })
+        self.sphereglue_cfg.update({"descriptor_dim": 256, "output_dim": 256 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
         self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])

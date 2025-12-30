@@ -74,12 +74,8 @@ class LISRDMatcher(BaseMatcher):
         meta_desc1 = outputs1["meta_descriptors"]
 
         # Sample the descriptors at the keypoint positions
-        desc0, meta_desc0 = extract_descriptors(
-            keypoints0, desc0, meta_desc0, img0_orig_shape
-        )
-        desc1, meta_desc1 = extract_descriptors(
-            keypoints1, desc1, meta_desc1, img1_orig_shape
-        )
+        desc0, meta_desc0 = extract_descriptors(keypoints0, desc0, meta_desc0, img0_orig_shape)
+        desc1, meta_desc1 = extract_descriptors(keypoints1, desc1, meta_desc1, img1_orig_shape)
         matches = lisrd_matcher(desc0, desc1, meta_desc0, meta_desc1).cpu().numpy()
 
         mkpts0, mkpts1 = (

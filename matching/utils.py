@@ -225,6 +225,7 @@ def add_to_path(path: str | Path, insert=None) -> None:
     else:
         sys.path.insert(insert, path)
 
+
 def get_default_device():
     device = "cpu"
 

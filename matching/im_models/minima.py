@@ -13,18 +13,10 @@ from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr
 
 
 class MINIMAMatcher(BaseMatcher):
-    weights_minima_sp_lg = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
-    )
-    weights_minima_roma = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
-    )
-    weights_minima_loftr = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
-    )
-    weights_minima_xoftr = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.pth"
-    )
+    weights_minima_sp_lg = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
+    weights_minima_roma = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
+    weights_minima_loftr = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
+    weights_minima_xoftr = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.pth"
 
     model_path_sp_lg = WEIGHTS_DIR.joinpath("minima_lightglue.ckpt")
     model_path_roma = WEIGHTS_DIR.joinpath("minima_roma.ckpt")
@@ -50,9 +42,7 @@ class MINIMAMatcher(BaseMatcher):
 
 
 class MINIMASpLgMatcher(MINIMAMatcher):
-    weights_src = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
-    )
+    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
     model_path = WEIGHTS_DIR.joinpath("minima_lightglue.ckpt")
 
     def __init__(self, device="cpu", **kwargs):
@@ -86,9 +76,7 @@ class MINIMASpLgMatcher(MINIMAMatcher):
 
 
 class MINIMALoFTRMatcher(MINIMAMatcher):
-    weights_src = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
-    )
+    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
     model_path = WEIGHTS_DIR.joinpath("minima_loftr.ckpt")
 
     def __init__(self, device="cpu", **kwargs):
@@ -123,9 +111,7 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
 
 
 class MINIMARomaMatcher(MINIMAMatcher):
-    weights_src = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
-    )
+    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
     model_path = WEIGHTS_DIR.joinpath("minima_roma.ckpt")
 
     ALLOWABLE_MODEL_SIZES = ["tiny", "large"]
@@ -153,9 +139,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
         matches, mconf = self.matcher.sample(warp, certainty)
 
-        mkpts0, mkpts1 = self.matcher.to_pixel_coordinates(
-            matches, orig_H0, orig_W0, orig_H1, orig_W1
-        )
+        mkpts0, mkpts1 = self.matcher.to_pixel_coordinates(matches, orig_H0, orig_W0, orig_H1, orig_W1)
 
         (W0, H0), (W1, H1) = img0.size, img1.size
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
@@ -165,9 +149,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
 
 class MINIMAXoFTRMatcher(MINIMAMatcher):
-    weights_src = (
-        "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.ckpt"
-    )
+    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.ckpt"
     model_path = WEIGHTS_DIR.joinpath("minima_xoftr.ckpt")
 
     def __init__(self, device="cpu", **kwargs):

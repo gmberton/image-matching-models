@@ -17,9 +17,7 @@ class RIPEMatcher(BaseMatcher):
     weights_src = "https://cvg.hhi.fraunhofer.de/RIPE/ripe_weights.pth"
     model_path = WEIGHTS_DIR.joinpath("ripe_weights.pth")
 
-    def __init__(
-        self, device="cpu", max_num_keypoints=2048, thresh=0.5, *args, **kwargs
-    ):
+    def __init__(self, device="cpu", max_num_keypoints=2048, thresh=0.5, *args, **kwargs):
         super().__init__(device, **kwargs)
 
         self.download_weights()
@@ -43,7 +41,7 @@ class RIPEMatcher(BaseMatcher):
 
             # Download with SSL context
             with urllib.request.urlopen(RIPEMatcher.weights_src, context=ssl_context) as response:
-                with open(RIPEMatcher.model_path, 'wb') as out_file:
+                with open(RIPEMatcher.model_path, "wb") as out_file:
                     out_file.write(response.read())
 
     def preprocess(self, img):
