@@ -51,7 +51,6 @@ class Patch2pixMatcher(BaseMatcher):
     @staticmethod
     def download_weights():
         print("Downloading Patch2Pix model weights...")
-        WEIGHTS_DIR.mkdir(exist_ok=True)
         gdown.download(
             Patch2pixMatcher.pretrained_src,
             output=str(Patch2pixMatcher.model_path),

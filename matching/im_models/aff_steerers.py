@@ -49,8 +49,6 @@ class AffSteererMatcher(BaseMatcher):
         if self.device != "cuda": # only cuda devices work due to autocast in cuda in upstream.
             raise ValueError("Only device 'cuda' supported for AffineSteerers.")
 
-        WEIGHTS_DIR.mkdir(exist_ok=True)
-
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:
             raise ValueError(f'unsupported type for aff-steerer: {steerer_type}. Must choose from {self.STEERER_TYPES}.')
