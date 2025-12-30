@@ -2,13 +2,11 @@ from pathlib import Path
 import ssl
 import urllib.request
 
-import torch
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import add_to_path
 
 import kornia.feature as KF
 
-from torchvision.io import decode_image
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RIPE"))
 

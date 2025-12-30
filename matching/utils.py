@@ -3,7 +3,8 @@ from pathlib import Path
 import numpy as np
 import torch
 import torchvision.transforms as tfm
-import os, contextlib
+import os
+import contextlib
 from yacs.config import CfgNode as CN
 import sys
 

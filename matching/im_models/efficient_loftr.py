@@ -29,7 +29,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         state_dict = load_file(model_path)
         self.matcher.load_state_dict(state_dict)
-        
+
         self.matcher = reparameter(self.matcher).to(self.device).eval()
 
     def get_precision(self):
