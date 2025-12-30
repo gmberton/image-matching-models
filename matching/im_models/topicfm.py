@@ -55,25 +55,19 @@ class TopicFMMatcher(BaseMatcher):
 
     def download_weights(self):
         """Download pretrained weights if not already present."""
-        import gdown
-
-        weights_dir = WEIGHTS_DIR / "topicfm"
-        weights_dir.mkdir(exist_ok=True, parents=True)
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
 
         if self.variant == "fast":
-            weights_path = weights_dir / "topicfm_fast.ckpt"
-            url = "https://drive.google.com/file/d/1DACWdszttpiCZlk4aazhu0IDWvHkLPZf/view?usp=sharing"
+            repo_id = "image-matching-models/topicfm"
         else:  # plus
-            weights_path = weights_dir / "topicfm_plus.ckpt"
-            url = "https://drive.google.com/file/d/1RTZJYrKQ593PBJTdxi9k5C4qZ5lSXnf0/view?usp=sharing"
+            repo_id = "image-matching-models/topicfm-plus"
 
-        if not weights_path.exists():
-            print(f"Downloading TopicFM {self.variant} weights...")
-            gdown.download(url, str(weights_path), quiet=False, fuzzy=True)
+        weights_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
 
         # Load weights
-        ckpt_dict = torch.load(weights_path, map_location=self.device, weights_only=False)
-        self.model.load_state_dict(ckpt_dict["state_dict"])
+        state_dict = load_file(weights_path)
+        self.model.load_state_dict(state_dict)
 
     def preprocess(self, img):
         """Convert RGB image to grayscale and add batch dimension."""
