@@ -1,9 +1,6 @@
-import torch
-from pathlib import Path
-import gdown
 import torchvision.transforms as tfm
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("XoFTR"), insert=0)
@@ -14,12 +11,6 @@ from src.utils.misc import lower_config
 
 
 class XoFTRMatcher(BaseMatcher):
-    weights_src_640 = "https://drive.google.com/file/d/1oRkEGsLpPIxlulc6a7c2q5H1XTNbfkVj/view"
-    weights_src_840 = "https://drive.google.com/file/d/1bexiQGcbZWESb2lp1cTsa7r5al9M4xzj/view"
-
-    model_path_640 = WEIGHTS_DIR.joinpath("weights_xoftr_640.ckpt")
-    model_path_840 = WEIGHTS_DIR.joinpath("weights_xoftr_840.ckpt")
-
     divisible_size = 8
 
     def __init__(self, device="cpu", pretrained_size=640, **kwargs):
@@ -31,9 +22,19 @@ class XoFTRMatcher(BaseMatcher):
             840,
         ], f"Pretrained size must be in [640, 840], you entered {self.pretrained_size}"
 
-        self.download_weights()
-
         self.matcher = self.build_matcher(**kwargs)
+
+    @staticmethod
+    def get_weights(pretrained_size=640):
+        """Download and return path to XoFTR weights from HuggingFace."""
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        repo_id = "image-matching-models/xoftr"
+        filename = f"xoftr_{pretrained_size}.safetensors"
+
+        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        return load_file(weights_path)
 
     def build_matcher(self, coarse_thresh=0.3, fine_thresh=0.1, denser=False):
         # Get default configurations
@@ -50,29 +51,11 @@ class XoFTRMatcher(BaseMatcher):
 
         matcher = XoFTR(config=config["xoftr"])
 
-        ckpt = self.model_path_640 if self.pretrained_size == 640 else self.model_path_840
-
-        # Load model
-        matcher.load_state_dict(torch.load(ckpt, map_location="cpu")["state_dict"], strict=True)
+        # Load model from HuggingFace
+        state_dict = self.get_weights(self.pretrained_size)
+        matcher.load_state_dict(state_dict, strict=True)
 
         return matcher.eval().to(self.device)
-
-    def download_weights(self):
-        if not Path(XoFTRMatcher.model_path_640).is_file() and self.pretrained_size == 640:
-            print("Downloading XoFTR outdoor... (takes a while)")
-            gdown.download(
-                XoFTRMatcher.weights_src_640,
-                output=str(XoFTRMatcher.model_path_640),
-                fuzzy=True,
-            )
-
-        if not Path(XoFTRMatcher.model_path_840).is_file() and self.pretrained_size == 840:
-            print("Downloading XoFTR outdoor... (takes a while)")
-            gdown.download(
-                XoFTRMatcher.weights_src_840,
-                output=str(XoFTRMatcher.model_path_840),
-                fuzzy=True,
-            )
 
     def preprocess(self, img):
         _, h, w = img.shape
