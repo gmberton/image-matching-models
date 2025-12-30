@@ -6,7 +6,6 @@ import numpy as np
 import os
 import shutil
 import torchvision.transforms as tfm
-import gdown
 import torch
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
@@ -43,10 +42,7 @@ class Patch2pixMatcher(BaseMatcher):
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
 
-        if not Patch2pixMatcher.model_path.is_file():
-            self.download_weights()
-
-        args["ckpt"] = str(Patch2pixMatcher.model_path)
+        args["ckpt"] = str(self.download_weights())
         print(args)
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model.to(device)
@@ -54,14 +50,10 @@ class Patch2pixMatcher(BaseMatcher):
 
     @staticmethod
     def download_weights():
-        print("Downloading Patch2Pix model weights...")
-        gdown.download(
-            Patch2pixMatcher.pretrained_src,
-            output=str(Patch2pixMatcher.model_path),
-            fuzzy=True,
-        )
-        # urllib.request.urlretrieve(Patch2pixMatcher.pretrained_src, ckpt)
-        # urllib.request.urlretrieve(Patch2pixMatcher.url2, ncn_ckpt)
+        from huggingface_hub import hf_hub_download
+
+        print("Downloading Patch2Pix model weights from HuggingFace...")
+        return hf_hub_download(repo_id="image-matching-models/patch2pix", filename="model.pth")
 
     def preprocess(self, img):
         img = resize_to_divisible(img, self.divisible_by)
