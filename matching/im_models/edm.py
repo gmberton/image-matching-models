@@ -16,9 +16,7 @@ from src.utils.misc import lower_config
 
 
 class EDMMatcher(BaseMatcher):
-    weights_outdoor = (
-        "https://drive.google.com/file/d/1Blu8cpjtKonVVf6YguQYoctycpMWH4bh/view"
-    )
+    weights_outdoor = "https://drive.google.com/file/d/1Blu8cpjtKonVVf6YguQYoctycpMWH4bh/view"
 
     model_path = WEIGHTS_DIR.joinpath("weights_edm.ckpt")
 
@@ -36,9 +34,7 @@ class EDMMatcher(BaseMatcher):
         # Get default configurations
         config = get_cfg_defaults()
         config.merge_from_file(THIRD_PARTY_DIR / "EDM/configs/edm/outdoor/edm_base.py")
-        config.merge_from_file(
-            THIRD_PARTY_DIR / "EDM/configs/data/megadepth_test_1500.py"
-        )
+        config.merge_from_file(THIRD_PARTY_DIR / "EDM/configs/data/megadepth_test_1500.py")
 
         config.EDM.COARSE.MCONF_THR = self.thresh
         config.EDM.COARSE.BORDER_RM = 2
@@ -47,9 +43,7 @@ class EDMMatcher(BaseMatcher):
         matcher = EDM(config=config["edm"])
 
         # Load model
-        matcher.load_state_dict(
-            torch.load(self.model_path, map_location="cpu")["state_dict"]
-        )
+        matcher.load_state_dict(torch.load(self.model_path, map_location="cpu")["state_dict"])
 
         return matcher.eval().to(self.device)
 

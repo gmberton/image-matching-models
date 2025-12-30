@@ -32,7 +32,6 @@ class BaseMatcher(torch.nn.Module):
         self.ransac_conf = kwargs.get("ransac_conf", BaseMatcher.DEFAULT_RANSAC_CONF)
         self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", BaseMatcher.DEFAULT_REPROJ_THRESH)
 
-
     @property
     def name(self):
         return self.__class__.__name__

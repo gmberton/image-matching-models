@@ -9,10 +9,8 @@ class xFeatSteerersMatcher(BaseMatcher):
     Reference for perm steerer: https://colab.research.google.com/drive/1ZFifMqUAOQhky1197-WAquEV1K-LhDYP?usp=sharing
     Reference for learned steerer: https://colab.research.google.com/drive/1sCqgi3yo3OuxA8VX_jPUt5ImHDmEajsZ?usp=sharing
     """
-    steer_permutations = [
-        torch.arange(64).reshape(4, 16).roll(k, dims=0).reshape(64)
-        for k in range(4)
-    ]
+
+    steer_permutations = [torch.arange(64).reshape(4, 16).roll(k, dims=0).reshape(64) for k in range(4)]
 
     perm_weights_gdrive_id = "1nzYg4dmkOAZPi4sjOGpQnawMoZSXYXHt"
     perm_weights_path = WEIGHTS_DIR.joinpath("xfeat_perm_steer.pth")
@@ -30,7 +28,9 @@ class xFeatSteerersMatcher(BaseMatcher):
 
         self.steerer_type = steerer_type
         if self.steerer_type not in ["learned", "perm"]:
-            raise ValueError(f'unsupported type for xfeat-steerer: {steerer_type}. Must choose from ["perm", "learned"]. Learned usually perofrms better.')
+            raise ValueError(
+                f'unsupported type for xfeat-steerer: {steerer_type}. Must choose from ["perm", "learned"]. Learned usually perofrms better.'
+            )
 
         self.model = torch.hub.load("verlab/accelerated_features", "XFeat", pretrained=False, top_k=max_num_keypoints)
         self.download_weights()
@@ -43,9 +43,9 @@ class xFeatSteerersMatcher(BaseMatcher):
         self.model.load_state_dict(state_dict)
         self.model.to(device)
 
-        if steerer_type == 'learned':
+        if steerer_type == "learned":
             self.steerer = torch.nn.Linear(64, 64, bias=False)
-            self.steerer.weight.data = torch.load(self.steerer_weights_path, map_location='cpu')['weight'][..., 0, 0]
+            self.steerer.weight.data = torch.load(self.steerer_weights_path, map_location="cpu")["weight"][..., 0, 0]
             self.steerer.eval()
             self.steerer.to(device)
         else:
@@ -59,19 +59,25 @@ class xFeatSteerersMatcher(BaseMatcher):
         if self.steerer_type == "perm":
             self.weights_path = self.perm_weights_path
             if not self.perm_weights_path.exists():
-                download_file_from_google_drive(self.perm_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.perm_weights_path.name)
+                download_file_from_google_drive(
+                    self.perm_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.perm_weights_path.name
+                )
 
         if self.steerer_type == "learned":
             self.weights_path = self.learned_weights_path
             if not self.learned_weights_path.exists():
-                download_file_from_google_drive(self.learned_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.learned_weights_path.name)
+                download_file_from_google_drive(
+                    self.learned_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.learned_weights_path.name
+                )
             if not self.steerer_weights_path.exists():
-                download_file_from_google_drive(self.steerer_weights_drive_id, root=WEIGHTS_DIR, filename=self.steerer_weights_path.name)
+                download_file_from_google_drive(
+                    self.steerer_weights_drive_id, root=WEIGHTS_DIR, filename=self.steerer_weights_path.name
+                )
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
         img = self.model.parse_input(img)
-        if self.device == 'cuda' and self.mode == 'semi-dense' and img.dtype == torch.uint8:
-            img = img / 255 # cuda error in upsample_bilinear_2d_out_frame if img is ubyte
+        if self.device == "cuda" and self.mode == "semi-dense" and img.dtype == torch.uint8:
+            img = img / 255  # cuda error in upsample_bilinear_2d_out_frame if img is ubyte
         return img
 
     def _forward(self, img0, img1):
@@ -82,7 +88,9 @@ class xFeatSteerersMatcher(BaseMatcher):
             output1 = self.model.detectAndComputeDense(img1, top_k=self.max_num_keypoints)
 
             rot0to1 = 0
-            idxs_list = self.model.batch_match(output0["descriptors"], output1["descriptors"], min_cossim=self.min_cossim)
+            idxs_list = self.model.batch_match(
+                output0["descriptors"], output1["descriptors"], min_cossim=self.min_cossim
+            )
             descriptors0 = output0["descriptors"].clone()
             for r in range(1, 4):
                 if self.steerer_type == "learned":
@@ -90,11 +98,7 @@ class xFeatSteerersMatcher(BaseMatcher):
                 else:
                     descriptors0 = output0["descriptors"][..., self.steer_permutations[r]]
 
-                new_idxs_list = self.model.batch_match(
-                    descriptors0,
-                    output1["descriptors"],
-                    min_cossim=self.min_cossim
-                )
+                new_idxs_list = self.model.batch_match(descriptors0, output1["descriptors"], min_cossim=self.min_cossim)
                 if len(new_idxs_list[0][0]) > len(idxs_list[0][0]):
                     idxs_list = new_idxs_list
                     rot0to1 = r
@@ -103,7 +107,9 @@ class xFeatSteerersMatcher(BaseMatcher):
             if self.steerer_type == "learned":
                 if rot0to1 > 0:
                     for _ in range(4 - rot0to1):
-                        output1['descriptors'] = self.steerer(output1['descriptors'])  # Adding normalization here hurts performance for some reason, probably due to the way it's done during training
+                        output1["descriptors"] = self.steerer(
+                            output1["descriptors"]
+                        )  # Adding normalization here hurts performance for some reason, probably due to the way it's done during training
             else:
                 output1["descriptors"] = output1["descriptors"][..., self.steer_permutations[-rot0to1]]
 
@@ -118,15 +124,13 @@ class xFeatSteerersMatcher(BaseMatcher):
             rot0to1 = 0
             for r in range(1, 4):
                 if self.steerer_type == "learned":
-                    output0['descriptors'] = torch.nn.functional.normalize(self.steerer(output0['descriptors']), dim=-1)
-                    output0_steered_descriptors = output0['descriptors']
+                    output0["descriptors"] = torch.nn.functional.normalize(self.steerer(output0["descriptors"]), dim=-1)
+                    output0_steered_descriptors = output0["descriptors"]
                 else:
-                    output0_steered_descriptors = output0['descriptors'][..., self.steer_permutations[r]]
+                    output0_steered_descriptors = output0["descriptors"][..., self.steer_permutations[r]]
 
                 new_idxs0, new_idxs1 = self.model.match(
-                    output0_steered_descriptors,
-                    output1['descriptors'],
-                    min_cossim=self.min_cossim
+                    output0_steered_descriptors, output1["descriptors"], min_cossim=self.min_cossim
                 )
                 if len(new_idxs0) > len(idxs0):
                     idxs0 = new_idxs0

@@ -20,9 +20,7 @@ from lightglue import ALIKED
 
 
 class RDDMatcher(BaseMatcher):
-    weights_src = (
-        "https://drive.google.com/file/d/1UN6jO5vDQCZcPyVOhRv_Qfvs9onzlJMO/view"
-    )
+    weights_src = "https://drive.google.com/file/d/1UN6jO5vDQCZcPyVOhRv_Qfvs9onzlJMO/view"
     model_path = WEIGHTS_DIR.joinpath("rdd_v2.ckpt")
 
     config_path = THIRD_PARTY_DIR.joinpath("rdd/configs/default.yaml")
@@ -45,10 +43,7 @@ class RDDMatcher(BaseMatcher):
         self.matcher = RDD_helper(self._matcher)
 
         self.max_num_keypoints = kwargs.get("max_num_keypoints", None)
-        if (
-            self.max_num_keypoints is not None
-            and self.max_num_keypoints != self.matcher.RDD.top_k
-        ):
+        if self.max_num_keypoints is not None and self.max_num_keypoints != self.matcher.RDD.top_k:
             self.matcher.RDD.top_k = self.max_num_keypoints
             self.matcher.RDD.set_softdetect(top_k=self.max_num_keypoints)
 
@@ -124,9 +119,7 @@ class _rdd_lg_wrapper(LightGlue):
 
 
 class RDD_LGMatcher(RDDMatcher):
-    weights_src_lg = (
-        "https://drive.google.com/file/d/153bHc-HXj7zT4d1hid-s9erjQ5sU5-aa/view"
-    )
+    weights_src_lg = "https://drive.google.com/file/d/153bHc-HXj7zT4d1hid-s9erjQ5sU5-aa/view"
     model_path_lg = WEIGHTS_DIR.joinpath("rdd_lg_v2.ckpt")
 
     lg_conf = {
@@ -221,11 +214,7 @@ class RDD_ThirdPartyMatcher(RDDMatcher):
         super().__init__(device, *args, **kwargs)
 
         if detector == "aliked":
-            self.extractor = (
-                ALIKED(max_num_keypoints=kwargs.get("max_num_keypoints", 4096))
-                .eval()
-                .to(self.device)
-            )
+            self.extractor = ALIKED(max_num_keypoints=kwargs.get("max_num_keypoints", 4096)).eval().to(self.device)
         else:
             print(f"Detector {detector} not yet supported.")
 
@@ -248,10 +237,7 @@ class RDD_ThirdPartyMatcher(RDDMatcher):
         feats = self.matcher.RDD.interpolator(M1, keypoints, H=H, W=W)
         feats = F.normalize(feats, dim=-1)
 
-        return [
-            {"keypoints": keypoints[b], "scores": scores[b], "descriptors": feats[b]}
-            for b in range(B)
-        ]
+        return [{"keypoints": keypoints[b], "scores": scores[b], "descriptors": feats[b]} for b in range(B)]
 
     def preprocess(self, img):
         img = resize_to_divisible(img, 32)

@@ -6,10 +6,14 @@ import torch
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
 _original_torch_load = torch.load
+
+
 def _patched_torch_load(*args, **kwargs):
-    if 'weights_only' not in kwargs:
-        kwargs['weights_only'] = False
+    if "weights_only" not in kwargs:
+        kwargs["weights_only"] = False
     return _original_torch_load(*args, **kwargs)
+
+
 torch.load = _patched_torch_load
 
 from matching.utils import add_to_path, resize_to_divisible
@@ -85,7 +89,7 @@ class Dust3rMatcher(BaseMatcher):
 
         # return if there is no 3d points found on either one of the image
         if pts3d_list[0].shape[0] == 0 or pts3d_list[1].shape[0] == 0:
-            return np.empty((0,2)), np.empty((0,2)), None, None, None, None
+            return np.empty((0, 2)), np.empty((0, 2)), None, None, None, None
         reciprocal_in_P2, nn2_in_P1, _ = find_reciprocal_matches(*pts3d_list)
 
         mkpts1 = pts2d_list[1][reciprocal_in_P2]

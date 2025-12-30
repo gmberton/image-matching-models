@@ -140,8 +140,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
         if not self.model_path.is_file():
             raise FileNotFoundError(
-                f"Missing weights for {self.model_name}. "
-                f"Place the checkpoint at {self.model_path}"
+                f"Missing weights for {self.model_name}. " f"Place the checkpoint at {self.model_path}"
             )
 
     @staticmethod

@@ -44,17 +44,11 @@ def plot_matches(
         )
 
     if show_all_kpts and result_dict["all_kpts0"] is not None:
-        viz2d.plot_keypoints(
-            [result_dict["all_kpts0"], result_dict["all_kpts1"]], colors="red", ps=2
-        )
+        viz2d.plot_keypoints([result_dict["all_kpts0"], result_dict["all_kpts1"]], colors="red", ps=2)
 
-    viz2d.plot_matches(
-        result_dict["inlier_kpts0"], result_dict["inlier_kpts1"], color="lime", lw=0.2
-    )
+    viz2d.plot_matches(result_dict["inlier_kpts0"], result_dict["inlier_kpts1"], color="lime", lw=0.2)
     if len(result_dict["matched_kpts1"]):
-        ratio = (
-            f"{len(result_dict['inlier_kpts0'])/len(result_dict['matched_kpts1']):0.2f}"
-        )
+        ratio = f"{len(result_dict['inlier_kpts0'])/len(result_dict['matched_kpts1']):0.2f}"
     else:
         ratio = "N/A"
     viz2d.add_text(
@@ -116,9 +110,7 @@ def add_alpha_channel(img: np.ndarray) -> np.ndarray:
         return img
 
 
-def stich(
-    img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, result_dict: dict
-) -> np.ndarray:
+def stich(img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, result_dict: dict) -> np.ndarray:
     """Stich two images together.
 
     Args:
@@ -154,18 +146,12 @@ def stich(
 
     # compute translation offset
     translation = [-x_min, -y_min]
-    H_translation = np.array(
-        [[1, 0, translation[0]], [0, 1, translation[1]], [0, 0, 1]]
-    )
+    H_translation = np.array([[1, 0, translation[0]], [0, 1, translation[1]], [0, 0, 1]])
 
     # warp first image onto stitch
-    stiched_imgs = cv2.warpPerspective(
-        img0, H_translation.dot(result_dict["H"]), (x_max - x_min, y_max - y_min)
-    )
+    stiched_imgs = cv2.warpPerspective(img0, H_translation.dot(result_dict["H"]), (x_max - x_min, y_max - y_min))
 
     # overlay second image onto stitch
-    stiched_imgs[
-        translation[1] : translation[1] + h1, translation[0] : translation[0] + w1
-    ] = img1
+    stiched_imgs[translation[1] : translation[1] + h1, translation[0] : translation[0] + w1] = img1
 
     return stiched_imgs
