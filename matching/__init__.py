@@ -85,6 +85,8 @@ available_models = [
     "lisrd",
     "lisrd-sift",
     "ripe",
+    "topicfm",
+    "topicfm-plus",
 ]
 
 
@@ -437,6 +439,16 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import ripe
 
         return ripe.RIPEMatcher(device, max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "topicfm":
+        from matching.im_models import topicfm
+
+        return topicfm.TopicFMMatcher(device, variant="fast", *args, **kwargs)
+
+    elif matcher_name == "topicfm-plus":
+        from matching.im_models import topicfm
+
+        return topicfm.TopicFMMatcher(device, variant="plus", *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
