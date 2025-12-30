@@ -49,7 +49,6 @@ class DedodeMatcher(BaseMatcher):
         descr_url = (
             "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth"
         )
-        os.makedirs("model_weights", exist_ok=True)
         if not os.path.isfile(DedodeMatcher.detector_path):
             print("Downloading dedode_detector_L.pth")
             py3_wget.download_file(detector_url, DedodeMatcher.detector_path)

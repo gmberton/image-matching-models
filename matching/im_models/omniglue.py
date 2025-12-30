@@ -39,7 +39,6 @@ class OmniglueMatcher(BaseMatcher):
         self.conf_thresh = conf_thresh
 
     def download_weights(self):
-        WEIGHTS_DIR.mkdir(exist_ok=True)
         if not OmniglueMatcher.OG_WEIGHTS_PATH.exists():
             # OmniglueMatcher.OG_WEIGHTS_PATH.mkdir(exist_ok=True)
             print("Downloading omniglue matcher weights...")
