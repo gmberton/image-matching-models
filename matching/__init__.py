@@ -35,6 +35,7 @@ available_models = [
     "aliked-lg",
     "doghardnet-lg",
     "roma",
+    "romav2",
     "tiny-roma",
     "dedode",
     "steerers",
@@ -200,6 +201,11 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import roma
 
         return roma.RomaMatcher(device, max_num_keypoints, *args, **kwargs)
+
+    elif matcher_name == "romav2":
+        from matching.im_models import romav2
+
+        return romav2.RoMaV2Matcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "tiny-roma":
         from matching.im_models import roma
