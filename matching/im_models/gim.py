@@ -98,6 +98,7 @@ class GIM_LG(BaseMatcher):
                 "detection_threshold": 0.0,
                 "nms_radius": 3,
                 "trainable": False,
+                "weights_path": self.superpoint_v1_path,
             }
         )
 
