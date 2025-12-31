@@ -5,7 +5,7 @@ from copy import deepcopy
 import torchvision.transforms as tfm
 
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("EfficientLoFTR"), insert=0)
@@ -23,7 +23,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         self.precision = kwargs.get("precision", self.get_precision())
 
-        model_path = self.download_weights()
+        model_path = hf_hub_download(repo_id=self.repo_id, filename=self.weight_filename)
 
         self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg))
 
@@ -34,14 +34,6 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
     def get_precision(self):
         return "fp16"
-
-    def download_weights(self):
-        model_path = hf_hub_download(
-            repo_id=EfficientLoFTRMatcher.repo_id,
-            filename=EfficientLoFTRMatcher.weight_filename,
-            local_dir=WEIGHTS_DIR,
-        )
-        return model_path
 
     def preprocess(self, img):
         _, h, w = img.shape

@@ -1,7 +1,7 @@
 import torch
 import torchvision.transforms as tfm
 
-from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
+from matching import BaseMatcher, THIRD_PARTY_DIR
 from matching.utils import add_to_path
 
 # Add TopicFM to path

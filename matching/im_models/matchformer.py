@@ -1,9 +1,6 @@
-import torch
-from pathlib import Path
-import gdown
 import torchvision.transforms as tfm
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MatchFormer"))
@@ -13,25 +10,23 @@ from config.defaultmf import get_cfg_defaults as mf_cfg_defaults
 
 
 class MatchformerMatcher(BaseMatcher):
-    weights_src = "https://drive.google.com/file/d/1Ii-z3dwNwGaxoeFVSE44DqHdMhubYbQf/view"
-    weights_path = WEIGHTS_DIR.joinpath("matchformer_outdoor-large-LA.ckpt")
     divisible_size = 32
 
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
-
-        self.download_weights()
-
         self.matcher = self.load_model().to(device).eval()
 
-    def download_weights(self):
-        if not Path(self.weights_path).is_file():
-            print("Downloading Matchformer outdoor... (takes a while)")
-            gdown.download(
-                MatchformerMatcher.weights_src,
-                output=str(self.weights_path),
-                fuzzy=True,
-            )
+    @staticmethod
+    def get_weights():
+        """Download and return Matchformer weights from HuggingFace."""
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        repo_id = "image-matching-models/matchformer"
+        filename = "matchformer_outdoor-large-LA.safetensors"
+
+        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        return load_file(weights_path)
 
     def load_model(self, cfg_path=None):
         config = mf_cfg_defaults()
@@ -44,9 +39,8 @@ class MatchformerMatcher(BaseMatcher):
         config.MATCHFORMER.COARSE.D_FFN = 256
 
         matcher = Matchformer(config=lower_config(config)["matchformer"])
-        matcher.load_state_dict(
-            {k.replace("matcher.", ""): v for k, v in torch.load(self.weights_path, map_location="cpu").items()}
-        )
+        state_dict = self.get_weights()
+        matcher.load_state_dict({k.replace("matcher.", ""): v for k, v in state_dict.items()})
 
         return matcher
 

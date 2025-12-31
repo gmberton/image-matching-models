@@ -2,10 +2,21 @@
 
 import torch
 import torch.nn.functional as F
-from pathlib import Path
-import gdown
+from huggingface_hub import hf_hub_download
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+# Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
+_original_torch_load = torch.load
+
+
+def _patched_torch_load(*args, **kwargs):
+    if "weights_only" not in kwargs:
+        kwargs["weights_only"] = False
+    return _original_torch_load(*args, **kwargs)
+
+
+torch.load = _patched_torch_load
+
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("rdd"))
@@ -20,9 +31,6 @@ from lightglue import ALIKED
 
 
 class RDDMatcher(BaseMatcher):
-    weights_src = "https://drive.google.com/file/d/1UN6jO5vDQCZcPyVOhRv_Qfvs9onzlJMO/view"
-    model_path = WEIGHTS_DIR.joinpath("rdd_v2.ckpt")
-
     config_path = THIRD_PARTY_DIR.joinpath("rdd/configs/default.yaml")
 
     def __init__(self, device="cpu", mode="sparse", anchor="mnn", *args, **kwargs):
@@ -34,7 +42,7 @@ class RDDMatcher(BaseMatcher):
         self.thresh = 0.01
         self.anchor = anchor
 
-        self.download_weights()
+        self.model_path = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_v2.pt")
 
         config = read_config(self.config_path)
         config["device"] = device
@@ -46,18 +54,6 @@ class RDDMatcher(BaseMatcher):
         if self.max_num_keypoints is not None and self.max_num_keypoints != self.matcher.RDD.top_k:
             self.matcher.RDD.top_k = self.max_num_keypoints
             self.matcher.RDD.set_softdetect(top_k=self.max_num_keypoints)
-
-    def download_weights(self):
-        # check if weights exist, otherwise download them
-        if not Path(RDDMatcher.model_path).is_file():
-            print("Downloading model... (takes a while)")
-
-            # if a google drive link
-            gdown.download(
-                RDDMatcher.weights_src,
-                output=str(RDDMatcher.model_path),
-                fuzzy=True,
-            )
 
     def preprocess(self, img: torch.Tensor):
         # need "batch" dimension for RDD
@@ -112,50 +108,37 @@ class _rdd_lg_wrapper(LightGlue):
         LightGlue (nn.Module): RDD LightGlue module
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, feature_type, weights_path=None, *args, **kwargs):
         # Fix the hardcoded path BEFORE parent init so it uses the correct weights
-        LightGlue.features["rdd"]["weights"] = RDD_LGMatcher.model_path_lg
-        super().__init__(*args, **kwargs)
+        if weights_path is not None:
+            LightGlue.features[feature_type]["weights"] = weights_path
+        super().__init__(feature_type, *args, **kwargs)
 
 
 class RDD_LGMatcher(RDDMatcher):
-    weights_src_lg = "https://drive.google.com/file/d/153bHc-HXj7zT4d1hid-s9erjQ5sU5-aa/view"
-    model_path_lg = WEIGHTS_DIR.joinpath("rdd_lg_v2.ckpt")
-
-    lg_conf = {
-        "name": "lightglue",  # just for interfacing
-        "input_dim": 256,  # input descriptor dimension (autoselected from weights)
-        "descriptor_dim": 256,
-        "add_scale_ori": False,
-        "n_layers": 9,
-        "num_heads": 4,
-        "flash": True,  # enable FlashAttention if available.
-        "mp": False,  # enable mixed precision
-        "filter_threshold": 0.01,  # match threshold
-        "depth_confidence": -1,  # depth confidence threshold
-        "width_confidence": -1,  # width confidence threshold
-        "weights": model_path_lg,  # path to the weights
-    }
-
     def __init__(self, device="cpu", *args, **kwargs):
+        # Get LG weights path before calling super().__init__
+        self.model_path_lg = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_lg_v2.pt")
+
+        # Set up lg_conf with the weights path
+        self.lg_conf = {
+            "name": "lightglue",  # just for interfacing
+            "input_dim": 256,  # input descriptor dimension (autoselected from weights)
+            "descriptor_dim": 256,
+            "add_scale_ori": False,
+            "n_layers": 9,
+            "num_heads": 4,
+            "flash": True,  # enable FlashAttention if available.
+            "mp": False,  # enable mixed precision
+            "filter_threshold": 0.01,  # match threshold
+            "depth_confidence": -1,  # depth confidence threshold
+            "width_confidence": -1,  # width confidence threshold
+            "weights": self.model_path_lg,  # path to the weights
+        }
+
         super().__init__(device, *args, **kwargs)
 
-        self.download_weights()
-
-        self.lg = _rdd_lg_wrapper("rdd", **RDD_LGMatcher.lg_conf).to(self.device)
-
-    def download_weights(self):
-        # check if weights exist, otherwise download them
-        if not Path(self.model_path_lg).is_file():
-            print("Downloading model... (takes a while)")
-
-            # if a google drive link
-            gdown.download(
-                RDD_LGMatcher.weights_src_lg,
-                output=str(RDD_LGMatcher.model_path_lg),
-                fuzzy=True,
-            )
-        super().download_weights()
+        self.lg = _rdd_lg_wrapper("rdd", weights_path=self.model_path_lg, **self.lg_conf).to(self.device)
 
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)

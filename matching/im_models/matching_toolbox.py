@@ -1,12 +1,11 @@
-from pathlib import Path
 import yaml
 import py3_wget
 import cv2
 import numpy as np
 import os
-import shutil
 import torchvision.transforms as tfm
 import torch
+from huggingface_hub import hf_hub_download
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
 _original_torch_load = torch.load
@@ -21,7 +20,7 @@ def _patched_torch_load(*args, **kwargs):
 torch.load = _patched_torch_load
 
 from matching.utils import add_to_path, resize_to_divisible
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("imatch-toolbox")
 add_to_path(BASE_PATH)
@@ -29,11 +28,6 @@ import immatch
 
 
 class Patch2pixMatcher(BaseMatcher):
-    # url1 = 'https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/patch2pix_pretrained.pth'
-    pretrained_src = "https://drive.google.com/file/d/1SyIAKza_PMlYsj6D72yOQjg2ZASXTjBd/view"
-    url2 = "https://vision.in.tum.de/webshare/u/zhouq/patch2pix/pretrained/ncn_ivd_5ep.pth"
-
-    model_path = WEIGHTS_DIR.joinpath("patch2pix_pretrained.pth")
     divisible_by = 32
 
     def __init__(self, device="cpu", *args, **kwargs):
@@ -42,18 +36,10 @@ class Patch2pixMatcher(BaseMatcher):
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
 
-        args["ckpt"] = str(self.download_weights())
-        print(args)
+        args["ckpt"] = hf_hub_download(repo_id="image-matching-models/patch2pix", filename="model.pth")
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model.to(device)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
-    @staticmethod
-    def download_weights():
-        from huggingface_hub import hf_hub_download
-
-        print("Downloading Patch2Pix model weights from HuggingFace...")
-        return hf_hub_download(repo_id="image-matching-models/patch2pix", filename="model.pth")
 
     def preprocess(self, img):
         img = resize_to_divisible(img, self.divisible_by)
@@ -125,25 +111,19 @@ class R2D2Matcher(BaseMatcher):
 
         with open(BASE_PATH.joinpath("configs/r2d2.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
-        args["ckpt"] = BASE_PATH.joinpath(args["ckpt"])
+
+        # Point directly to third_party instead of copying to pretrained
+        # Replace 'pretrained/r2d2' with 'third_party/r2d2/models' in the checkpoint path
+        ckpt_path = args["ckpt"].replace("pretrained/r2d2", "third_party/r2d2/models")
+        args["ckpt"] = BASE_PATH.joinpath(ckpt_path)
         args["top_k"] = max_num_keypoints
 
-        self.get_model_weights(args["ckpt"])
         self.model = immatch.__dict__[args["class"]](args)
 
         # move models to proper device - immatch reads cuda available and defaults to GPU
         self.model.model.to(device)
 
         self.match_threshold = args["match_threshold"]
-
-    @staticmethod
-    def get_model_weights(model_path):
-        if not os.path.isfile(model_path):
-            print("Getting R2D2 model weights...")
-            shutil.copytree(
-                Path(f"{BASE_PATH}/third_party/r2d2/models"),
-                Path(f"{BASE_PATH}/pretrained/r2d2"),
-            )
 
     def _forward(self, img0, img1):
 
@@ -170,7 +150,6 @@ class D2netMatcher(BaseMatcher):
         args["ckpt"] = BASE_PATH.joinpath(args["ckpt"])
 
         if not os.path.isfile(args["ckpt"]):
-            print("Downloading D2Net model weights...")
             os.makedirs(os.path.dirname(args["ckpt"]), exist_ok=True)
             py3_wget.download_file("https://dusmanu.com/files/d2-net/d2_tf.pth", args["ckpt"])
 
