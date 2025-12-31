@@ -96,7 +96,6 @@ def get_version(pkg):
     return major, minor, patch
 
 
-# @supress_stdout
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
