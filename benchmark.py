@@ -102,6 +102,7 @@ def main(args):
             args.device,
         ]
 
+        # Timeout of 10 minutes because Dust3r is slow to download
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
 
         try:
