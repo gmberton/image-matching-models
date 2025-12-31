@@ -1,9 +1,6 @@
 import torchvision.transforms as tfm
-import torch
-import os
-import gdown
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
 
 
@@ -25,26 +22,11 @@ class Se2LoFTRMatcher(BaseMatcher):
         # 'loftr': baseline_cfg
     }
 
-    weights = {
-        "rot8": "se2loftr_rot8.pt",
-        "big": "se2loftr_rot4_big.pt",
-        "dense": "se2loftr_rot4_dense.pt",
-        "rot4": "se2loftr_rot4.pt",
-        #    'loftr': 'baseline.ckpt'
-    }
-
-    weights_url = {
-        # weight files (.pt) only
-        "rot8": "https://drive.google.com/file/d/1ulaJE25hMOYYxZsnPgLQXPqGFQv_06-O/view",
-        "big": "https://drive.google.com/file/d/145i4KqbyCg6J1JdJTa0A05jVp_7ckebq/view",
-        "dense": "https://drive.google.com/file/d/1QMDgOzhIB5zjm-K5Sltcpq7wF94ZpwE7/view",
-        "rot4": "https://drive.google.com/file/d/19c00PuTtbQO4KxVod3G0FBr_MWrqts4c/view",
-        # original ckpts (requires pytorch lightning to load)
-        # "rot8": "https://drive.google.com/file/d/1jPtOTxmwo1Z_YYP2YMS6efOevDaNiJR4/view",
-        # "big": "https://drive.google.com/file/d/1AE_EmmhQLfArIP-zokSlleY2YiSgBV3m/view",
-        # 'dense':'https://drive.google.com/file/d/17vxdnVtjVuq2m8qJsOG1JFfJjAqcgr4j/view',
-        # 'rot4': 'https://drive.google.com/file/d/17vxdnVtjVuq2m8qJsOG1JFfJjAqcgr4j/view'
-        # 'loftr': 'https://drive.google.com/file/d/1OylPSrbjzRJgvLHM3qJPAVpW3BEQeuFS/view'
+    weights_filenames = {
+        "rot8": "se2loftr_rot8.safetensors",
+        "big": "se2loftr_rot4_big.safetensors",
+        "dense": "se2loftr_rot4_dense.safetensors",
+        "rot4": "se2loftr_rot4.safetensors",
     }
 
     divisible_size = 32
@@ -54,33 +36,24 @@ class Se2LoFTRMatcher(BaseMatcher):
         assert loftr_config in self.configs.keys(), f"Config not found. Must choose from {self.configs.keys()}"
         self.loftr_config = loftr_config
 
-        self.weights_path = WEIGHTS_DIR.joinpath(Se2LoFTRMatcher.weights[self.loftr_config])
-
-        self.download_weights()
-
         self.model = self.load_model(self.loftr_config, device)
 
-    def download_weights(self):
-        if not os.path.isfile(self.weights_path):
-            print(f"Downloading {Se2LoFTRMatcher.weights_url[self.loftr_config]}")
-            gdown.download(
-                Se2LoFTRMatcher.weights_url[self.loftr_config],
-                output=str(self.weights_path),
-                fuzzy=True,
-            )
+    @staticmethod
+    def get_weights(loftr_config):
+        """Download and return Se2-LoFTR weights from HuggingFace."""
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        repo_id = "image-matching-models/se2_loftr"
+        filename = Se2LoFTRMatcher.weights_filenames[loftr_config]
+
+        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        return load_file(weights_path)
 
     def load_model(self, config, device="cpu"):
         model = LoFTR(config=lower_config(Se2LoFTRMatcher.configs[config])["loftr"]).to(self.device)
-        # model.load_state_dict(
-        #     {
-        #         k.replace("matcher.", ""): v
-        #         for k, v in torch.load(self.weights_path, map_location=device)[
-        #             "state_dict"
-        #         ].items()
-        #     }
-        # )
-        print(str(self.weights_path))
-        model.load_state_dict(torch.load(str(self.weights_path), map_location=device))
+        state_dict = self.get_weights(config)
+        model.load_state_dict(state_dict)
         return model.eval()
 
     def preprocess(self, img):

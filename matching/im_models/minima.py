@@ -1,9 +1,8 @@
-from pathlib import Path
-import py3_wget
 import torchvision.transforms as tfm
 from argparse import Namespace
+from huggingface_hub import hf_hub_download
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"), insert=0)
@@ -13,16 +12,6 @@ from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr
 
 
 class MINIMAMatcher(BaseMatcher):
-    weights_minima_sp_lg = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
-    weights_minima_roma = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
-    weights_minima_loftr = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
-    weights_minima_xoftr = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.pth"
-
-    model_path_sp_lg = WEIGHTS_DIR.joinpath("minima_lightglue.ckpt")
-    model_path_roma = WEIGHTS_DIR.joinpath("minima_roma.ckpt")
-    model_path_loftr = WEIGHTS_DIR.joinpath("minima_loftr.ckpt")
-    model_path_xoftr = WEIGHTS_DIR.joinpath("minima_xoftr.ckpt")
-
     ALLOWED_TYPES = ["roma", "sp_lg", "loftr", "xoftr"]
 
     def __init__(self, device="cpu", model_type="sp_lg", **kwargs):
@@ -33,22 +22,12 @@ class MINIMAMatcher(BaseMatcher):
             self.model_type in MINIMAMatcher.ALLOWED_TYPES
         ), f"model type must be in {MINIMAMatcher.ALLOWED_TYPES}, you passed {self.model_type}"
 
-        self.download_weights()
-
-    def download_weights(self):
-        if not Path(self.weights_src).is_file():
-            print(f"Downloading MINIMA {self.model_type}...")
-            py3_wget.download_file(self.weights_src, self.model_path)
-
 
 class MINIMASpLgMatcher(MINIMAMatcher):
-    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_lightglue.pth"
-    model_path = WEIGHTS_DIR.joinpath("minima_lightglue.ckpt")
-
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
-        self.model_args.ckpt = self.model_path_sp_lg
+        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_lightglue.pt")
 
         self.matcher = load_sp_lg(self.model_args).model.to(self.device)
 
@@ -76,14 +55,11 @@ class MINIMASpLgMatcher(MINIMAMatcher):
 
 
 class MINIMALoFTRMatcher(MINIMAMatcher):
-    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_loftr.ckpt"
-    model_path = WEIGHTS_DIR.joinpath("minima_loftr.ckpt")
-
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
         self.model_args.thr = 0.2
-        self.model_args.ckpt = self.model_path_loftr
+        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_loftr.pt")
         self.matcher = load_loftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):
@@ -111,16 +87,13 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
 
 
 class MINIMARomaMatcher(MINIMAMatcher):
-    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_roma.pth"
-    model_path = WEIGHTS_DIR.joinpath("minima_roma.ckpt")
-
     ALLOWABLE_MODEL_SIZES = ["tiny", "large"]
 
     def __init__(self, device="cpu", model_size="tiny", **kwargs):
         super().__init__(device, **kwargs)
         assert model_size in self.ALLOWABLE_MODEL_SIZES
 
-        self.model_args.ckpt = self.model_path_roma
+        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_roma.pt")
         self.model_args.ckpt2 = model_size
         self.matcher = load_roma(self.model_args).model.eval().to(self.device)
 
@@ -149,15 +122,12 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
 
 class MINIMAXoFTRMatcher(MINIMAMatcher):
-    weights_src = "https://github.com/LSXI7/storage/releases/download/MINIMA/minima_xoftr.ckpt"
-    model_path = WEIGHTS_DIR.joinpath("minima_xoftr.ckpt")
-
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
         self.model_args.match_threshold = 0.3
         self.model_args.fine_threshold = 0.1
-        self.model_args.ckpt = self.model_path_xoftr
+        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_xoftr.pt")
         self.matcher = load_xoftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):

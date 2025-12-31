@@ -1,11 +1,8 @@
 # implementation inspired by https://github.com/chicleee/EDM/blob/main/demo_single_pair.ipynb
 
-import torch
-from pathlib import Path
-import gdown
 import torchvision.transforms as tfm
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("EDM"), insert=0)
@@ -16,19 +13,24 @@ from src.utils.misc import lower_config
 
 
 class EDMMatcher(BaseMatcher):
-    weights_outdoor = "https://drive.google.com/file/d/1Blu8cpjtKonVVf6YguQYoctycpMWH4bh/view"
-
-    model_path = WEIGHTS_DIR.joinpath("weights_edm.ckpt")
-
     divisible_size = 32
 
     def __init__(self, device="cpu", thresh=0.2, **kwargs):
         super().__init__(device, **kwargs)
-
-        self.download_weights()
         self.thresh = thresh
-
         self.matcher = self.build_matcher()
+
+    @staticmethod
+    def get_weights():
+        """Download and return EDM weights from HuggingFace."""
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        repo_id = "image-matching-models/edm"
+        filename = "edm.safetensors"
+
+        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        return load_file(weights_path)
 
     def build_matcher(self):
         # Get default configurations
@@ -42,19 +44,11 @@ class EDMMatcher(BaseMatcher):
 
         matcher = EDM(config=config["edm"])
 
-        # Load model
-        matcher.load_state_dict(torch.load(self.model_path, map_location="cpu")["state_dict"])
+        # Load model from HuggingFace
+        state_dict = self.get_weights()
+        matcher.load_state_dict(state_dict)
 
         return matcher.eval().to(self.device)
-
-    def download_weights(self):
-        if not Path(EDMMatcher.model_path).is_file():
-            print("Downloading EDM outdoor... (takes a while)")
-            gdown.download(
-                EDMMatcher.weights_outdoor,
-                output=str(EDMMatcher.model_path),
-                fuzzy=True,
-            )
 
     def preprocess(self, img):
         _, h, w = img.shape

@@ -1,10 +1,8 @@
 import torch
-import py3_wget
 
-import gdown
 from kornia.color import rgb_to_grayscale
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import load_module, add_to_path
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("gim")
@@ -13,31 +11,27 @@ from dkm.models.model_zoo.DKMv3 import DKMv3
 
 
 class GIM_DKM(BaseMatcher):
-
-    weights_src = "https://drive.google.com/file/d/1gk97V4IROnR1Nprq10W9NCFUv2mxXR_-/view"
-
     def __init__(self, device="cpu", max_num_keypoints=5000, **kwargs):
         super().__init__(device, **kwargs)
-        self.ckpt_path = WEIGHTS_DIR / "gim_dkm_100h.ckpt"
-
         self.model = DKMv3(weights=None, h=672, w=896)
-
         self.max_num_keypoints = max_num_keypoints
-
-        self.download_weights()
         self.load_weights()
-
         self.model = self.model.eval().to(device)
 
-    def download_weights(self):
-        if not self.ckpt_path.exists():
-            print(f"Downloading {self.ckpt_path.name}")
-            gdown.download(GIM_DKM.weights_src, output=str(self.ckpt_path), fuzzy=True)
+    @staticmethod
+    def get_weights():
+        """Download and return GIM-DKM weights from HuggingFace."""
+        from huggingface_hub import hf_hub_download
+        from safetensors.torch import load_file
+
+        repo_id = "image-matching-models/gim-dkm"
+        filename = "gim_dkm_100h.safetensors"
+
+        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
+        return load_file(weights_path)
 
     def load_weights(self):
-        state_dict = torch.load(self.ckpt_path, map_location="cpu")
-        if "state_dict" in state_dict.keys():
-            state_dict = state_dict["state_dict"]
+        state_dict = self.get_weights()
         for k in list(state_dict.keys()):
             if k.startswith("model."):
                 state_dict[k.replace("model.", "", 1)] = state_dict.pop(k)
@@ -82,12 +76,6 @@ class GIM_DKM(BaseMatcher):
 
 
 class GIM_LG(BaseMatcher):
-
-    weights_src = "https://github.com/xuelunshen/gim/blob/main/weights/gim_lightglue_100h.ckpt"
-    superpoint_v1_weight_src = (
-        "https://github.com/magicleap/SuperGluePretrainedNetwork/raw/master/models/weights/superpoint_v1.pth"
-    )
-
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
         # load the altered version of gluefactory
@@ -96,10 +84,12 @@ class GIM_LG(BaseMatcher):
         from gluefactory_gim.superpoint import SuperPoint
         from gluefactory_gim.models.matchers.lightglue import LightGlue
 
-        self.ckpt_path = BASE_PATH / "weights" / "gim_lightglue_100h.ckpt"
-        self.superpoint_v1_path = BASE_PATH / "weights" / "superpoint_v1.pth"
+        # Download weights from HF and get paths from cache
+        from huggingface_hub import hf_hub_download
 
-        self.download_weights()
+        repo_id = "image-matching-models/gim-lg"
+        self.ckpt_path = hf_hub_download(repo_id=repo_id, filename="gim_lightglue_100h.ckpt")
+        self.superpoint_v1_path = hf_hub_download(repo_id=repo_id, filename="superpoint_v1.pth")
 
         self.detector = SuperPoint(
             {
@@ -120,14 +110,6 @@ class GIM_LG(BaseMatcher):
         )
 
         self.load_weights()
-
-    def download_weights(self):
-        if not self.ckpt_path.exists():
-            print(f"Downloading {self.ckpt_path.name}")
-            py3_wget.download_file(GIM_LG.weights_src, self.ckpt_path)
-        if not self.superpoint_v1_path.exists():
-            print(f"Downloading {self.superpoint_v1_path.name}")
-            py3_wget.download_file(GIM_LG.superpoint_v1_weight_src, self.superpoint_v1_path)
 
     def load_weights(self):
         state_dict = torch.load(self.ckpt_path, map_location="cpu")
