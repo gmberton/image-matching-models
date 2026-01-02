@@ -74,6 +74,19 @@ available_models = [
     "minima-splg",
     "minima-loftr",
     "ufm",
+    "rdd",
+    "rdd-star",
+    "rdd-lg",
+    "rdd-aliked",
+    "minima-xoftr",
+    "edm",
+    "lisrd-aliked",
+    "lisrd-sp",
+    "lisrd",
+    "lisrd-sift",
+    "ripe",
+    "topicfm",
+    "topicfm-plus",
 ]
 
 
@@ -83,7 +96,6 @@ def get_version(pkg):
     return major, minor, patch
 
 
-def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
 def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
         from matching.base_matcher import EnsembleMatcher
@@ -219,7 +231,6 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import aff_steerers
 
         return aff_steerers.AffSteererMatcher(device, max_num_keypoints, *args, **kwargs)
-        return aff_steerers.AffSteererMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "sift-nn":
         from matching.im_models import handcrafted
@@ -239,7 +250,6 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
     elif matcher_name == "superglue":
         from matching.im_models import matching_toolbox
 
-        return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
         return matching_toolbox.SuperGlueMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "r2d2":
@@ -344,7 +354,6 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import sphereglue
 
         return sphereglue.SuperpointSphereGlue(device, max_num_keypoints, *args, **kwargs)
-        return sphereglue.SuperpointSphereGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "minima":
         from matching.im_models import minima
@@ -435,11 +444,6 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import topicfm
 
         return topicfm.TopicFMMatcher(device, variant="plus", *args, **kwargs)
-    elif matcher_name == "ufm":
-        from matching.im_models import ufm
-
-        return ufm.UFMMatcher(device, max_num_keypoints, *args, **kwargs)
-
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
