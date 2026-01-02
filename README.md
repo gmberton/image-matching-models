@@ -153,7 +153,7 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](docs/model_details.md) for runtimes. If a runtime is ❌, it means that model can not run on that device. 
 
-### Adding a new method
+## Adding a new method
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details. 
 
 
@@ -161,7 +161,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 > This repo is optimized for usability, not necessarily for speed or performance. Ideally you can use this repo to find the matcher that best suits your needs, and then use the original code (or a modified version of this code) to get maximize performance. Default hyperparameters used here **may not be optimal for your use case!**
 
 
-### Acknowledgements
+## Acknowledgements
 
 Special thanks to the authors of the respective works that are included in this repo (see their papers above). Additional thanks to [@GrumpyZhou](https://github.com/GrumpyZhou) for developing and maintaining the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main), which we have wrapped in this repo, and the [maintainers](https://github.com/kornia/kornia?tab=readme-ov-file#community) of [Kornia](https://github.com/kornia/kornia).
 
