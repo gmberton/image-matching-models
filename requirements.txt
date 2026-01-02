@@ -6,7 +6,6 @@ matplotlib
 kornia
 einops
 transforms3d
-h5py
 kornia_moons
 yacs
 gdown>=5.1.0
@@ -30,6 +29,9 @@ timm
 omegaconf
 poselib
 lightning==2.0.0 # from EDM
-flow_vis
--e ./matching/third_party/UFM/UniCeption
--e ./matching/third_party/UFM
+flow_vis # for UFM
+h5py
+# The following editable installs are handled in install.sh
+# since pyptroject.toml does not support editable installs
+# -e ./matching/third_party/UFM/UniCeption
+# -e ./matching/third_party/UFM
