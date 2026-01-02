@@ -32,6 +32,6 @@ lightning==2.0.0 # from EDM
 flow_vis # for UFM
 h5py
 # The following editable installs are handled in install.sh
-# since pyptroject.toml does not support editable installs
+# since pyproject.toml does not support editable installs
 # -e ./matching/third_party/UFM/UniCeption
 # -e ./matching/third_party/UFM
