@@ -79,3 +79,6 @@
 [submodule "matching/third_party/TopicFM"]
 	path = matching/third_party/TopicFM
 	url = https://github.com/TruongKhang/TopicFM
+[submodule "matching/third_party/UFM"]
+	path = matching/third_party/UFM
+	url = https://github.com/UniFlowMatch/UFM.git
