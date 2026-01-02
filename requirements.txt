@@ -30,3 +30,6 @@ timm
 omegaconf
 poselib
 lightning==2.0.0 # from EDM
+flow_vis
+-e ./matching/third_party/UFM/UniCeption
+-e ./matching/third_party/UFM
