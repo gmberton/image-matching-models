@@ -23,6 +23,13 @@
       <td></td>
       <td></td>
     </tr>
+      <tr>
+      <td>UFM (NeurIPS '25)</td>
+      <td><a href="https://github.com/UniFlowMatch/UFM">Official</a></td>
+      <td><a href="https://arxiv.org/abs/2506.09278">arxiv</a></td>
+      <td></td>
+      <td></td>
+    </tr>
     <tr>
       <td>RIPE (ICCV '25)</td>
       <td><a href="https://github.com/fraunhoferhhi/RIPE">Official</a></td>

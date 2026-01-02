@@ -141,7 +141,7 @@ python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg
 ## Available Models
 You can choose any of the following methods (input to `get_matcher()`):
 
-**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma```
+**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma, ufm```
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star, topicfm[-plus]```
 
