@@ -438,7 +438,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
     elif matcher_name == "ufm":
         from matching.im_models import ufm
 
-        return ufm.UFMMatcher(device, *args, **kwargs)
+        return ufm.UFMMatcher(device, max_num_keypoints, *args, **kwargs)
 
     else:
         raise RuntimeError(

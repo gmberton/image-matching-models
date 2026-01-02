@@ -227,3 +227,97 @@ def get_default_device():
         device = "cuda"
 
     return device
+
+
+def flow_to_matches(flow, covisibility, num_samples=1000, min_confidence=0.0, method="probabilistic", rng=None):
+    """
+    Convert a dense optical flow + covisibility map to sparse keypoint matches.
+    - flow: np.ndarray, shape (2, H, W) or (H, W, 2). Interpreted as (dx, dy) per pixel.
+    - covisibility: np.ndarray, shape (H, W) with confidence in [0, 1] (or any non-negative scores).
+    - num_samples: max number of matches to return.
+    - min_confidence: ignore pixels with covisibility <= min_confidence.
+    - method: one of:
+        * "probabilistic" - sample pixels with probability proportional to covisibility.
+        * "topk"          - pick top-k pixels by covisibility.
+        * "grid"          - sample a uniform grid (best-effort to get ~num_samples).
+    - rng: optional np.random.RandomState or np.random.Generator for reproducibility.
+
+    Returns:
+    - matches0: (N,2) numpy array of source keypoints as (x, y) (float32)
+    - matches1: (N,2) numpy array of target keypoints as (x, y) = source + flow (float32)
+    - confidences: (N,) numpy array of covisibility/confidence values (float32)
+    """
+    if rng is None:
+        rng = np.random
+
+    # Normalize flow shape -> (2, H, W)
+    if flow.ndim == 3 and flow.shape[2] == 2:
+        flow_xy = flow.transpose(2, 0, 1)  # (2, H, W)
+    elif flow.ndim == 3 and flow.shape[0] == 2:
+        flow_xy = flow
+    else:
+        raise ValueError("flow must have shape (2,H,W) or (H,W,2)")
+
+    H, W = covisibility.shape
+    if flow_xy.shape[1:] != (H, W):
+        raise ValueError(
+            f"flow and covisibility spatial dims mismatch: flow {flow_xy.shape[1:]}, covisibility {covisibility.shape}"
+        )
+
+    # Flatten grids
+    xs = np.arange(W, dtype=np.float32)
+    ys = np.arange(H, dtype=np.float32)
+    gx, gy = np.meshgrid(xs, ys)  # gx: (H,W) x coords, gy: (H,W) y coords
+
+    flat_conf = covisibility.ravel().astype(np.float64)
+    valid_mask = flat_conf > min_confidence
+    if valid_mask.sum() == 0:
+        return np.zeros((0, 2), dtype=np.float32), np.zeros((0, 2), dtype=np.float32), np.zeros((0,), dtype=np.float32)
+
+    valid_idxs = np.nonzero(valid_mask)[0]
+
+    if method == "probabilistic":
+        scores = flat_conf[valid_mask].astype(np.float64)
+        # avoid degenerate all-zero
+        if scores.sum() <= 0:
+            probs = None
+        else:
+            probs = scores / scores.sum()
+        k = min(num_samples, len(valid_idxs))
+        # if probs is None or degenerate, fallback to uniform
+        chosen = rng.choice(valid_idxs, size=k, replace=False, p=probs)
+    elif method == "topk":
+        k = min(num_samples, len(valid_idxs))
+        topk_local = np.argsort(-flat_conf[valid_mask])[:k]
+        chosen = valid_idxs[topk_local]
+    elif method == "grid":
+        # choose roughly sqrt grid
+        n = max(1, int(np.sqrt(num_samples)))
+        xs_idx = np.linspace(0, W - 1, n, dtype=int)
+        ys_idx = np.linspace(0, H - 1, int(np.ceil(num_samples / n)), dtype=int)
+        gx_idx, gy_idx = np.meshgrid(xs_idx, ys_idx)
+        chosen_coords = np.stack([gy_idx.ravel(), gx_idx.ravel()], axis=1)
+        chosen_coords = chosen_coords[:num_samples]
+        chosen = chosen_coords[:, 0] * W + chosen_coords[:, 1]
+        # mask by min_confidence
+        keep = flat_conf[chosen] > min_confidence
+        chosen = chosen[keep]
+    else:
+        raise ValueError("method must be one of 'probabilistic','topk','grid'")
+
+    # gather coordinates and flows
+    gy_flat = gy.ravel().astype(np.float32)
+    gx_flat = gx.ravel().astype(np.float32)
+    dx_flat = flow_xy[0].ravel().astype(np.float32)
+    dy_flat = flow_xy[1].ravel().astype(np.float32)
+
+    src_x = gx_flat[chosen]
+    src_y = gy_flat[chosen]
+    dx = dx_flat[chosen]
+    dy = dy_flat[chosen]
+    confs = flat_conf[chosen].astype(np.float32)
+
+    matches0 = np.stack([src_x, src_y], axis=1).astype(np.float32)
+    matches1 = (matches0 + np.stack([dx, dy], axis=1)).astype(np.float32)
+
+    return matches0, matches1, confs
