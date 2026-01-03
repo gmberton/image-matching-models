@@ -30,8 +30,6 @@ omegaconf
 poselib
 lightning==2.0.0 # from EDM
 flow_vis # for UFM
+-e ./matching/third_party/UFM/UniCeption
+-e ./matching/third_party/UFM
 h5py
-# The following editable installs are handled in install.sh
-# since pyproject.toml does not support editable installs
-# -e ./matching/third_party/UFM/UniCeption
-# -e ./matching/third_party/UFM

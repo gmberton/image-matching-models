@@ -58,18 +58,15 @@ cd image-matching-models
 
 # activate the python enviroment you want to install IMM in
 
-# UNIX
-source install.sh
-
-# WINDOWS
-install.bat
+pip install -r requirements.txt # must be done to support editable depedencies
+pip install .
 ```
 
 Some models require additional optional dependencies which are not included in the default list. To install these, use
 ```
 pip install .[all]
 ```
-AFTER running the install script. This will install all dependencies needed to run all models.
+This will install all dependencies needed to run all models.
 
 We recommend using torch>=2.2, and we haven't tested with older versions.
 
