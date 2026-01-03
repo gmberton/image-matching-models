@@ -1,4 +1,5 @@
 import torch
+from huggingface_hub import hf_hub_download
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
 from matching.utils import add_to_path
@@ -11,8 +12,6 @@ from lightglue import ALIKED, SuperPoint, SIFT
 
 
 class LISRDMatcher(BaseMatcher):
-
-    model_path = THIRD_PARTY_DIR.joinpath("LISRD", "weights", "lisrd_vidit.pth")
 
     # Load the LISRD model
     model_config = {
@@ -36,9 +35,12 @@ class LISRDMatcher(BaseMatcher):
     ):
         super().__init__(device, **kwargs)
         print("WARNING: LISRD may take awhile to load.")
+
+        model_path = hf_hub_download(repo_id="image-matching-models/lisrd", filename="lisrd_vidit.pth")
+
         self.model = Lisrd(None, self.model_config, device)
 
-        self.model.load(self.model_path, Mode.EXPORT)
+        self.model.load(model_path, Mode.EXPORT)
 
         self.model._net.eval()
 

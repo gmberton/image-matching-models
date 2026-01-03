@@ -1,8 +1,7 @@
 from pathlib import Path
-import ssl
-import urllib.request
+from huggingface_hub import hf_hub_download
 
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import add_to_path
 
 import kornia.feature as KF
@@ -14,35 +13,18 @@ from ripe import vgg_hyper
 
 
 class RIPEMatcher(BaseMatcher):
-    weights_src = "https://cvg.hhi.fraunhofer.de/RIPE/ripe_weights.pth"
-    model_path = WEIGHTS_DIR.joinpath("ripe_weights.pth")
-
     def __init__(self, device="cpu", max_num_keypoints=2048, thresh=0.5, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        self.download_weights()
+        model_path = Path(hf_hub_download(repo_id="image-matching-models/ripe", filename="ripe.pth"))
+
         self.thresh = thresh
         self.max_num_keypoints = max_num_keypoints
 
-        self.detector = vgg_hyper(self.model_path).to(self.device)
+        self.detector = vgg_hyper(model_path).to(self.device)
         self.detector.eval()
 
         self.matcher = KF.DescriptorMatcher("mnn").to(self.device)
-
-    def download_weights(self):
-        # check if weights exist, otherwise download them
-        if not Path(RIPEMatcher.model_path).is_file():
-            print("Downloading model... (takes a while)")
-
-            # Create unverified SSL context to bypass certificate verification
-            ssl_context = ssl.create_default_context()
-            ssl_context.check_hostname = False
-            ssl_context.verify_mode = ssl.CERT_NONE
-
-            # Download with SSL context
-            with urllib.request.urlopen(RIPEMatcher.weights_src, context=ssl_context) as response:
-                with open(RIPEMatcher.model_path, "wb") as out_file:
-                    out_file.write(response.read())
 
     def preprocess(self, img):
         _, h, w = img.shape
