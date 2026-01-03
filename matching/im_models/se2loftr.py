@@ -1,4 +1,6 @@
 import torchvision.transforms as tfm
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
@@ -38,22 +40,12 @@ class Se2LoFTRMatcher(BaseMatcher):
 
         self.model = self.load_model(self.loftr_config, device)
 
-    @staticmethod
-    def get_weights(loftr_config):
-        """Download and return Se2-LoFTR weights from HuggingFace."""
-        from huggingface_hub import hf_hub_download
-        from safetensors.torch import load_file
-
-        repo_id = "image-matching-models/se2_loftr"
-        filename = Se2LoFTRMatcher.weights_filenames[loftr_config]
-
-        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
-        return load_file(weights_path)
-
     def load_model(self, config, device="cpu"):
         model = LoFTR(config=lower_config(Se2LoFTRMatcher.configs[config])["loftr"]).to(self.device)
-        state_dict = self.get_weights(config)
-        model.load_state_dict(state_dict)
+        weights_path = hf_hub_download(
+            repo_id="image-matching-models/se2loftr", filename=self.weights_filenames[config]
+        )
+        model.load_state_dict(load_file(weights_path))
         return model.eval()
 
     def preprocess(self, img):

@@ -1,4 +1,6 @@
 import torchvision.transforms as tfm
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, resize_to_divisible, add_to_path
@@ -24,18 +26,6 @@ class XoFTRMatcher(BaseMatcher):
 
         self.matcher = self.build_matcher(**kwargs)
 
-    @staticmethod
-    def get_weights(pretrained_size=640):
-        """Download and return path to XoFTR weights from HuggingFace."""
-        from huggingface_hub import hf_hub_download
-        from safetensors.torch import load_file
-
-        repo_id = "image-matching-models/xoftr"
-        filename = f"xoftr_{pretrained_size}.safetensors"
-
-        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
-        return load_file(weights_path)
-
     def build_matcher(self, coarse_thresh=0.3, fine_thresh=0.1, denser=False):
         # Get default configurations
         config = get_cfg_defaults(inference=True)
@@ -52,8 +42,10 @@ class XoFTRMatcher(BaseMatcher):
         matcher = XoFTR(config=config["xoftr"])
 
         # Load model from HuggingFace
-        state_dict = self.get_weights(self.pretrained_size)
-        matcher.load_state_dict(state_dict, strict=True)
+        weights_path = hf_hub_download(
+            repo_id="image-matching-models/xoftr", filename=f"xoftr_{self.pretrained_size}.safetensors"
+        )
+        matcher.load_state_dict(load_file(weights_path), strict=True)
 
         return matcher.eval().to(self.device)
 

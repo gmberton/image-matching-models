@@ -1,5 +1,7 @@
 import torch
 import torchvision.transforms as tfm
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
 from matching.utils import add_to_path
@@ -49,25 +51,15 @@ class TopicFMMatcher(BaseMatcher):
         self.model = TopicFM(config=conf)
 
         # Download and load pretrained weights
-        self.download_weights()
-
-        self.model = self.model.eval().to(self.device)
-
-    def download_weights(self):
-        """Download pretrained weights if not already present."""
-        from huggingface_hub import hf_hub_download
-        from safetensors.torch import load_file
-
         if self.variant == "fast":
             repo_id = "image-matching-models/topicfm"
         else:  # plus
             repo_id = "image-matching-models/topicfm-plus"
 
         weights_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
+        self.model.load_state_dict(load_file(weights_path))
 
-        # Load weights
-        state_dict = load_file(weights_path)
-        self.model.load_state_dict(state_dict)
+        self.model = self.model.eval().to(self.device)
 
     def preprocess(self, img):
         """Convert RGB image to grayscale and add batch dimension."""

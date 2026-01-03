@@ -21,7 +21,8 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 6. Format the code with [Black](https://github.com/psf/black), like this
 ```
 pip install black
-cd image-matching-models && black --line-length 120 ./
+cd image-matching-models
+black --line-length 120 --exclude 'matching/third_party' ./
 ```
 
 7. Test your model and submit a PR!

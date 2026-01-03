@@ -1,4 +1,6 @@
 import torch
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from kornia.color import rgb_to_grayscale
 
@@ -18,20 +20,9 @@ class GIM_DKM(BaseMatcher):
         self.load_weights()
         self.model = self.model.eval().to(device)
 
-    @staticmethod
-    def get_weights():
-        """Download and return GIM-DKM weights from HuggingFace."""
-        from huggingface_hub import hf_hub_download
-        from safetensors.torch import load_file
-
-        repo_id = "image-matching-models/gim-dkm"
-        filename = "gim_dkm_100h.safetensors"
-
-        weights_path = hf_hub_download(repo_id=repo_id, filename=filename)
-        return load_file(weights_path)
-
     def load_weights(self):
-        state_dict = self.get_weights()
+        weights_path = hf_hub_download(repo_id="image-matching-models/gim-dkm", filename="gim_dkm_100h.safetensors")
+        state_dict = load_file(weights_path)
         for k in list(state_dict.keys()):
             if k.startswith("model."):
                 state_dict[k.replace("model.", "", 1)] = state_dict.pop(k)
@@ -85,8 +76,6 @@ class GIM_LG(BaseMatcher):
         from gluefactory_gim.models.matchers.lightglue import LightGlue
 
         # Download weights from HF and get paths from cache
-        from huggingface_hub import hf_hub_download
-
         repo_id = "image-matching-models/gim-lg"
         self.ckpt_path = hf_hub_download(repo_id=repo_id, filename="gim_lightglue_100h.ckpt")
         self.superpoint_v1_path = hf_hub_download(repo_id=repo_id, filename="superpoint_v1.pth")

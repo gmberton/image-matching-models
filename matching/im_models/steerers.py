@@ -39,12 +39,24 @@ class SteererMatcher(BaseMatcher):
             raise ValueError("Only device 'cuda' supported for Steerers.")
 
         # Download weights from HuggingFace Hub
-        self.detector_path_L = hf_hub_download(repo_id="image-matching-models/steerers", filename="dedode_detector_L.pth")
-        self.descriptor_path_G = hf_hub_download(repo_id="image-matching-models/steerers", filename="dedode_descriptor_G.pth")
-        self.descriptor_path_B_C4 = hf_hub_download(repo_id="image-matching-models/steerers", filename="B_C4_Perm_descriptor_setting_C.pth")
-        self.descriptor_path_B_SO2 = hf_hub_download(repo_id="image-matching-models/steerers", filename="B_SO2_Spread_descriptor_setting_B.pth")
-        self.steerer_path_C = hf_hub_download(repo_id="image-matching-models/steerers", filename="B_C4_Perm_steerer_setting_C.pth")
-        self.steerer_path_B = hf_hub_download(repo_id="image-matching-models/steerers", filename="B_SO2_Spread_steerer_setting_B.pth")
+        self.detector_path_L = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="dedode_detector_L.pth"
+        )
+        self.descriptor_path_G = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="dedode_descriptor_G.pth"
+        )
+        self.descriptor_path_B_C4 = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="B_C4_Perm_descriptor_setting_C.pth"
+        )
+        self.descriptor_path_B_SO2 = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="B_SO2_Spread_descriptor_setting_B.pth"
+        )
+        self.steerer_path_C = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="B_C4_Perm_steerer_setting_C.pth"
+        )
+        self.steerer_path_B = hf_hub_download(
+            repo_id="image-matching-models/steerers", filename="B_SO2_Spread_steerer_setting_B.pth"
+        )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
