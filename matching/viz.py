@@ -11,6 +11,15 @@ if not hasattr(sys, "ps1"):
     matplotlib.use("Agg")
 
 
+def clip_img(img: np.ndarray) -> np.ndarray:
+    """
+    Clip image to [0, 1] range.
+    """
+    if img.dtype == np.uint8:
+        img = img.astype(np.float32) / 255.0
+    return np.clip(img, 0, 1)
+
+
 def plot_matches(
     img0: np.ndarray,
     img1: np.ndarray,

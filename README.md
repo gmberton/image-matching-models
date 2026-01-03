@@ -55,27 +55,25 @@ If you want to to install from source (easiest to edit, use `benchmark.py`, `dem
 ```bash
 git clone --recursive https://github.com/alexstoken/image-matching-models
 cd image-matching-models
-pip install -e .
+
+# activate the python enviroment you want to install IMM in
+
+# UNIX
+source install.sh
+
+# WINDOWS
+install.bat
 ```
-Some models require additional optional dependencies which are not included in the default list. To install these, use 
+
+Some models require additional optional dependencies which are not included in the default list. To install these, use
 ```
 pip install .[all]
 ```
-This will install all dependencies needed to run all models.
+AFTER running the install script. This will install all dependencies needed to run all models.
 
-We recommend using torch>=2.2, we didn't test most models with older versions.
+We recommend using torch>=2.2, and we haven't tested with older versions.
 
-### As package (simplest)
-You can install directly to your package directory with 
-```bash
-pip install git+https://github.com/alexstoken/image-matching-models.git
-```
-Similar to the above, to get all optional dependencies, use the `[all]` addendum:
-```bash
-pip install "image-matching-models[all] @ git+https://github.com/alexstoken/image-matching-models.git"
-```
-
-> [!Note]  
+> [!Note]
 > SphereGlue depends on `torch-geometric` and `torch-cluster` which require that you pass an additional parameter given your installed versions of torch and CUDA like so: `pip install .[all] -f https://data.pyg.org/whl/torch-2.5.0+cu124.html` (replace `cu124` with `cpu` for CPU version). See [PyTorch Geometric installation docs](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) for more information 
 
 
@@ -141,7 +139,7 @@ python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg
 ## Available Models
 You can choose any of the following methods (input to `get_matcher()`):
 
-**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma```
+**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma, ufm```
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star, topicfm[-plus]```
 

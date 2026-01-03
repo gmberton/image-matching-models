@@ -73,6 +73,7 @@ available_models = [
     "minima-roma-tiny",
     "minima-splg",
     "minima-loftr",
+    "ufm",
     "rdd",
     "rdd-star",
     "rdd-lg",
@@ -443,6 +444,11 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
         from matching.im_models import topicfm
 
         return topicfm.TopicFMMatcher(device, variant="plus", *args, **kwargs)
+
+    elif matcher_name == "ufm":
+        from matching.im_models import ufm
+
+        return ufm.UFMMatcher(device, max_num_keypoints, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
