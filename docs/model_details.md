@@ -163,13 +163,6 @@
       <td colspan="5" align="center"><strong>2023</strong></td>
     </tr>
     <tr>
-      <td>TopicFM[+] (AAAI '23)</td>
-      <td><a href="https://github.com/TruongKhang/TopicFM?tab=readme-ov-file">Official</a></td>
-      <td><a href="https://arxiv.org/abs/2307.00485">arxiv</a></td>
-      <td></td>
-      <td></td>
-    </tr>
-    <tr>
       <td>SphereGlue* (CVPRW '23)</td>
       <td><a href="https://github.com/vishalsharbidar/SphereGlue">Official</a></td>
       <td><a href="https://openaccess.thecvf.com/content/CVPR2023W/IMW/papers/Gava_SphereGlue_Learning_Keypoint_Matching_on_High_Resolution_Spherical_Images_CVPRW_2023_paper.pdf">pdf</a></td>
