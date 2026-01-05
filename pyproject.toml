@@ -23,7 +23,8 @@ classifiers = [
   "Programming Language :: Python"
 ]
 dynamic = ["version",
-            "dependencies"]
+            # "dependencies"
+            ]
 
 
 [project.urls]
@@ -34,9 +35,9 @@ Repository = "https://github.com/gmberton/image-matching-models"
 # Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
 
 [tool.setuptools.dynamic]
-dependencies = { file = [
-  "./requirements.txt",
-] }
+# dependencies = { file = [
+#   "./requirements.txt",
+# ] }
 version = { attr = "matching.__version__" }
 
 [tool.setuptools.packages]
