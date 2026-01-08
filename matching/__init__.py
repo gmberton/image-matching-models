@@ -87,6 +87,7 @@ available_models = [
     "ripe",
     "topicfm",
     "topicfm-plus",
+    "silk",
 ]
 
 
