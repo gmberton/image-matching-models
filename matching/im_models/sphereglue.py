@@ -38,7 +38,7 @@ class SphereGlueBase(BaseMatcher):
             "knn": kwargs.get("knn", 20),
         }
 
-        self.skip_ransac = False
+        self.skip_ransac = True
 
     def _forward(self, img0, img1):
         """
