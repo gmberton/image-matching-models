@@ -12,7 +12,6 @@ from lightglue import ALIKED, SuperPoint, SIFT
 
 
 class LISRDMatcher(BaseMatcher):
-
     # Load the LISRD model
     model_config = {
         "name": "lisrd",

@@ -5,14 +5,14 @@ warnings due to unused modules.
 """
 
 from pathlib import Path
-from .utils import add_to_path, get_default_device  # for quick import later 'from matching import get_default_device'
-from .base_matcher import BaseMatcher  # for quick import later 'from matching import BaseMatcher'
+from .utils import add_to_path, get_default_device  # noqa: F401 - for quick import later 'from matching import get_default_device'
+from .base_matcher import BaseMatcher  # noqa: F401 - for quick import later 'from matching import BaseMatcher'
 
 # add viz2d from lightglue to namespace - thanks lightglue!
 THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
-from lightglue import viz2d  # for quick import later 'from matching import viz2d'
+from lightglue import viz2d  # noqa: F401 - for quick import later 'from matching import viz2d'
 
 WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
 WEIGHTS_DIR.mkdir(exist_ok=True)

@@ -11,7 +11,7 @@ BASE_PATH = THIRD_PARTY_DIR.joinpath("keypt2subpx")
 add_to_path(BASE_PATH)
 
 load_module("gluefactory", BASE_PATH.joinpath("submodules/glue_factory/gluefactory/__init__.py"))
-from dataprocess.superpoint_densescore import *
+from dataprocess.superpoint_densescore import SuperPoint
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 from lightglue import LightGlue
@@ -69,8 +69,9 @@ class Keypt2SubpxMatcher(BaseMatcher):
     def _forward(self, img0, img1):
         mkpts0, mkpts1, keypoints0, keypoints1, descriptors0, descriptors1 = self.matcher._forward(img0, img1)
         if len(mkpts0):  # only run subpx refinement if kpts are found
-            matching_idxs0, matching_idxs1 = self.get_match_idxs(mkpts0, keypoints0), self.get_match_idxs(
-                mkpts1, keypoints1
+            matching_idxs0, matching_idxs1 = (
+                self.get_match_idxs(mkpts0, keypoints0),
+                self.get_match_idxs(mkpts1, keypoints1),
             )
             mdesc0, mdesc1 = descriptors0[matching_idxs0], descriptors1[matching_idxs1]
 

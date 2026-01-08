@@ -18,11 +18,10 @@ This command automatically modifies `.gitmodules` (and modifying it manually doe
 
 5. If it requires additional dependencies, add them to `requirements.txt` or to the `[project.optional-dependencies]` of `pyproject.toml`.
 
-6. Format the code with [Black](https://github.com/psf/black), like this
+6. Format the code with [ruff](https://github.com/astral-sh/ruff)
 ```
-pip install black
-cd image-matching-models
-black --line-length 120 --exclude 'matching/third_party' ./
+ruff format .
+ruff check --fix .
 ```
 
 7. Test your model and submit a PR!

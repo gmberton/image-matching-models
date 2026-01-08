@@ -93,7 +93,6 @@ class SuperGlueMatcher(BaseMatcher):
         # print(self.matcher.detector.model.config)
 
     def _forward(self, img0, img1):
-
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
 
@@ -126,7 +125,6 @@ class R2D2Matcher(BaseMatcher):
         self.match_threshold = args["match_threshold"]
 
     def _forward(self, img0, img1):
-
         img0 = self.normalize(img0).unsqueeze(0).to(self.device)
         img1 = self.normalize(img1).unsqueeze(0).to(self.device)
 
@@ -170,7 +168,6 @@ class D2netMatcher(BaseMatcher):
         return image
 
     def _forward(self, img0, img1):
-
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)
 

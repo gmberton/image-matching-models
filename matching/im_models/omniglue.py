@@ -20,7 +20,6 @@ import omniglue
 
 
 class OmniglueMatcher(BaseMatcher):
-
     OG_WEIGHTS_PATH = WEIGHTS_DIR.joinpath("og_export")
     SP_WEIGHTS_PATH = WEIGHTS_DIR.joinpath("sp_v6")
 

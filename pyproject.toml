@@ -8,12 +8,12 @@ readme = "README.md"
 description = "Easily test and apply pairwise image matching models"
 authors = [
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
-  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
+  {name = "Gabriele Berton", email = "berton.gabri@gmail.com"},
   {name = "Gabriele Trivigno", email="gabriele.trivigno@polito.it"},
 ]
 maintainers = [
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
-  {name = "Gabriele Berton"},{email = "berton.gabri@gmail.com"},
+  {name = "Gabriele Berton", email = "berton.gabri@gmail.com"},
 ]
 requires-python = ">= 3.10"
 license = {file = "LICENSE"}
@@ -59,8 +59,13 @@ omniglue = ["tensorflow"
 
 cuda = ["xformers"]
 
-duster = ["huggingface_hub"]
-
 sphereglue = ["torch-geometric", "torch-cluster"]
 
-all = ["image-matching-models[loftrs, omniglue, duster, sphereglue]"]
+all = ["image-matching-models[loftrs, omniglue, sphereglue]"]
+
+[tool.ruff]
+line-length = 120
+exclude = ["matching/third_party", "demo.ipynb", "TEMPLATE.py"]
+
+[tool.ruff.lint]
+ignore = ["E402"]

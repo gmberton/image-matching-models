@@ -66,7 +66,6 @@ class RomaMatcher(BaseMatcher):
 
 
 class TinyRomaMatcher(BaseMatcher):
-
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.roma_model = tiny_roma_v1_outdoor(device=device)

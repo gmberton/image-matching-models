@@ -13,7 +13,6 @@ from uniflowmatch.models.ufm import (
 
 
 class UFMMatcher(BaseMatcher):
-
     def __init__(self, device="cpu", max_num_keypoints=1024, min_confidence=0.2, *args, **kwargs):
         super().__init__(device, **kwargs)
 

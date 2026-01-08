@@ -3,8 +3,6 @@ from pathlib import Path
 import numpy as np
 import torch
 import torchvision.transforms as tfm
-import os
-import contextlib
 from yacs.config import CfgNode as CN
 import sys
 
@@ -13,7 +11,6 @@ logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
 def get_image_pairs_paths(inputs):
-
     if len(inputs) > 2:
         raise ValueError(f"--input should be one or two paths, not {len(inputs)} paths like {inputs}")
 

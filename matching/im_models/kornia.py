@@ -6,7 +6,6 @@ from matching import get_version, BaseMatcher
 
 
 class DeDoDeLightGlue(BaseMatcher):
-
     detector_options = ["L-upright", "L-C4", "L-SO2", "L-C4-v2"]
     descriptor_options = ["B-upright", "G-upright", "B-C4", "B-SO2", "G-C4"]
 
@@ -20,16 +19,16 @@ class DeDoDeLightGlue(BaseMatcher):
         super().__init__(device, **kwargs)
 
         major, minor, patch = get_version(kornia)
-        assert major > 1 or (
-            minor > 7 or (minor == 7 and patch >= 3)
-        ), "DeDoDe-LG only available in kornia v 0.7.3 or greater. Update kornia to use this model."
+        assert major > 1 or (minor > 7 or (minor == 7 and patch >= 3)), (
+            "DeDoDe-LG only available in kornia v 0.7.3 or greater. Update kornia to use this model."
+        )
 
-        assert (
-            detector_weights in DeDoDeLightGlue.detector_options
-        ), f"Invalid detector weights passed ({detector_weights}). Choose from {DeDoDeLightGlue.detector_options}"
-        assert (
-            desc_weights in DeDoDeLightGlue.descriptor_options
-        ), f"Invalid descriptor weights passed ({desc_weights}). Choose from {DeDoDeLightGlue.descriptor_options}"
+        assert detector_weights in DeDoDeLightGlue.detector_options, (
+            f"Invalid detector weights passed ({detector_weights}). Choose from {DeDoDeLightGlue.detector_options}"
+        )
+        assert desc_weights in DeDoDeLightGlue.descriptor_options, (
+            f"Invalid descriptor weights passed ({desc_weights}). Choose from {DeDoDeLightGlue.descriptor_options}"
+        )
 
         desc_type = desc_weights[0].lower()
         self.model = DeDoDe.from_pretrained(

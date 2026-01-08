@@ -57,7 +57,7 @@ def plot_matches(
 
     viz2d.plot_matches(result_dict["inlier_kpts0"], result_dict["inlier_kpts1"], color="lime", lw=0.2)
     if len(result_dict["matched_kpts1"]):
-        ratio = f"{len(result_dict['inlier_kpts0'])/len(result_dict['matched_kpts1']):0.2f}"
+        ratio = f"{len(result_dict['inlier_kpts0']) / len(result_dict['matched_kpts1']):0.2f}"
     else:
         ratio = "N/A"
     viz2d.add_text(

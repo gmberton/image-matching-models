@@ -30,7 +30,6 @@ def main(args):
         )
 
     for i, img_path in enumerate(images_paths):
-
         image = matcher.load_image(img_path, resize=image_size)
         result = matcher.extract(image)
 

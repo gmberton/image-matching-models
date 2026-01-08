@@ -18,9 +18,9 @@ class MINIMAMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         self.model_type = model_type.lower()
         self.model_args = Namespace()
-        assert (
-            self.model_type in MINIMAMatcher.ALLOWED_TYPES
-        ), f"model type must be in {MINIMAMatcher.ALLOWED_TYPES}, you passed {self.model_type}"
+        assert self.model_type in MINIMAMatcher.ALLOWED_TYPES, (
+            f"model type must be in {MINIMAMatcher.ALLOWED_TYPES}, you passed {self.model_type}"
+        )
 
 
 class MINIMASpLgMatcher(MINIMAMatcher):

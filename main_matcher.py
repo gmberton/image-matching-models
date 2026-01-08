@@ -22,7 +22,6 @@ def main(args):
 
     pairs_of_paths = get_image_pairs_paths(args.input)
     for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
-
         image0 = matcher.load_image(img0_path, resize=image_size)
         image1 = matcher.load_image(img1_path, resize=image_size)
         result = matcher(image0, image1)
