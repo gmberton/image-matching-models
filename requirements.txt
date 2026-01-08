@@ -9,7 +9,7 @@ transforms3d
 kornia_moons
 yacs
 gdown>=5.1.0
-huggingface_hub>=0.34.0,<1.0  # <1.0 required by transformers (used by eloftr)
+huggingface_hub
 safetensors
 tables
 imageio
