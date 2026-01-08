@@ -1,14 +1,10 @@
 import torch
 import torchvision.transforms as tfm
-import py3_wget
-from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
-from matching.utils import resize_to_divisible, add_to_path
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
-# add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
-# from DeDoDe import (
-#     dedode_detector_L,
-#     dedode_descriptor_B,
-# )
+from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("affine-steerers"))
 from affine_steerers.utils import build_affine
@@ -17,22 +13,7 @@ from affine_steerers import dedode_detector_L, dedode_descriptor_B, dedode_descr
 
 
 class AffSteererMatcher(BaseMatcher):
-    detector_path_L = WEIGHTS_DIR.joinpath("dedode_detector_C4_affsteerers.pth")
-
-    descriptor_path_equi_G = WEIGHTS_DIR.joinpath("descriptor_aff_equi_G.pth")
-    descriptor_path_steer_G = WEIGHTS_DIR.joinpath("descriptor_aff_steer_G.pth")
-
-    descriptor_path_equi_B = WEIGHTS_DIR.joinpath("descriptor_aff_equi_B.pth")
-    descriptor_path_steer_B = WEIGHTS_DIR.joinpath("descriptor_aff_steer_B.pth")
-
-    steerer_path_equi_G = WEIGHTS_DIR.joinpath("steerer_aff_equi_G.pth")
-    steerer_path_steer_G = WEIGHTS_DIR.joinpath("steerer_aff_steer_G.pth")
-
-    steerer_path_equi_B = WEIGHTS_DIR.joinpath("steerer_aff_equi_B.pth")
-    steerer_path_steer_B = WEIGHTS_DIR.joinpath("steerer_aff_steer_B.pth")
-
     dino_patch_size = 14
-
     STEERER_TYPES = ["equi_G", "steer_G", "equi_B", "steer_B"]
 
     def __init__(
@@ -55,10 +36,6 @@ class AffSteererMatcher(BaseMatcher):
                 f"unsupported type for aff-steerer: {steerer_type}. Must choose from {self.STEERER_TYPES}."
             )
 
-        # download detector / descriptor / steerer
-
-        self.download_weights()
-
         self.max_keypoints = max_num_keypoints
         self.threshold = match_threshold
 
@@ -66,90 +43,21 @@ class AffSteererMatcher(BaseMatcher):
 
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher()
 
-    def download_weights(self):
-        if not AffSteererMatcher.detector_path_L.exists():
-            print("Downloading dedode_detector_C4.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/dedode_detector_C4.pth",
-                AffSteererMatcher.detector_path_L,
-            )
-
-        # download descriptors
-        if self.steerer_type == "equi_G" and not AffSteererMatcher.descriptor_path_equi_G.exists():
-            print("Downloading descriptor_aff_equi_G.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_equi_G.pth",
-                AffSteererMatcher.descriptor_path_equi_G,
-            )
-
-        if self.steerer_type == "steer_G" and not AffSteererMatcher.descriptor_path_steer_G.exists():
-            print("Downloading descriptor_aff_steer_G.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_steer_G.pth",
-                AffSteererMatcher.descriptor_path_steer_G,
-            )
-
-        if self.steerer_type == "equi_B" and not AffSteererMatcher.descriptor_path_equi_B.exists():
-            print("Downloading descriptor_aff_equi_B.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_equi_B.pth",
-                AffSteererMatcher.descriptor_path_equi_B,
-            )
-
-        if self.steerer_type == "steer_B" and not AffSteererMatcher.descriptor_path_steer_B.exists():
-            print("Downloading descriptor_aff_steer_B.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/descriptor_aff_steer_B.pth",
-                AffSteererMatcher.descriptor_path_steer_B,
-            )
-
-        # download steerers
-        if self.steerer_type == "equi_G" and not AffSteererMatcher.steerer_path_equi_G.exists():
-            print("Downloading steerer_aff_equi_G.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_equi_G.pth",
-                AffSteererMatcher.steerer_path_equi_G,
-            )
-        if self.steerer_type == "steer_G" and not AffSteererMatcher.steerer_path_steer_G.exists():
-            print("Downloading steerer_aff_steer_G.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_steer_G.pth",
-                AffSteererMatcher.steerer_path_steer_G,
-            )
-
-        if self.steerer_type == "equi_B" and not AffSteererMatcher.steerer_path_equi_B.exists():
-            print("Downloading steerer_aff_equi_B.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_equi_B.pth",
-                AffSteererMatcher.steerer_path_equi_B,
-            )
-        if self.steerer_type == "steer_B" and not AffSteererMatcher.steerer_path_steer_B.exists():
-            print("Downloading steerer_aff_steer_B.pth")
-            py3_wget.download_file(
-                "https://github.com/georg-bn/affine-steerers/releases/download/weights/steerer_aff_steer_B.pth",
-                AffSteererMatcher.steerer_path_steer_B,
-            )
-
     def build_matcher(self):
-        detector = dedode_detector_L(weights=torch.load(self.detector_path_L, map_location=self.device))
+        detector_path = hf_hub_download(
+            repo_id="image-matching-models/affine-steerers", filename="dedode_detector_C4.safetensors"
+        )
+        detector = dedode_detector_L(weights=load_file(detector_path))
 
+        descriptor_filename = f"descriptor_aff_{self.steerer_type}.safetensors"
+        descriptor_path = hf_hub_download(repo_id="image-matching-models/affine-steerers", filename=descriptor_filename)
         if "G" in self.steerer_type:
-            descriptor_path = (
-                self.descriptor_path_equi_G if "equi" in self.steerer_type else self.descriptor_path_steer_G
-            )
-            descriptor = dedode_descriptor_G(weights=torch.load(descriptor_path, map_location=self.device))
+            descriptor = dedode_descriptor_G(weights=load_file(descriptor_path))
         else:
-            descriptor_path = (
-                self.descriptor_path_equi_B if "equi" in self.steerer_type else self.descriptor_path_steer_B
-            )
-            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path, map_location=self.device))
+            descriptor = dedode_descriptor_B(weights=load_file(descriptor_path))
 
-        if "G" in self.steerer_type:
-            steerer_path = self.steerer_path_equi_G if "equi" in self.steerer_type else self.steerer_path_steer_G
-        else:
-            steerer_path = self.steerer_path_equi_B if "equi" in self.steerer_type else self.steerer_path_steer_B
-
-        assert steerer_path.exists(), f"could not find steerer weights at {steerer_path}. Please check that they exist."
+        steerer_filename = f"steerer_aff_{self.steerer_type}.safetensors"
+        steerer_path = hf_hub_download(repo_id="image-matching-models/affine-steerers", filename=steerer_filename)
         steerer = self.load_steerer(steerer_path).to(self.device).eval()
 
         steerer.use_prototype_affines = True
@@ -159,7 +67,7 @@ class AffSteererMatcher(BaseMatcher):
                 [
                     build_affine(angle_1=0.0, dilation_1=1.0, dilation_2=1.0, angle_2=r * 2 * torch.pi / 8)
                     for r in range(8)
-                ],  # + ... more affines
+                ],
                 dim=0,
             ).to(self.device)
 
@@ -171,13 +79,10 @@ class AffSteererMatcher(BaseMatcher):
         return detector, descriptor, steerer, matcher
 
     @staticmethod
-    def load_steerer(steerer_path, checkpoint=False, prototypes=True, feat_dim=256):
+    def load_steerer(steerer_path, prototypes=True, feat_dim=256):
         from affine_steerers.steerers import SteererSpread
 
-        if checkpoint:
-            sd = torch.load(steerer_path, map_location="cpu")["steerer"]
-        else:
-            sd = torch.load(steerer_path, map_location="cpu")
+        sd = load_file(steerer_path)
 
         nbr_prototypes = 0
         if prototypes and "prototype_affines" in sd:

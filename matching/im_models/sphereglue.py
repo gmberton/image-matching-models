@@ -1,10 +1,10 @@
-import os
 import torch
-import py3_wget
+from huggingface_hub import hf_hub_download
+from safetensors.torch import load_file
 
 from matching.im_models.lightglue import SIFT, SuperPoint
 from matching.utils import add_to_path
-from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from matching import THIRD_PARTY_DIR, BaseMatcher
 
 add_to_path(THIRD_PARTY_DIR.joinpath("SphereGlue"))
 
@@ -38,12 +38,7 @@ class SphereGlueBase(BaseMatcher):
             "knn": kwargs.get("knn", 20),
         }
 
-        self.skip_ransac = True
-
-    def download_weights(self):
-        if not os.path.isfile(self.model_path):
-            print("Downloading SphereGlue weights")
-            py3_wget.download_file(self.weights_url, self.model_path)
+        self.skip_ransac = False
 
     def _forward(self, img0, img1):
         """
@@ -83,28 +78,22 @@ class SphereGlueBase(BaseMatcher):
 
 
 class SiftSphereGlue(SphereGlueBase):
-    model_path = WEIGHTS_DIR.joinpath("sift-sphereglue.pt")
-    weights_url = "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/sift/autosaved.pt"
-
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.download_weights()
         self.sphereglue_cfg.update({"descriptor_dim": 128, "output_dim": 128 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])
+        weights_path = hf_hub_download(repo_id="image-matching-models/sift-sphereglue", filename="model.safetensors")
+        self.matcher.load_state_dict(load_file(weights_path))
 
 
 class SuperpointSphereGlue(SphereGlueBase):
-    model_path = WEIGHTS_DIR.joinpath("superpoint-sphereglue.pt")
-    weights_url = (
-        "https://github.com/vishalsharbidar/SphereGlue/raw/refs/heads/main/model_weights/superpoint/autosaved.pt"
-    )
-
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.download_weights()
         self.sphereglue_cfg.update({"descriptor_dim": 256, "output_dim": 256 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        self.matcher.load_state_dict(torch.load(self.model_path, map_location=self.device)["MODEL_STATE_DICT"])
+        weights_path = hf_hub_download(
+            repo_id="image-matching-models/superpoint-sphereglue", filename="model.safetensors"
+        )
+        self.matcher.load_state_dict(load_file(weights_path))

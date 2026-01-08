@@ -1,11 +1,11 @@
-import os
 import torch
-import py3_wget
 import torchvision.transforms as tfm
+from huggingface_hub import hf_hub_download
 from kornia.feature import DeDoDe
+from safetensors.torch import load_file
 import kornia
 
-from matching import get_version, THIRD_PARTY_DIR, WEIGHTS_DIR, BaseMatcher
+from matching import get_version, THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import add_to_path, resize_to_divisible
 
 add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
@@ -15,9 +15,6 @@ from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
 
 
 class DedodeMatcher(BaseMatcher):
-    detector_path = WEIGHTS_DIR.joinpath("dedode_detector_L.pth")
-    detector_v2_path = WEIGHTS_DIR.joinpath("dedode_detector_L_v2.pth")
-    descriptor_path = WEIGHTS_DIR.joinpath("dedode_descriptor_G.pth")
     dino_patch_size = 14
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
@@ -30,35 +27,17 @@ class DedodeMatcher(BaseMatcher):
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        self.download_weights()
-
-        detector_weight_path = self.detector_path if detector_version == 1 else self.detector_v2_path
-        self.detector = dedode_detector_L(weights=torch.load(detector_weight_path, map_location=device), device=device)
-        self.descriptor = dedode_descriptor_G(
-            weights=torch.load(self.descriptor_path, map_location=device), device=device
+        detector_filename = (
+            "dedode_detector_L.safetensors" if detector_version == 1 else "dedode_detector_L_v2.safetensors"
         )
+        detector_path = hf_hub_download(repo_id="image-matching-models/dedode", filename=detector_filename)
+        descriptor_path = hf_hub_download(
+            repo_id="image-matching-models/dedode", filename="dedode_descriptor_G.safetensors"
+        )
+
+        self.detector = dedode_detector_L(weights=load_file(detector_path), device=device)
+        self.descriptor = dedode_descriptor_G(weights=load_file(descriptor_path), device=device)
         self.matcher = DualSoftMaxMatcher()
-
-    @staticmethod
-    def download_weights():
-        detector_url = (
-            "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_detector_L.pth"
-        )
-        detector_v2_url = "https://github.com/Parskatt/DeDoDe/releases/download/v2/dedode_detector_L_v2.pth"
-        descr_url = (
-            "https://github.com/Parskatt/DeDoDe/releases/download/dedode_pretrained_models/dedode_descriptor_G.pth"
-        )
-        if not os.path.isfile(DedodeMatcher.detector_path):
-            print("Downloading dedode_detector_L.pth")
-            py3_wget.download_file(detector_url, DedodeMatcher.detector_path)
-
-        if not os.path.isfile(DedodeMatcher.detector_v2_path):
-            print("Downloading dedode_descriptor_L-v2.pth")
-            py3_wget.download_file(detector_v2_url, DedodeMatcher.detector_v2_path)
-
-        if not os.path.isfile(DedodeMatcher.descriptor_path):
-            print("Downloading dedode_descriptor_G.pth")
-            py3_wget.download_file(descr_url, DedodeMatcher.descriptor_path)
 
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes

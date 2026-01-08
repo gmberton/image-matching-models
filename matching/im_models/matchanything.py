@@ -1,14 +1,12 @@
 import cv2
-import gdown
 import numpy as np
-import shutil
-import tarfile
-import zipfile
+from huggingface_hub import hf_hub_download
 from PIL import Image
+from safetensors.torch import load_file
 import torch
 import torch.nn.functional as F
 
-from matching import BaseMatcher, THIRD_PARTY_DIR, WEIGHTS_DIR
+from matching import BaseMatcher, THIRD_PARTY_DIR
 from matching.utils import add_to_path, dict_to_device
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
@@ -54,30 +52,12 @@ class MatchAnythingMatcher(BaseMatcher):
         self.img_resize = img_resize
 
         self.model_name = f"matchanything_{self.variant}"
-        self.model_path = WEIGHTS_DIR.joinpath("matchanything", f"{self.model_name}.ckpt")
         self._load_model()
 
-    def _try_migrate_legacy_weights(self):
-        legacy_weights_dir = MATCHANYTHING_DIR.joinpath("weights")
-        legacy_candidates = [
-            legacy_weights_dir.joinpath(self.model_path.name),
-            legacy_weights_dir.joinpath("weights", self.model_path.name),
-        ]
-        for legacy_path in legacy_candidates:
-            if legacy_path.is_file():
-                self.model_path.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(str(legacy_path), str(self.model_path))
-                return True
-        return False
-
     def _load_model(self):
-        self.model_path.parent.mkdir(parents=True, exist_ok=True)
-        self.download_weights()
-
         cfg = get_cfg_defaults()
         if self.variant == "eloftr":
             cfg.merge_from_file(str(MATCHANYTHING_DIR.joinpath("configs", "models", "eloftr_model.py")))
-            # The LoFTR config expects an NPE tuple; default to 832 if not provided.
             if cfg.DATASET.NPE_NAME is not None:
                 if cfg.DATASET.NPE_NAME == "megadepth":
                     target_size = self.img_resize or 832
@@ -97,69 +77,11 @@ class MatchAnythingMatcher(BaseMatcher):
         else:
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 
-        checkpoint = torch.load(self.model_path, map_location="cpu")
-        state_dict = checkpoint.get("state_dict", checkpoint)
-        if self.variant == "eloftr" and any(k.startswith("matcher.") for k in state_dict):
-            state_dict = {
-                (k.replace("matcher.", "", 1) if k.startswith("matcher.") else k): v for k, v in state_dict.items()
-            }
+        repo_id = f"image-matching-models/matchanything-{self.variant}"
+        weights_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
+        state_dict = load_file(weights_path)
         self.net.load_state_dict(state_dict, strict=False)
         self.net.eval().to(self.device)
-
-    def download_weights(self):
-        """Ensure weights exist locally; downloads and extracts if missing."""
-        weights_dir = self.model_path.parent
-        weights_dir.mkdir(parents=True, exist_ok=True)
-
-        if self.model_path.is_file():
-            return
-        if self._try_migrate_legacy_weights():
-            return
-
-        archive_path = weights_dir.joinpath("weights.zip")
-        if not archive_path.is_file():
-            gdown.download(
-                id="12L3g9-w8rR9K2L4rYaGaDJ7NqX1D713d",
-                output=str(archive_path),
-                fuzzy=True,
-            )
-
-        self._extract_weights_archive(archive_path, weights_dir)
-
-        # Some archives include a top-level "weights/" folder; flatten if needed.
-        nested_dir = weights_dir.joinpath("weights")
-        if nested_dir.is_dir():
-            for ckpt_path in nested_dir.glob("*.ckpt"):
-                target = weights_dir.joinpath(ckpt_path.name)
-                if not target.is_file():
-                    shutil.move(str(ckpt_path), str(target))
-            try:
-                nested_dir.rmdir()
-            except OSError:
-                pass
-
-        if not self.model_path.is_file():
-            raise FileNotFoundError(
-                f"Missing weights for {self.model_name}. " f"Place the checkpoint at {self.model_path}"
-            )
-
-    @staticmethod
-    def _extract_weights_archive(archive_path, target_dir):
-        """Extract weights archive (zip or tar) into target_dir and clean up."""
-        if not archive_path.exists():
-            return
-
-        if zipfile.is_zipfile(archive_path):
-            with zipfile.ZipFile(archive_path, "r") as zip_ref:
-                zip_ref.extractall(target_dir)
-        else:
-            try:
-                with tarfile.open(archive_path) as tar_ref:
-                    tar_ref.extractall(target_dir)
-            except tarfile.TarError:
-                raise ValueError(f"Unsupported weights archive format: {archive_path}")
-
-        archive_path.unlink(missing_ok=True)
 
     def preprocess(self, img):
         img_np = img.cpu().numpy().squeeze() * 255

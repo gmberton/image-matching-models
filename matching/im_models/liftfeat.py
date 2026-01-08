@@ -1,11 +1,12 @@
 import torch
 import numpy as np
+from huggingface_hub import hf_hub_download
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
 from matching.utils import to_numpy, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LiftFeat"))
-from models.liftfeat_wrapper import LiftFeat, MODEL_PATH
+from models.liftfeat_wrapper import LiftFeat
 
 
 class LyftFeatMatcher(BaseMatcher):
@@ -13,7 +14,8 @@ class LyftFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
         self.detect_threshold = detect_threshold
-        self.model = LiftFeat(weight=MODEL_PATH, detect_threshold=self.detect_threshold)
+        weights_path = hf_hub_download(repo_id="image-matching-models/liftfeat", filename="liftfeat.pth")
+        self.model = LiftFeat(weight=weights_path, detect_threshold=self.detect_threshold)
 
     def preprocess(self, img):
         "LiftFeat requires input as raw ndarray (result of cv2.imread)"
