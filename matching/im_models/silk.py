@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from huggingface_hub import hf_hub_download
 from kornia.color import rgb_to_grayscale
+from safetensors.torch import load_file
 
 from matching import BaseMatcher
 from matching.utils import to_numpy
@@ -299,7 +300,6 @@ class SiLKModel(nn.Module):
 
 def load_silk_model(weights_path, device="cpu"):
     """Load SiLK model from safetensors."""
-    from safetensors.torch import load_file
 
     model = SiLKModel(descriptor_dim=128)
     state_dict = load_file(weights_path)

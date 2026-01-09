@@ -3,7 +3,6 @@ import torch
 import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
-import warnings
 from pathlib import Path
 from typing import Tuple
 
@@ -35,14 +34,6 @@ class BaseMatcher(torch.nn.Module):
     @property
     def name(self):
         return self.__class__.__name__
-
-    @staticmethod
-    def image_loader(path: str | Path, resize: int | Tuple, rot_angle: float = 0) -> torch.Tensor:
-        warnings.warn(
-            "`image_loader` is replaced by `load_image` and will be removed in a future release.",
-            DeprecationWarning,
-        )
-        return BaseMatcher.load_image(path, resize, rot_angle)
 
     @staticmethod
     def load_image(path: str | Path, resize: int | Tuple = None, rot_angle: float = 0) -> torch.Tensor:
