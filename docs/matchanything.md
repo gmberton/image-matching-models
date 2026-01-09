@@ -15,10 +15,10 @@ git submodule update --init --recursive matching/third_party/MatchAnything
 Run either variant via:
 ```bash
 # ELoFTR backbone (defaults to 832px NPE size)
-python main_matcher.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
+python imm_match.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
 
 # RoMa backbone (AMP disabled on CPU automatically)
-python main_matcher.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
+python imm_match.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
 ```
 Weights download automatically on first MatchAnything use and are cached under `matching/model_weights/matchanything`.
 For submodule setup and troubleshooting, see [docs/matchanything.md](docs/matchanything.md).

@@ -98,7 +98,7 @@ plot_matches(img0, img1, result, save_path='plot_matches.png')
 You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. You may also resolution (`im_size`) and number of keypoints (`n_kpts`). This will take a few seconds on a laptop's CPU, and will produce the same images that you see above.
 
 ```bash
-python main_matcher.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue
+python imm_match.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue
 ```
 where `sift-lightglue` will use `SIFT + LightGlue`.
 
@@ -107,8 +107,8 @@ The script will generate an image with the matching keypoints for each pair, und
 ### Use on your own images
 
 To use on your images you have three options:
-1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python main_matcher.py --input path/to/dir`
-2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python main_matcher.py --input path/to/file.txt`
+1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python imm_match.py --input path/to/dir`
+2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python imm_match.py --input path/to/file.txt`
 3. import the matcher package into a script/notebook and use from there, as in the example above
 
 ### Keypoint Extraction and Description
@@ -130,7 +130,7 @@ plot_kpts(img, result)
 
 As with matching, you can also run extraction from the command line
 ```bash
-python main_extractor.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue --n_kpts 2048
+python imm_extract.py --matcher sift-lightglue --device cpu --out_dir outputs_sift-lightglue --n_kpts 2048
 ```
 
 ## Available Models
