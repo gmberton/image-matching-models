@@ -4,7 +4,7 @@ import gdown
 import py3_wget
 
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import resize_to_divisible, add_to_path
+from matching.utils import resize_to_divisible, add_to_path, to_numpy
 
 add_to_path(THIRD_PARTY_DIR.joinpath("path/to/submodule"))
 
@@ -60,6 +60,12 @@ class NewMatcher(BaseMatcher):
         output = self.matcher(batch)
 
         # postprocess model output to get kpts, desc, etc
+        desc0 = to_numpy(output["desc0"].cpu().numpy())
+        desc1 = to_numpy(output["desc1"].cpu().numpy())
+        keypoints_0 = to_numpy(output["keypoints0"].cpu().numpy())
+        keypoints_1 = to_numpy(output["keypoints1"].cpu().numpy())
+        mkpts0 = to_numpy(output["mkpts0"].cpu().numpy())
+        mkpts1 = to_numpy(output["mkpts1"].cpu().numpy())
 
         # if we had to resize the img to divisible, then rescale the kpts back to input img size
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
