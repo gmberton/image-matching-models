@@ -1,10 +1,10 @@
 # Image Matching Models (IMM)
 
-A unified API for quickly and easily trying 37 (and growing!) image matching models.
+A unified API for quickly and easily trying 50+ (and growing!) image matching models.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/alexstoken/image-matching-models/blob/main/demo.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/image-matching-models/blob/main/demo.ipynb)
 
-Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model/Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
+Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model / Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
 
 ### Matching Examples
 Compare matching models across various scenes. For example, we show `SIFT-LightGlue` and `LoFTR` matches on pairs: 
@@ -50,91 +50,68 @@ SIFT and DeDoDe
 </details>
 
 ## Install
-### From Source [Recommended]
-If you want to to install from source (easiest to edit, use `benchmark.py`, `demo.ipynb`), 
+
+Clone recursively and installed packages:
 ```bash
-git clone --recursive https://github.com/alexstoken/image-matching-models
+git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
-
-# activate the python environment you want to install IMM in
-
-pip install -r requirements.txt  # must be done to support editable dependencies
+pip install -r requirements.txt  # required to support editable dependencies
 pip install .
 ```
 
-Some models require additional optional dependencies which are not included in the default list. To install these, use
+Some models require additional optional dependencies which are not included in the default list, like torch-geometric (required by SphereGlue) and tensorflow (required by OmniGlue). To install these, use
 ```
 pip install .[all]
 ```
-This will install all dependencies needed to run all models.
-
-We recommend using torch>=2.2, and we haven't tested with older versions.
-
-> [!Note]
-> SphereGlue depends on `torch-geometric` and `torch-cluster` which require that you pass an additional parameter given your installed versions of torch and CUDA like so: `pip install .[all] -f https://data.pyg.org/whl/torch-2.5.0+cu124.html` (replace `cu124` with `cpu` for CPU version). See [PyTorch Geometric installation docs](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html) for more information 
 
 
 ## Use
 
-You can use any of the matchers with
-
+You can use any of the over 50 matchers simply like this. You never need to download weights, it's all taken care in the code.
 ```python
 from matching import get_matcher
-from matching.viz import plot_matches
+from matching.viz import plot_matches, plot_kpts
 
-device = 'cuda'  # 'cpu'
-matcher = get_matcher('superpoint-lightglue', device=device)  # Choose any of our ~30+ matchers listed below
+# Choose any of the 50+ matchers listed below
+matcher = get_matcher("superpoint-lightglue", device="cuda")
 img_size = 512  # optional
 
-img0 = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
-img1 = matcher.load_image('assets/example_pairs/outdoor/montmartre_far.jpg', resize=img_size)
+img0 = matcher.load_image("assets/example_pairs/outdoor/montmartre_close.jpg", resize=img_size)
+img1 = matcher.load_image("assets/example_pairs/outdoor/montmartre_far.jpg", resize=img_size)
 
 result = matcher(img0, img1)
-num_inliers, H, inlier_kpts0, inlier_kpts1 = result['num_inliers'], result['H'], result['inlier_kpts0'], result['inlier_kpts1']
-# result.keys() = ['num_inliers', 'H', 'all_kpts0', 'all_kpts1', 'all_desc0', 'all_desc1', 'matched_kpts0', 'matched_kpts1', 'inlier_kpts0', 'inlier_kpts1']
-plot_matches(img0, img1, result, save_path='plot_matches.png')
+# result.keys() = ["num_inliers", "H", "all_kpts0", "all_kpts1", "all_desc0", "all_desc1", "matched_kpts0", "matched_kpts1", "inlier_kpts0", "inlier_kpts1"]
+
+# This will plot visualizations for matches as shown in the figures above
+plot_matches(img0, img1, result, save_path="plot_matches.png")
+
+# Or you can extract and visualize keypoints as easily as
+result = matcher.extract(img0)
+# result.keys() = ["all_kpts0", "all_desc0"]
+plot_kpts(img0, result, save_path="plot_kpts.png")
 ```
 
-You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. You may also resolution (`im_size`) and number of keypoints (`n_kpts`). This will take a few seconds on a laptop's CPU, and will produce the same images that you see above.
-
+You can also run matching or extraction as standalone scripts, to get the same results as above. Matching:
 ```bash
-python imm_match.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue
-```
-where `sift-lightglue` will use `SIFT + LightGlue`.
-
-The script will generate an image with the matching keypoints for each pair, under `./output_sift-lightglue`.
-
-### Use on your own images
-
-To use on your images you have three options:
-1. create a directory with sub-directories, with two images per sub-directory, just like `./assets/example_pairs`. Then use as `python imm_match.py --input path/to/dir`
-2. create a file with pairs of paths, separate by a space, just like `assets/example_pairs_paths.txt`. Then use as `python imm_match.py --input path/to/file.txt`
-3. import the matcher package into a script/notebook and use from there, as in the example above
-
-### Keypoint Extraction and Description
-To extract keypoints and descriptions (when available) from a single image, use the `extract()` method.
-
-```python
-from matching import get_matcher
-
-device = 'cuda' # 'cpu'
-matcher = get_matcher('xfeat', device=device)  # Choose any of our ~30+ matchers listed below
-img_size = 512 # optional
-
-img = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
-
-result = matcher.extract(img)
-# result.keys() = ['all_kpts0', 'all_desc0']
-plot_kpts(img, result)
+python imm_match.py --matcher superpoint-lightglue --out_dir outputs_superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
 ```
 
-As with matching, you can also run extraction from the command line
+Keypoints extraction:
 ```bash
-python imm_extract.py --matcher sift-lightglue --device cpu --out_dir outputs_sift-lightglue --n_kpts 2048
+python imm_extract.py --matcher superpoint-lightglue --out_dir outputs_superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
 ```
+
+These scripts can take as input images, folders with multiple images (or multiple pairs of images), or files with pairs of images paths.
+To see all possible parameters run
+```bash
+python imm_match.py -h
+# or
+python imm_extract.py -h
+```
+
 
 ## Available Models
-You can choose any of the following methods (input to `get_matcher()`):
+We support the following methods:
 
 **Dense**: ```roma, tiny-roma, duster, master, minima-roma, ufm```
 
@@ -142,27 +119,16 @@ You can choose any of the following methods (input to `get_matcher()`):
 
 **Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd```
 
-
-> [!TIP]
-> You can pass a list of matchers, i.e. `get_matcher([xfeat, tiny-roma])` to run both matchers and concatenate their keypoints.
-
-Most matchers can run on CPU and GPU. MPS is not tested. See [Model Details](docs/model_details.md) for runtimes. If a runtime is ❌, it means that model can not run on that device. 
+See [Model Details](docs/model_details.md) to see runtimes, supported devices, and source of each model.
 
 ## Adding a new method
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details. 
-
-
-> [!Note]
-> This repo is optimized for usability, not necessarily for speed or performance. Ideally you can use this repo to find the matcher that best suits your needs, and then use the original code (or a modified version of this code) to get maximize performance. Default hyperparameters used here **may not be optimal for your use case!**
-
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details. We follow the [1st principle of PyTorch](https://docs.pytorch.org/docs/stable/community/design.html#design-principles): Usability over Performance
 
 ## Acknowledgements
-
-Special thanks to the authors of the respective works that are included in this repo (see their papers above). Additional thanks to [@GrumpyZhou](https://github.com/GrumpyZhou) for developing and maintaining the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main), which we have wrapped in this repo, and the [maintainers](https://github.com/kornia/kornia?tab=readme-ov-file#community) of [Kornia](https://github.com/kornia/kornia).
-
+Special thanks to the authors of all models included in this repo (links in [Model Details](docs/model_details.md)), and to authors of other libraries we wrap like the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main) and [Kornia](https://github.com/kornia/kornia).
 
 ## Cite
-This repo was created as part of the EarthMatch paper. Please consider citing EarthMatch if this repo is helpful to you!
+This repo was created as part of the EarthMatch paper. Please cite EarthMatch if this repo is helpful to you!
 
 ```
 @InProceedings{Berton_2024_EarthMatch,
