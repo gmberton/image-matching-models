@@ -9,7 +9,7 @@ description = "Easily test and apply pairwise image matching models"
 authors = [
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
   {name = "Gabriele Berton", email = "berton.gabri@gmail.com"},
-  {name = "Gabriele Trivigno", email="gabriele.trivigno@polito.it"},
+  {name = "Gabriele Trivigno", email = "gabriele.trivigno@polito.it"},
 ]
 maintainers = [
   {name = "Alex Stoken", email = "alex.stoken@gmail.com"},
@@ -20,48 +20,24 @@ license = {file = "LICENSE"}
 keywords = ["image matching"]
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python"
+  "Programming Language :: Python",
 ]
-dynamic = ["version",
-            # "dependencies"
-            ]
-
+dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
-# Documentation = "https://readthedocs.org"
 Repository = "https://github.com/gmberton/image-matching-models"
-# "Bug Tracker" = "https://github.com/me/spam/issues"
-# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+omniglue = ["tensorflow"]
+sphereglue = ["torch-geometric", "torch-cluster"]
+all = ["image-matching-models[omniglue, sphereglue]"]
 
 [tool.setuptools.dynamic]
-# dependencies = { file = [
-#   "./requirements.txt",
-# ] }
-version = { attr = "matching.__version__" }
+version = {attr = "matching.__version__"}
 
 [tool.setuptools.packages]
 find = {}
-
-[project.optional-dependencies]
-silk = [
-        "hydra-core",
-        "pytorch-lightning==1.5.2",
-        "jax",
-        "jaxlib"
-        ]
-
-loftrs = ["pytorch-lightning==1.5.2"
-            ]
-
-omniglue = ["tensorflow"
-            ]
-
-cuda = ["xformers"]
-
-sphereglue = ["torch-geometric", "torch-cluster"]
-
-all = ["image-matching-models[loftrs, omniglue, sphereglue]"]
 
 [tool.ruff]
 line-length = 120
