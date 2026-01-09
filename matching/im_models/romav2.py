@@ -1,8 +1,7 @@
 import torch
-import torchvision.transforms as tfm
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
-from matching.utils import add_to_path
+from matching.utils import add_to_path, to_numpy
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RoMaV2/src"))
 
@@ -13,6 +12,10 @@ import romav2.device as romav2_device  # noqa: E402
 class RoMaV2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
+        assert device in [
+            "cpu",
+            "cuda",
+        ], "RoMaV2Matcher only supports 'cpu' or 'cuda' devices. `mps` has a bug where matches are placed incorrectly."
 
         # Temporarily override the global device for proper initialization
         original_device = romav2_device.device
@@ -35,10 +38,9 @@ class RoMaV2Matcher(BaseMatcher):
         self.romav2_model = self.romav2_model.to(torch.device(device))
 
         self.max_keypoints = max_num_keypoints
-        self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     def preprocess(self, img):
-        return self.normalize(img).unsqueeze(0)
+        return img.unsqueeze(0)
 
     def _forward(self, img0, img1):
         img0 = self.preprocess(img0)
@@ -50,14 +52,13 @@ class RoMaV2Matcher(BaseMatcher):
         h0, w0 = img0.shape[-2:]
         h1, w1 = img1.shape[-2:]
 
-        with torch.no_grad():
-            preds = self.romav2_model.match(img0, img1)
-            matches, confidence, precision_AB, precision_BA = self.romav2_model.sample(preds, self.max_keypoints)
+        preds = self.romav2_model.match(img0, img1)
+        matches, confidence, precision_AB, precision_BA = self.romav2_model.sample(preds, self.max_keypoints)
 
-        mkpts0, mkpts1 = RoMaV2.to_pixel_coordinates(matches, h0, w0, h1, w1)
+        mkpts0, mkpts1 = self.romav2_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
         # Convert to numpy
-        mkpts0 = mkpts0.cpu().numpy()
-        mkpts1 = mkpts1.cpu().numpy()
+        mkpts0 = to_numpy(mkpts0)
+        mkpts1 = to_numpy(mkpts1)
 
         return mkpts0, mkpts1, None, None, None, None
