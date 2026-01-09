@@ -45,3 +45,11 @@ exclude = ["matching/third_party"]
 
 [tool.ruff.lint]
 ignore = ["E402"]
+
+[tool.setuptools]
+py-modules = ["imm_match", "imm_extract", "imm_benchmark"]
+
+[project.scripts]
+imm-match = "imm_match:main"
+imm-extract = "imm_extract:main"
+imm-benchmark = "imm_benchmark:main"
