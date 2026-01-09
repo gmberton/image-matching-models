@@ -12,9 +12,9 @@ from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr
 
 
 class MINIMAMatcher(BaseMatcher):
-    ALLOWED_TYPES = ["roma", "sp_lg", "loftr", "xoftr"]
+    ALLOWED_TYPES = ["roma", "superpoint_lightglue", "loftr", "xoftr"]
 
-    def __init__(self, device="cpu", model_type="sp_lg", **kwargs):
+    def __init__(self, device="cpu", model_type="superpoint_lightglue", **kwargs):
         super().__init__(device, **kwargs)
         self.model_type = model_type.lower()
         self.model_args = Namespace()
@@ -23,7 +23,7 @@ class MINIMAMatcher(BaseMatcher):
         )
 
 
-class MINIMASpLgMatcher(MINIMAMatcher):
+class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 

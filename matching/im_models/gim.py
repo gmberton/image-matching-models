@@ -66,7 +66,7 @@ class GIM_DKM(BaseMatcher):
         return mkpts0, mkpts1, None, None, None, None
 
 
-class GIM_LG(BaseMatcher):
+class GIM_LightGlue(BaseMatcher):
     def __init__(self, device="cpu", max_keypoints=2048, **kwargs):
         super().__init__(device, **kwargs)
         # load the altered version of gluefactory
@@ -76,7 +76,7 @@ class GIM_LG(BaseMatcher):
         from gluefactory_gim.models.matchers.lightglue import LightGlue
 
         # Download weights from HF and get paths from cache
-        repo_id = "image-matching-models/gim-lg"
+        repo_id = "image-matching-models/gim-lightglue"
         self.ckpt_path = hf_hub_download(repo_id=repo_id, filename="gim_lightglue_100h.ckpt")
         self.superpoint_v1_path = hf_hub_download(repo_id=repo_id, filename="superpoint_v1.pth")
 

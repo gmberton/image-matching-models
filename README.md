@@ -13,12 +13,12 @@ Compare matching models across various scenes. For example, we show `SIFT-LightG
 SIFT-LightGlue
 </summary>
 <p float="left">
-  <img src="assets/example_sift-lg/output_3_matches.jpg" width="195" />
-  <img src="assets/example_sift-lg/output_2_matches.jpg" width="195" />
-  <img src="assets/example_sift-lg/output_4_matches.jpg" width="195" />
-  <img src="assets/example_sift-lg/output_1_matches.jpg" width="195" />
-  <img src="assets/example_sift-lg/output_0_matches.jpg" width="195" />
-    <img src="assets/example_sift-lg/output_5_matches.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_3_matches.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_2_matches.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_4_matches.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_1_matches.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_0_matches.jpg" width="195" />
+    <img src="assets/example_sift-lightglue/output_5_matches.jpg" width="195" />
 
 </p>
 </details>
@@ -42,9 +42,9 @@ You can also extract keypoints and associated descriptors.
 SIFT and DeDoDe
 </summary>
 <p float="left">
-  <img src="assets/example_sift-lg/output_8_kpts.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_8_kpts.jpg" width="195" />
   <img src="assets/example_dedode/output_8_kpts.jpg" width="195" />
-  <img src="assets/example_sift-lg/output_0_kpts.jpg" width="195" />
+  <img src="assets/example_sift-lightglue/output_0_kpts.jpg" width="195" />
   <img src="assets/example_dedode/output_0_kpts.jpg" width="195" />
 </p>
 </details>
@@ -56,9 +56,9 @@ If you want to to install from source (easiest to edit, use `benchmark.py`, `dem
 git clone --recursive https://github.com/alexstoken/image-matching-models
 cd image-matching-models
 
-# activate the python enviroment you want to install IMM in
+# activate the python environment you want to install IMM in
 
-pip install -r requirements.txt # must be done to support editable depedencies
+pip install -r requirements.txt  # must be done to support editable dependencies
 pip install .
 ```
 
@@ -83,7 +83,7 @@ from matching import get_matcher
 from matching.viz import plot_matches
 
 device = 'cuda'  # 'cpu'
-matcher = get_matcher('superpoint-lg', device=device)  # Choose any of our ~30+ matchers listed below
+matcher = get_matcher('superpoint-lightglue', device=device)  # Choose any of our ~30+ matchers listed below
 img_size = 512  # optional
 
 img0 = matcher.load_image('assets/example_pairs/outdoor/montmartre_close.jpg', resize=img_size)
@@ -98,11 +98,11 @@ plot_matches(img0, img1, result, save_path='plot_matches.png')
 You can also run this as a standalone script, which will perform inference on the the examples inside `./assets`. You may also resolution (`im_size`) and number of keypoints (`n_kpts`). This will take a few seconds on a laptop's CPU, and will produce the same images that you see above.
 
 ```bash
-python main_matcher.py --matcher sift-lg --device cpu --out_dir output_sift-lg
+python main_matcher.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue
 ```
-where `sift-lg` will use `SIFT + LightGlue`.
+where `sift-lightglue` will use `SIFT + LightGlue`.
 
-The script will generate an image with the matching keypoints for each pair, under `./output_sift-lg`.
+The script will generate an image with the matching keypoints for each pair, under `./output_sift-lightglue`.
 
 ### Use on your own images
 
@@ -130,17 +130,17 @@ plot_kpts(img, result)
 
 As with matching, you can also run extraction from the command line
 ```bash
-python main_extractor.py --matcher sift-lg --device cpu --out_dir output_sift-lg --n_kpts 2048
+python main_extractor.py --matcher sift-lightglue --device cpu --out_dir output_sift-lightglue --n_kpts 2048
 ```
 
 ## Available Models
 You can choose any of the following methods (input to `get_matcher()`):
 
-**Dense**: ```roma, tiny-roma, dust3r, mast3r, minima-roma, ufm```
+**Dense**: ```roma, tiny-roma, duster, master, minima-roma, ufm```
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star, topicfm[-plus]```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lg, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-splg, liftfeat, rdd-[sparse,lg, aliked], ripe, lisrd```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd```
 
 
 > [!TIP]

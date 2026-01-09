@@ -100,9 +100,9 @@ class RDDMatcher(BaseMatcher):
         return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1
 
 
-class _rdd_lg_wrapper(LightGlue):
+class _rdd_lightglue_wrapper(LightGlue):
     """
-    This wrapper is required to fix the hardcoded rdd_lg weights path in the LightGlue matcher.
+    This wrapper is required to fix the hardcoded rdd_lightglue weights path in the LightGlue matcher.
 
     Args:
         LightGlue (nn.Module): RDD LightGlue module
@@ -115,13 +115,13 @@ class _rdd_lg_wrapper(LightGlue):
         super().__init__(feature_type, *args, **kwargs)
 
 
-class RDD_LGMatcher(RDDMatcher):
+class RDD_LightGlueMatcher(RDDMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
-        # Get LG weights path before calling super().__init__
-        self.model_path_lg = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_lg_v2.pt")
+        # Get LightGlue weights path before calling super().__init__
+        self.model_path_lightglue = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_lg_v2.pt")
 
-        # Set up lg_conf with the weights path
-        self.lg_conf = {
+        # Set up lightglue_conf with the weights path
+        self.lightglue_conf = {
             "name": "lightglue",  # just for interfacing
             "input_dim": 256,  # input descriptor dimension (autoselected from weights)
             "descriptor_dim": 256,
@@ -133,12 +133,14 @@ class RDD_LGMatcher(RDDMatcher):
             "filter_threshold": 0.01,  # match threshold
             "depth_confidence": -1,  # depth confidence threshold
             "width_confidence": -1,  # width confidence threshold
-            "weights": self.model_path_lg,  # path to the weights
+            "weights": self.model_path_lightglue,  # path to the weights
         }
 
         super().__init__(device, *args, **kwargs)
 
-        self.lg = _rdd_lg_wrapper("rdd", weights_path=self.model_path_lg, **self.lg_conf).to(self.device)
+        self.lightglue = _rdd_lightglue_wrapper(
+            "rdd", weights_path=self.model_path_lightglue, **self.lightglue_conf
+        ).to(self.device)
 
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
@@ -168,7 +170,7 @@ class RDD_LGMatcher(RDDMatcher):
 
         pred = {}
         pred.update({"image0": image0_data, "image1": image1_data})
-        pred.update(self.lg({**pred}))
+        pred.update(self.lightglue({**pred}))
 
         kpts0 = pred["image0"]["keypoints"][0]
         kpts1 = pred["image1"]["keypoints"][0]

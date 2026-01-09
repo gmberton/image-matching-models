@@ -296,9 +296,9 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 
 \* `LightGlue` model runtimes are listed in the order: `SIFT, SuperPoint, Disk, ALIKED`
 
-\* `Keypt2Subpx` model runtimes are listed in the order: `superpoint-lg, aliked-lg, xfeat, dedode`
+\* `Keypt2Subpx` model runtimes are listed in the order: `superpoint-lightglue, aliked-lightglue, xfeat, dedode`
 
-\* `MINIMA` model runtimes are listed in the order: `superpoint-lg, LoFTR, RoMa (large), RoMa (tiny)`
+\* `MINIMA` model runtimes are listed in the order: `superpoint-lightglue, LoFTR, RoMa (large), RoMa (tiny)`
 
-\* `RDD` model runtimes are listed in the order: `sparse, star (semi-dense), lg, aliked`
+\* `RDD` model runtimes are listed in the order: `sparse, star (semi-dense), lightglue, aliked`
 ##

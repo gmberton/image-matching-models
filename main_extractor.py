@@ -56,7 +56,7 @@ def parse_args():
     parser.add_argument(
         "--matcher",
         type=str,
-        default="sift-lg",
+        default="sift-lightglue",
         choices=available_models,
         help="choose your matcher",
     )

@@ -36,7 +36,7 @@ class DeDoDeLightGlue(BaseMatcher):
             descriptor_weights=desc_weights,
             amp_dtype=torch.float16 if "cuda" in device else torch.float32,
         ).to(device)
-        self.lg = LightGlue(features="dedode" + desc_type).to(device).eval()
+        self.lightglue = LightGlue(features="dedode" + desc_type).to(device).eval()
 
     def preprocess(self, img):
         # kornia version applies imagenet normalization
@@ -63,7 +63,7 @@ class DeDoDeLightGlue(BaseMatcher):
             },
         }
 
-        matches = self.lg(match_input)
+        matches = self.lightglue(match_input)
 
         matching_idxs = matches["matches"][0]
         mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]]

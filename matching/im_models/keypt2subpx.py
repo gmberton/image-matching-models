@@ -19,29 +19,25 @@ from lightglue.utils import rbd, batch_to_device
 
 
 class Keypt2SubpxMatcher(BaseMatcher):
-    detector_name2matcher_name = {
-        "splg": "superpoint-lg",
-        "aliked": "aliked-lg",
+    # Maps our detector names to third-party library's expected names
+    THIRDPARTY_NAMES = {
+        "superpoint-lightglue": "splg",
+        "aliked-lightglue": "aliked",
         "xfeat": "xfeat",
-        "xfeat-lg": "xfeat-lg",
+        "xfeat-lightglue": "xfeat",
         "dedode": "dedode",
     }
 
     def __init__(self, device="cpu", detector_name: str | None = None, **kwargs):
         super().__init__(device, **kwargs)
 
-        matcher_name = self.detector_name2matcher_name[detector_name]
         self.detector_name = detector_name
-        if detector_name == "splg":
+        if detector_name == "superpoint-lightglue":
             self.matcher = SuperPointDense(self.device)
         else:
-            self.matcher = get_matcher(matcher_name, device=device, **kwargs)
-
-        self.keypt2subpx = self.load_refiner(detector_name.split("-")[0])
-
-    def load_refiner(self, detector: str) -> torch.nn.Module:
-        assert detector in ["splg", "aliked", "xfeat", "dedode"]
-        return (
+            self.matcher = get_matcher(detector_name, device=device, **kwargs)
+        detector = self.THIRDPARTY_NAMES[detector_name]
+        self.keypt2subpx = (
             torch.hub.load("KimSinjeong/keypt2subpx", "Keypt2Subpx", pretrained=True, detector=detector, verbose=False)
             .eval()
             .to(self.device)
@@ -58,12 +54,12 @@ class Keypt2SubpxMatcher(BaseMatcher):
 
     def get_scoremap(self, img=None, idx=None):
         assert img is not None or idx is not None, "Must provide either image or idx"
-        if self.detector_name in ["xfeat", "dedode"]:
+        if self.detector_name in ["xfeat", "xfeat-lightglue", "dedode"]:
             return None
-        elif self.detector_name == "aliked":
+        elif self.detector_name == "aliked-lightglue":
             # https://github.com/cvg/LightGlue/blob/edb2b838efb2ecfe3f88097c5fad9887d95aedad/lightglue/aliked.py#L707
             return self.matcher.extractor.extract_dense_map(img[None, ...])[-1].squeeze(0)
-        elif self.detector_name == "splg":
+        elif self.detector_name == "superpoint-lightglue":
             return self.matcher.get_scoremap(idx)
 
     def _forward(self, img0, img1):

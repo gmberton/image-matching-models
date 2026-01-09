@@ -9,7 +9,7 @@ add_to_path(THIRD_PARTY_DIR.joinpath("LiftFeat"))
 from models.liftfeat_wrapper import LiftFeat
 
 
-class LyftFeatMatcher(BaseMatcher):
+class LiftFeatMatcher(BaseMatcher):
     def __init__(self, device="cpu", detect_threshold=0.05, *args, **kwargs):
         super().__init__(device, **kwargs)
 

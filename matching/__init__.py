@@ -29,11 +29,11 @@ available_models = [
     "matchanything-eloftr",
     "matchanything-roma",
     "matchformer",
-    "sift-lg",
-    "superpoint-lg",
-    "disk-lg",
-    "aliked-lg",
-    "doghardnet-lg",
+    "sift-lightglue",
+    "superpoint-lightglue",
+    "disk-lightglue",
+    "aliked-lightglue",
+    "doghardnet-lightglue",
     "roma",
     "romav2",
     "tiny-roma",
@@ -52,36 +52,36 @@ available_models = [
     "doghardnet-nn",
     "xfeat",
     "xfeat-star",
-    "xfeat-lg",
+    "xfeat-lightglue",
     "xfeat-steerers-perm",
     "xfeat-steerers-learned",
     "xfeat-star-steerers-perm",
     "xfeat-star-steerers-learned",
-    "dedode-lg",
+    "dedode-lightglue",
     "gim-dkm",
-    "gim-lg",
+    "gim-lightglue",
     "omniglue",
     "xfeat-subpx",
-    "xfeat-lg-subpx",
+    "xfeat-lightglue-subpx",
     "dedode-subpx",
-    "splg-subpx",
-    "aliked-subpx",
+    "superpoint-lightglue-subpx",
+    "aliked-lightglue-subpx",
     "sift-sphereglue",
     "superpoint-sphereglue",
     "minima",
     "minima-roma",
     "minima-roma-tiny",
-    "minima-splg",
+    "minima-superpoint-lightglue",
     "minima-loftr",
     "ufm",
     "rdd",
     "rdd-star",
-    "rdd-lg",
+    "rdd-lightglue",
     "rdd-aliked",
     "minima-xoftr",
     "edm",
     "lisrd-aliked",
-    "lisrd-sp",
+    "lisrd-superpoint",
     "lisrd",
     "lisrd-sift",
     "ripe",
@@ -97,7 +97,7 @@ def get_version(pkg):
     return major, minor, patch
 
 
-def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *args, **kwargs):
+def get_matcher(matcher_name="sift-lightglue", device="cpu", max_num_keypoints=2048, *args, **kwargs):
     if isinstance(matcher_name, list):
         from matching.base_matcher import EnsembleMatcher
 
@@ -108,30 +108,30 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="xfeat", *args, **kwargs)
 
-    elif matcher_name == "xfeat-lg-subpx":
+    elif matcher_name == "xfeat-lightglue-subpx":
         from matching.im_models import keypt2subpx
 
-        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="xfeat-lg", *args, **kwargs)
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="xfeat-lightglue", *args, **kwargs)
 
     elif matcher_name == "dedode-subpx":
         from matching.im_models import keypt2subpx
 
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="dedode", *args, **kwargs)
 
-    elif matcher_name == "splg-subpx":
+    elif matcher_name == "superpoint-lightglue-subpx":
         from matching.im_models import keypt2subpx
 
-        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="splg", *args, **kwargs)
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="superpoint-lightglue", *args, **kwargs)
 
-    elif matcher_name == "aliked-subpx":
+    elif matcher_name == "aliked-lightglue-subpx":
         from matching.im_models import keypt2subpx
 
-        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="aliked", *args, **kwargs)
+        return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="aliked-lightglue", *args, **kwargs)
 
     elif matcher_name == "liftfeat":
         from matching.im_models import liftfeat
 
-        return liftfeat.LyftFeatMatcher(device, *args, **kwargs)
+        return liftfeat.LiftFeatMatcher(device, *args, **kwargs)
 
     elif matcher_name == "loftr":
         from matching.im_models import loftr
@@ -173,27 +173,27 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return matchformer.MatchformerMatcher(device, *args, **kwargs)
 
-    elif matcher_name == "sift-lg":
+    elif matcher_name == "sift-lightglue":
         from matching.im_models import lightglue
 
         return lightglue.SiftLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "superpoint-lg":
+    elif matcher_name == "superpoint-lightglue":
         from matching.im_models import lightglue
 
         return lightglue.SuperpointLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "disk-lg":
+    elif matcher_name == "disk-lightglue":
         from matching.im_models import lightglue
 
         return lightglue.DiskLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "aliked-lg":
+    elif matcher_name == "aliked-lightglue":
         from matching.im_models import lightglue
 
         return lightglue.AlikedLightGlue(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "doghardnet-lg":
+    elif matcher_name == "doghardnet-lightglue":
         from matching.im_models import lightglue
 
         return lightglue.DognetLightGlue(device, max_num_keypoints, *args, **kwargs)
@@ -288,7 +288,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, mode="semi-dense", *args, **kwargs)
 
-    elif matcher_name == "xfeat-lg":
+    elif matcher_name == "xfeat-lightglue":
         from matching.im_models import xfeat
 
         return xfeat.xFeatMatcher(device, max_num_keypoints=max_num_keypoints, mode="lighterglue", *args, **kwargs)
@@ -321,7 +321,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
             device, max_num_keypoints, mode="semi-dense", steerer_type="learned", *args, **kwargs
         )
 
-    elif matcher_name == "dedode-lg":
+    elif matcher_name == "dedode-lightglue":
         from matching.im_models import kornia
 
         return kornia.DeDoDeLightGlue(device, *args, **kwargs)
@@ -331,10 +331,10 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return gim.GIM_DKM(device, max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "gim-lg":
+    elif matcher_name == "gim-lightglue":
         from matching.im_models import gim
 
-        return gim.GIM_LG(device, max_num_keypoints, *args, **kwargs)
+        return gim.GIM_LightGlue(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "silk":
         from matching.im_models import silk
@@ -359,12 +359,12 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
     elif matcher_name == "minima":
         from matching.im_models import minima
 
-        return minima.MINIMASpLgMatcher(device, *args, **kwargs)
+        return minima.MINIMASuperpointLightGlueMatcher(device, *args, **kwargs)
 
-    elif matcher_name == "minima-splg":
+    elif matcher_name == "minima-superpoint-lightglue":
         from matching.im_models import minima
 
-        return minima.MINIMASpLgMatcher(device, *args, **kwargs)
+        return minima.MINIMASuperpointLightGlueMatcher(device, *args, **kwargs)
 
     elif matcher_name == "minima-roma":
         from matching.im_models import minima
@@ -396,10 +396,10 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return rdd.RDDMatcher(device, mode="dense", *args, **kwargs)
 
-    elif matcher_name == "rdd-lg":
+    elif matcher_name == "rdd-lightglue":
         from matching.im_models import rdd
 
-        return rdd.RDD_LGMatcher(device, *args, **kwargs)
+        return rdd.RDD_LightGlueMatcher(device, *args, **kwargs)
 
     elif matcher_name == "rdd-aliked":
         from matching.im_models import rdd
@@ -416,7 +416,7 @@ def get_matcher(matcher_name="sift-lg", device="cpu", max_num_keypoints=2048, *a
 
         return lisrd.LISRDMatcher(device, "superpoint", max_num_keypoints, *args, **kwargs)
 
-    elif matcher_name == "lisrd-sp":
+    elif matcher_name == "lisrd-superpoint":
         from matching.im_models import lisrd
 
         return lisrd.LISRDMatcher(device, "superpoint", max_num_keypoints, *args, **kwargs)
