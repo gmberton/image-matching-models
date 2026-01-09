@@ -7,6 +7,7 @@ import warnings
 import os
 import subprocess
 import sys
+import shutil
 import json
 from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
@@ -73,7 +74,8 @@ def benchmark_and_test(matcher, img_size=512, runs=5):
     return np.mean(runtimes), error
 
 
-def main(args):
+def main():
+    args = parse_args()
     # Handle single matcher mode (for subprocess calls)
     if args.single_matcher_json:
         result = run_single_matcher(args.single_matcher_json, args.img_size, args.device)
@@ -91,16 +93,17 @@ def main(args):
         print("\033[0m", end="")
 
         # Run each matcher in a subprocess for isolation
-        cmd = [
-            sys.executable,
-            __file__,
-            "--single-matcher-json",
-            matcher_name,
-            "--img-size",
-            str(args.img_size),
-            "--device",
-            args.device,
-        ]
+        cmd = ["imm-benchmark"] if shutil.which("imm-benchmark") else [sys.executable, __file__]
+        cmd.extend(
+            [
+                "--single-matcher-json",
+                matcher_name,
+                "--img-size",
+                str(args.img_size),
+                "--device",
+                args.device,
+            ]
+        )
 
         # Timeout of 10 minutes because Dust3r is slow to download
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
@@ -120,4 +123,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    main(parse_args())
+    main()

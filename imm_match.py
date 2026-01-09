@@ -13,7 +13,8 @@ from matching import get_matcher, available_models
 from matching.viz import plot_matches
 
 
-def main(args):
+def main():
+    args = parse_args()
     image_size = [args.im_size, args.im_size]
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
@@ -85,5 +86,4 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    main(args)
+    main()
