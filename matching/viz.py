@@ -11,15 +11,6 @@ if not hasattr(sys, "ps1"):
     matplotlib.use("Agg")
 
 
-def clip_img(img: np.ndarray) -> np.ndarray:
-    """
-    Clip image to [0, 1] range.
-    """
-    if img.dtype == np.uint8:
-        img = img.astype(np.float32) / 255.0
-    return np.clip(img, 0, 1)
-
-
 def plot_matches(
     img0: np.ndarray,
     img1: np.ndarray,
@@ -119,7 +110,7 @@ def add_alpha_channel(img: np.ndarray) -> np.ndarray:
         return img
 
 
-def stich(img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, result_dict: dict) -> np.ndarray:
+def stitch(img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, result_dict: dict) -> np.ndarray:
     """Stich two images together.
 
     Args:
@@ -158,9 +149,9 @@ def stich(img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, resu
     H_translation = np.array([[1, 0, translation[0]], [0, 1, translation[1]], [0, 0, 1]])
 
     # warp first image onto stitch
-    stiched_imgs = cv2.warpPerspective(img0, H_translation.dot(result_dict["H"]), (x_max - x_min, y_max - y_min))
+    stitched_imgs = cv2.warpPerspective(img0, H_translation.dot(result_dict["H"]), (x_max - x_min, y_max - y_min))
 
     # overlay second image onto stitch
-    stiched_imgs[translation[1] : translation[1] + h1, translation[0] : translation[0] + w1] = img1
+    stitched_imgs[translation[1] : translation[1] + h1, translation[0] : translation[0] + w1] = img1
 
-    return stiched_imgs
+    return stitched_imgs
