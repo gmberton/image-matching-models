@@ -79,7 +79,7 @@ class BaseMatcher(torch.nn.Module):
             inlier_kpts1 (np.ndarray): inlier kpts in img1
         """
         if len(matched_kpts0) < 4 or self.skip_ransac:  # Sperical matchers like sphereglue skip RANSAC
-            return None, matched_kpts0, matched_kpts1
+            return None, np.empty([0, 2]), np.empty([0, 2])
 
         H, inliers_mask = cv2.findHomography(
             matched_kpts0,

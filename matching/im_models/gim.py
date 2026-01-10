@@ -102,7 +102,7 @@ class GIM_LightGlue(BaseMatcher):
         self.load_weights()
 
     def load_weights(self):
-        state_dict = torch.load(self.ckpt_path, map_location="cpu")
+        state_dict = torch.load(self.ckpt_path, map_location="cpu", weights_only=True)
         if "state_dict" in state_dict.keys():
             state_dict = state_dict["state_dict"]
         for k in list(state_dict.keys()):
@@ -112,7 +112,7 @@ class GIM_LightGlue(BaseMatcher):
                 state_dict[k.replace("superpoint.", "", 1)] = state_dict.pop(k)
         self.detector.load_state_dict(state_dict)
 
-        state_dict = torch.load(self.ckpt_path, map_location="cpu")
+        state_dict = torch.load(self.ckpt_path, map_location="cpu", weights_only=True)
         if "state_dict" in state_dict.keys():
             state_dict = state_dict["state_dict"]
         for k in list(state_dict.keys()):

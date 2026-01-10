@@ -23,7 +23,9 @@ class NewMatcher(BaseMatcher):
 
         self.matcher = model()
 
-        self.matcher.load_state_dict(torch.load(self.model_path, map_location=torch.device("cpu"))["state_dict"])
+        self.matcher.load_state_dict(
+            torch.load(self.model_path, map_location=torch.device("cpu"), weights_only=True)["state_dict"]
+        )
 
     def download_weights(self):
         # check if weights exist, otherwise download them

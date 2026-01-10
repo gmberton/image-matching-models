@@ -36,7 +36,7 @@ class xFeatSteerersMatcher(BaseMatcher):
         self.download_weights()
 
         # Load xfeat-fixed-perm-steerers weights
-        state_dict = torch.load(self.weights_path, map_location="cpu")
+        state_dict = torch.load(self.weights_path, map_location="cpu", weights_only=True)
         for k in list(state_dict):
             state_dict["net." + k] = state_dict[k]
             del state_dict[k]
@@ -45,7 +45,9 @@ class xFeatSteerersMatcher(BaseMatcher):
 
         if steerer_type == "learned":
             self.steerer = torch.nn.Linear(64, 64, bias=False)
-            self.steerer.weight.data = torch.load(self.steerer_weights_path, map_location="cpu")["weight"][..., 0, 0]
+            self.steerer.weight.data = torch.load(self.steerer_weights_path, map_location="cpu", weights_only=True)[
+                "weight"
+            ][..., 0, 0]
             self.steerer.eval()
             self.steerer.to(device)
         else:

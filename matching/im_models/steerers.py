@@ -67,23 +67,36 @@ class SteererMatcher(BaseMatcher):
 
     def build_matcher(self, steerer_type="C8", device="cpu"):
         if steerer_type == "C4":
-            detector = dedode_detector_L(weights=torch.load(self.detector_path_L, map_location=device))
-            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path_B_C4, map_location=device))
-            steerer = DiscreteSteerer(generator=torch.load(self.steerer_path_C, map_location=device))
+            detector = dedode_detector_L(
+                weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
+            )
+            descriptor = dedode_descriptor_B(
+                weights=torch.load(self.descriptor_path_B_C4, map_location=device, weights_only=True)
+            )
+            steerer = DiscreteSteerer(generator=torch.load(self.steerer_path_C, map_location=device, weights_only=True))
             steerer_order = 4
         elif steerer_type == "C8":
-            detector = dedode_detector_L(weights=torch.load(self.detector_path_L, map_location=device))
-            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path_B_SO2, map_location=device))
+            detector = dedode_detector_L(
+                weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
+            )
+            descriptor = dedode_descriptor_B(
+                weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
+            )
             steerer_order = 8
             steerer = DiscreteSteerer(
                 generator=torch.matrix_exp(
-                    (2 * 3.14159 / steerer_order) * torch.load(self.steerer_path_B, map_location=device)
+                    (2 * 3.14159 / steerer_order)
+                    * torch.load(self.steerer_path_B, map_location=device, weights_only=True)
                 )
             )
 
         elif steerer_type == "S02":
-            descriptor = dedode_descriptor_B(weights=torch.load(self.descriptor_path_B_SO2, map_location=device))
-            steerer = ContinuousSteerer(generator=torch.load(self.steerer_path_B, map_location=device))
+            descriptor = dedode_descriptor_B(
+                weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
+            )
+            steerer = ContinuousSteerer(
+                generator=torch.load(self.steerer_path_B, map_location=device, weights_only=True)
+            )
 
         else:
             print(f"Steerer type {steerer_type} not yet implemented")

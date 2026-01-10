@@ -29,7 +29,7 @@ class AspanformerMatcher(BaseMatcher):
         self.matcher = ASpanFormer(config=lower_config(config)["aspan"])
 
         self.matcher.load_state_dict(
-            torch.load(self.weights_path, map_location=self.device)["state_dict"], strict=False
+            torch.load(self.weights_path, map_location=self.device, weights_only=True)["state_dict"], strict=False
         )
 
         self.matcher = self.matcher.to(device).eval()
