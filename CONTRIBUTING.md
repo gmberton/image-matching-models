@@ -1,30 +1,32 @@
-Thanks for your interest in contributing to IMM!
+# To add a new method:
+Let's for example add a matcher called new_matcher.
+1. Copy the template to create a new file: `cp matching/TEMPLATE.py matching/im_models/new_matcher.py`
+2. If the method requires external modules (for example the offical repository of new_matcher), use `git submodule add`: for example, I used this command to add the LightGlue module
+   ```bash
+   git submodule add https://github.com/cvg/LightGlue matching/third_party/LightGlue
+   ```
+   This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `matching/third_party`.
 
-## To add a new method:
+3. In `matching/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`. The template has more details on how to implement the class.
 
-1. Create a new file in the `matching/im_models` folder called `[method].py`
-2. If the method requires external modules, add them to `./matching/third_party` with `git submodule add`: for example, I've used this command to add the LightGlue module which is automatically downloaded when using `--recursive`
-
-```bash
-git submodule add https://github.com/cvg/LightGlue matching/third_party/LightGlue
-```
-This command automatically modifies `.gitmodules` (and modifying it manually doesn't work).
-
-3. Add the method by subclassing `BaseMatcher` and implementing `_forward`, which takes two image tensors as input and returns a dict with keys `['num_inliers','H', 'mkpts0', 'mkpts1', 'inliers0', 'inliers1', 'kpts0', 'kpts1', 'desc0', desc1']`. The value of any key may be 0, if that model does not produce that output, but they key must exist. See `matching/TEMPLATE.py` for an example.
-<br></br>You may also want to implement `preprocess`, `download_weights`, and anything else necessary to make the model easy to run. 
-
-4. Open `__init__.py` and add the model name (all lowercase) to the `available_models` list.
-<br></br>Add an `elif` case to `get_matcher()` with this model name, following the template from the other matchers. 
+4. Open `matching/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
 
 5. If it requires additional dependencies, add them to `requirements.txt` or to the `[project.optional-dependencies]` of `pyproject.toml`.
 
 6. Format the code with [ruff](https://github.com/astral-sh/ruff)
-```
-ruff format .
-ruff check --fix .
-```
+   ```
+   ruff format .
+   ruff check --fix .
+   ```
 
-7. Test your model and submit a PR!
+7. Test your model. Make sure the model weights are downloaded automatically in the code, either with huggingface_hub (if on HF), gdown (if on GDrive), or py3_wget (any other platform or HTTP URL).
+   ```
+   # Run this and have a look at the generated images in outputs_new_matcher
+   python imm_match.py --matcher new_matcher --out_dir outputs_new_matcher
+   # Run this and make sure it passes the test
+   python imm_benchmark.py --matcher new_matcher
+   ```
+   Now submit a PR!
 
 Note: as authors update their model repos, consider updating the submodule reference here using the below:
 To update a submodule to the head of the remote, run 
@@ -32,7 +34,10 @@ To update a submodule to the head of the remote, run
 git submodule update --remote matching/third_party/[submodule_name]
 ```
 
-## Adding models to the Hugging Face Hub:
+## Optional: add docs
+You can create the file `docs/new_matcher.md` to explain how the model is used. This is especially useful if the model has multiple hyperparameters.
+
+## Optional: adding model weights to the Hugging Face Hub
 
 Although not mandatory, we encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/image-matching-models). This will increase model visibility and help track usage of each model.
 
@@ -52,7 +57,7 @@ model_path = "eloftr_outdoor.ckpt"
 gdown.download(weights_src, output=model_path, fuzzy=True)
 ```
 
-2. Save the state dict as a [safetensor](https://huggingface.co/docs/safetensors/en/index)
+2. Although weights can be uploaded as PyTorch file, safetensor is preferred. Save the state dict as a [safetensor](https://huggingface.co/docs/safetensors/en/index)
 ```py
 state_dict = torch.load(model_path, map_location=torch.device("cpu"), weights_only=False)["state_dict"]
 save_file(state_dict, "eloftr_outdoors.safetensors")
