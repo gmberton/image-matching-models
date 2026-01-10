@@ -173,15 +173,9 @@ class BaseMatcher(torch.nn.Module):
         }
 
     def extract(self, img: str | Path | torch.Tensor) -> dict:
-        # Take as input a pair of images (not a batch)
-        if isinstance(img, (str, Path)):
-            img = BaseMatcher.load_image(img)
-
-        assert isinstance(img, torch.Tensor)
-        img = img.to(self.device)
-        matched_kpts0, _, all_kpts0, _, all_desc0, _ = self._forward(img, img)
-        kpts = matched_kpts0 if isinstance(self, EnsembleMatcher) else all_kpts0
-        return {"all_kpts0": to_numpy(kpts), "all_desc0": to_numpy(all_desc0)}
+        result = self.forward(img, img)
+        kpts = result["matched_kpts0"] if isinstance(self, EnsembleMatcher) else result["all_kpts0"]
+        return {"all_kpts0": kpts, "all_desc0": result["all_desc0"]}
 
     @staticmethod
     def get_empty_array_if_none(array):
