@@ -137,7 +137,7 @@ class BaseMatcher(torch.nn.Module):
         matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1 = self._forward(img0, img1)
 
         # Check that returned objects are of accepted types (nd.array, torch.tensor or None)
-        self.sanity_check_1(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
+        self.check_types(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
 
         # Convert torch tensors to numpy. None objects stay None
         matched_kpts0, matched_kpts1 = to_numpy(matched_kpts0), to_numpy(matched_kpts1)
@@ -154,7 +154,7 @@ class BaseMatcher(torch.nn.Module):
         all_desc1 = self.get_empty_array_if_none(all_desc1)
 
         # Check that shapes are correct and consistent
-        self.sanity_check_2(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
+        self.check_shapes(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
 
         # Compute RANSAC to obtain the inliers and homography matrix
         H, inlier_kpts0, inlier_kpts1 = self.compute_ransac(matched_kpts0, matched_kpts1)
@@ -184,7 +184,7 @@ class BaseMatcher(torch.nn.Module):
         return array
 
     @staticmethod
-    def sanity_check_1(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
+    def check_types(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
         """Check that objects are of accepted types (nd.array, torch.tensor or None)"""
 
         def is_array_or_tensor_or_none(data):
@@ -198,7 +198,7 @@ class BaseMatcher(torch.nn.Module):
         assert is_array_or_tensor_or_none(all_desc1)
 
     @staticmethod
-    def sanity_check_2(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
+    def check_shapes(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
         """Check that objects have appropriate shapes, e.g. keypoints should have shape (N, 2)"""
 
         def check_kpts(np_array):
