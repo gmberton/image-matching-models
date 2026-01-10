@@ -32,7 +32,7 @@ def plot_matches(
     Returns:
         List[plt.Axes]: plot axes
     """
-    ax = viz2d.plot_images([img0, img1])
+    ax = viz2d.plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])
 
     if show_matched_kpts and "matched_kpts0" in result.keys():
         viz2d.plot_matches(
@@ -80,7 +80,7 @@ def plot_kpts(img0, result, model_name="", save_path=None):
     """
     if len(model_name):
         model_name = " - " + model_name
-    ax = viz2d.plot_images([img0])
+    ax = viz2d.plot_images([np.clip(img0, 0, 1)])
     viz2d.plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
     viz2d.add_text(0, f"{len(result['all_kpts0'])} kpts" + model_name, fs=20)
     if model_name is not None:
