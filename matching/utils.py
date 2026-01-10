@@ -67,6 +67,9 @@ def to_numpy(x: torch.Tensor | np.ndarray | dict | list) -> np.ndarray:
         return x.cpu().numpy()
     if isinstance(x, np.ndarray):
         return x
+    if x is None:
+        return
+    raise NotImplementedError(f"to_numpy not implemented for data type {type(x)}")
 
 
 def to_tensor(x: np.ndarray | torch.Tensor, device: str = None) -> torch.Tensor:

@@ -1,3 +1,9 @@
+"""
+This script runs a simple test over all (or few chosen) matchers. The test passes if the
+homography between two images is computed correctly. The two images are generated synthetically,
+as one is a warping of the other.
+"""
+
 from matching import get_matcher, available_models, get_default_device
 from argparse import ArgumentParser
 import cv2
@@ -90,6 +96,10 @@ def main():
     print("-" * 58)
 
     for matcher_name in args.matchers:
+        if matcher_name in ["sift-sphereglue", "superpoint-sphereglue"]:
+            # Sperical matchers can't be tested on homography
+            continue
+
         print("\033[0m", end="")
 
         # Run each matcher in a subprocess for isolation
@@ -116,7 +126,7 @@ def main():
                 print(f"{matcher_name:<30} {output['runtime']:.3f}      {status_with_error:<15}")
             else:
                 error_msg = output["error"]
-                pretty_error = error_msg if len(error_msg) < 100 else error_msg[:100] + "..."
+                pretty_error = error_msg if len(error_msg) < 100 else error_msg[:200] + "..."
                 print(f"{matcher_name:<30} error: {pretty_error}")
         except (json.JSONDecodeError, KeyError, subprocess.TimeoutExpired):
             print(f"{matcher_name:<30} error: subprocess failed or timed out")

@@ -136,7 +136,7 @@ class R2D2Matcher(BaseMatcher):
         mkpts0 = kpts0[match_ids[:, 0], :2].cpu().numpy()
         mkpts1 = kpts1[match_ids[:, 1], :2].cpu().numpy()
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0[:, :2], kpts1[:, :2], desc0, desc1
 
 
 class D2netMatcher(BaseMatcher):

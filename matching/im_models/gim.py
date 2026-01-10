@@ -184,4 +184,4 @@ class GIM_LightGlue(BaseMatcher):
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         # mconf = torch.cat(pred['scores'])
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0, kpts1, desc0[0], desc1[0]

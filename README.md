@@ -51,7 +51,7 @@ SIFT and DeDoDe
 
 ## Install
 
-Clone recursively and installed packages:
+Clone recursively and install packages:
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models

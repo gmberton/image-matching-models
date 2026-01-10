@@ -53,10 +53,6 @@ available_models = [
     "xfeat",
     "xfeat-star",
     "xfeat-lightglue",
-    # "xfeat-steerers-perm",
-    # "xfeat-steerers-learned",
-    # "xfeat-star-steerers-perm",
-    # "xfeat-star-steerers-learned",
     "dedode-lightglue",
     "gim-dkm",
     "gim-lightglue",
@@ -88,6 +84,10 @@ available_models = [
     "topicfm",
     "topicfm-plus",
     "silk",
+    # "xfeat-steerers-perm",  # Temporarily commented as weights are unavailable
+    # "xfeat-steerers-learned",
+    # "xfeat-star-steerers-perm",
+    # "xfeat-star-steerers-learned",
 ]
 
 

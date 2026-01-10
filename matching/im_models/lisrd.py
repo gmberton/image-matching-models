@@ -88,6 +88,9 @@ class LISRDMatcher(BaseMatcher):
             mkpts1,
             keypoints0,
             keypoints1,
-            desc0,
-            desc1,
+            None,
+            None,
+            # desc0,
+            # desc1,
         )
+        # lisrd has N x 4 x D dimensional descriptors, inconsistent with other methods, hence return None as descs

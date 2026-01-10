@@ -17,19 +17,16 @@ class BaseMatcher(torch.nn.Module):
     homography estimator
     """
 
-    # OpenCV default ransac params
-    DEFAULT_RANSAC_ITERS = 2000
-    DEFAULT_RANSAC_CONF = 0.95
-    DEFAULT_REPROJ_THRESH = 3
-
     def __init__(self, device="cpu", **kwargs):
         super().__init__()
         self.device = device
 
         self.skip_ransac = False
-        self.ransac_iters = kwargs.get("ransac_iters", BaseMatcher.DEFAULT_RANSAC_ITERS)
-        self.ransac_conf = kwargs.get("ransac_conf", BaseMatcher.DEFAULT_RANSAC_CONF)
-        self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", BaseMatcher.DEFAULT_REPROJ_THRESH)
+
+        # OpenCV default ransac params
+        self.ransac_iters = kwargs.get("ransac_iters", 2000)
+        self.ransac_conf = kwargs.get("ransac_conf", 0.95)
+        self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", 3)
 
     @property
     def name(self):
@@ -67,24 +64,7 @@ class BaseMatcher(torch.nn.Module):
         """
         return to_px_coords(to_normalized_coords(pts, h_new, w_new), h_orig, w_orig)
 
-    @staticmethod
-    def find_homography(
-        points1: np.ndarray | torch.Tensor,
-        points2: np.ndarray | torch.Tensor,
-        reproj_thresh: int = DEFAULT_REPROJ_THRESH,
-        num_iters: int = DEFAULT_RANSAC_ITERS,
-        ransac_conf: float = DEFAULT_RANSAC_CONF,
-    ):
-        assert points1.shape == points2.shape
-        assert points1.shape[1] == 2
-        points1, points2 = to_numpy(points1), to_numpy(points2)
-
-        H, inliers_mask = cv2.findHomography(points1, points2, cv2.USAC_MAGSAC, reproj_thresh, ransac_conf, num_iters)
-        assert inliers_mask.shape[1] == 1
-        inliers_mask = inliers_mask[:, 0]
-        return H, inliers_mask.astype(bool)
-
-    def process_matches(
+    def compute_ransac(
         self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Process matches into inliers and the respective Homography using RANSAC.
@@ -94,38 +74,26 @@ class BaseMatcher(torch.nn.Module):
             matched_kpts1 (np.ndarray): matching kpts from img1
 
         Returns:
-            Tuple[np.ndarray, np.ndarray, np.ndarray]: Homography matrix from img0 to img1, inlier kpts in img0, inlier kpts in img1
+            H (np.ndarray): (3 x 3) homography matrix from img0 to img1. Can be None if no homography is found
+            inlier_kpts0 (np.ndarray): inlier kpts in img0
+            inlier_kpts1 (np.ndarray): inlier kpts in img1
         """
-        if len(matched_kpts0) < 4 or self.skip_ransac:
+        if len(matched_kpts0) < 4 or self.skip_ransac:  # Sperical matchers like sphereglue skip RANSAC
             return None, matched_kpts0, matched_kpts1
 
-        H, inliers_mask = self.find_homography(
+        H, inliers_mask = cv2.findHomography(
             matched_kpts0,
             matched_kpts1,
+            cv2.USAC_MAGSAC,
             self.ransac_reproj_thresh,
-            self.ransac_iters,
             self.ransac_conf,
+            self.ransac_iters,
         )
+        inliers_mask = inliers_mask[:, 0].astype(bool)
         inlier_kpts0 = matched_kpts0[inliers_mask]
         inlier_kpts1 = matched_kpts1[inliers_mask]
 
         return H, inlier_kpts0, inlier_kpts1
-
-    def preprocess(self, img: torch.Tensor) -> Tuple[torch.Tensor, Tuple[int, int]]:
-        """Image preprocessing for each matcher. Some matchers require grayscale, normalization, etc.
-        Applied to each input img independently
-
-        Default preprocessing is none
-
-        Args:
-            img (torch.Tensor): input image (before preprocessing)
-
-        Returns:
-            img, (H,W) (Tuple[torch.Tensor, Tuple[int, int]]): img after preprocessing, original image shape
-        """
-        _, h, w = img.shape
-        orig_shape = h, w
-        return img, orig_shape
 
     @torch.inference_mode()
     def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path) -> dict:
@@ -168,16 +136,36 @@ class BaseMatcher(torch.nn.Module):
         # self._forward() is implemented by the children modules
         matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1 = self._forward(img0, img1)
 
+        # Check that returned objects are of accepted types (nd.array, torch.tensor or None)
+        self.sanity_check_1(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
+
+        # Convert torch tensors to numpy. None objects stay None
         matched_kpts0, matched_kpts1 = to_numpy(matched_kpts0), to_numpy(matched_kpts1)
-        H, inlier_kpts0, inlier_kpts1 = self.process_matches(matched_kpts0, matched_kpts1)
+        all_kpts0, all_kpts1 = to_numpy(all_kpts0), to_numpy(all_kpts1)
+        all_desc0, all_desc1 = to_numpy(all_desc0), to_numpy(all_desc1)
+
+        # Some models might return kpts=None if no kpts are found. In this case, set an empty array with dim (0, 2)
+        matched_kpts0 = self.get_empty_array_if_none(matched_kpts0)
+        matched_kpts1 = self.get_empty_array_if_none(matched_kpts1)
+        all_kpts0 = self.get_empty_array_if_none(all_kpts0)
+        all_kpts1 = self.get_empty_array_if_none(all_kpts1)
+        # Same for descriptors: if it is empty set as descriptor an array with dim (0, 2)
+        all_desc0 = self.get_empty_array_if_none(all_desc0)
+        all_desc1 = self.get_empty_array_if_none(all_desc1)
+
+        # Check that shapes are correct and consistent
+        self.sanity_check_2(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1)
+
+        # Compute RANSAC to obtain the inliers and homography matrix
+        H, inlier_kpts0, inlier_kpts1 = self.compute_ransac(matched_kpts0, matched_kpts1)
 
         return {
             "num_inliers": len(inlier_kpts0),
             "H": H,
-            "all_kpts0": to_numpy(all_kpts0),
-            "all_kpts1": to_numpy(all_kpts1),
-            "all_desc0": to_numpy(all_desc0),
-            "all_desc1": to_numpy(all_desc1),
+            "all_kpts0": all_kpts0,
+            "all_kpts1": all_kpts1,
+            "all_desc0": all_desc0,
+            "all_desc1": all_desc1,
             "matched_kpts0": matched_kpts0,
             "matched_kpts1": matched_kpts1,
             "inlier_kpts0": inlier_kpts0,
@@ -190,14 +178,53 @@ class BaseMatcher(torch.nn.Module):
             img = BaseMatcher.load_image(img)
 
         assert isinstance(img, torch.Tensor)
-
         img = img.to(self.device)
-
         matched_kpts0, _, all_kpts0, _, all_desc0, _ = self._forward(img, img)
-
         kpts = matched_kpts0 if isinstance(self, EnsembleMatcher) else all_kpts0
-
         return {"all_kpts0": to_numpy(kpts), "all_desc0": to_numpy(all_desc0)}
+
+    @staticmethod
+    def get_empty_array_if_none(array):
+        if array is None or array.size == 0:
+            return np.empty([0, 2])
+        return array
+
+    @staticmethod
+    def sanity_check_1(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
+        """Check that objects are of accepted types (nd.array, torch.tensor or None)"""
+
+        def is_array_or_tensor_or_none(data):
+            return data is None or isinstance(data, np.ndarray) or isinstance(data, torch.Tensor)
+
+        assert is_array_or_tensor_or_none(matched_kpts0)
+        assert is_array_or_tensor_or_none(matched_kpts1)
+        assert is_array_or_tensor_or_none(all_kpts0)
+        assert is_array_or_tensor_or_none(all_kpts1)
+        assert is_array_or_tensor_or_none(all_desc0)
+        assert is_array_or_tensor_or_none(all_desc1)
+
+    @staticmethod
+    def sanity_check_2(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
+        """Check that objects have appropriate shapes, e.g. keypoints should have shape (N, 2)"""
+
+        def check_kpts(np_array):
+            """Keypoint arrays should be in the form of N x 2"""
+            return np_array.ndim == 2 and np_array.shape[1] == 2
+
+        assert check_kpts(matched_kpts0), f"matched_kpts0 shape should be (N x 2) but it is {matched_kpts0.shape}"
+        assert check_kpts(matched_kpts1), f"matched_kpts1 shape should be (N x 2) but it is {matched_kpts1.shape}"
+        assert check_kpts(all_kpts0), f"all_kpts0 shape should be (N x 2) but it is {all_kpts0.shape}"
+        assert check_kpts(all_kpts1), f"all_kpts1 shape should be (N x 2) but it is {all_kpts1.shape}"
+        # Number of matched_kpts should be equal from both images
+        assert matched_kpts0.shape == matched_kpts1.shape, f"{matched_kpts0.shape} != {matched_kpts1.shape}"
+        # Descriptors should have shape (N x D)
+        assert all_desc0.ndim == 2, str(all_desc0.shape)
+        assert all_desc1.ndim == 2, str(all_desc1.shape)
+        # Some models return no descriptors. If there are descriptors, there should be as many keypoints as descriptors.
+        if all_desc0.shape[0] != 0:
+            assert all_desc0.shape[0] == all_kpts0.shape[0], f"{all_desc0.shape[0]} != {all_kpts0.shape[0]}"
+        if all_desc1.shape[0] != 0:
+            assert all_desc1.shape[0] == all_kpts1.shape[0], f"{all_desc1.shape[0]} != {all_kpts1.shape[0]}"
 
 
 class EnsembleMatcher(BaseMatcher):
@@ -205,7 +232,6 @@ class EnsembleMatcher(BaseMatcher):
         from matching import get_matcher
 
         super().__init__(device, **kwargs)
-
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
 
     def _forward(self, img0: torch.Tensor, img1: torch.Tensor) -> Tuple[np.ndarray, np.ndarray, None, None, None, None]:

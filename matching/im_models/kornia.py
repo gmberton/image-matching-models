@@ -69,4 +69,4 @@ class DeDoDeLightGlue(BaseMatcher):
         mkpts0 = kpts0.squeeze()[matching_idxs[:, 0]]
         mkpts1 = kpts1.squeeze()[matching_idxs[:, 1]]
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0[0], kpts1[0], desc0[0], desc1[0]

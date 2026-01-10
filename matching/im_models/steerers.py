@@ -139,4 +139,4 @@ class SteererMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1
+        return mkpts0, mkpts1, keypoints_0[0], keypoints_1[0], description_0[0], description_1[0]

@@ -149,4 +149,4 @@ class DedodeKorniaMatcher(BaseMatcher):
             threshold=self.threshold,  # Increasing threshold -> fewer matches, fewer outliers
         )
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, description_0, description_1
+        return mkpts0, mkpts1, keypoints_0[0], keypoints_1[0], description_0[0], description_1[0]
