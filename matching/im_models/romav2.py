@@ -1,7 +1,7 @@
 import torch
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
-from matching.utils import add_to_path, to_numpy
+from matching.utils import add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RoMaV2/src"))
 
@@ -56,9 +56,5 @@ class RoMaV2Matcher(BaseMatcher):
         matches, confidence, precision_AB, precision_BA = self.romav2_model.sample(preds, self.max_keypoints)
 
         mkpts0, mkpts1 = self.romav2_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
-
-        # Convert to numpy
-        mkpts0 = to_numpy(mkpts0)
-        mkpts1 = to_numpy(mkpts1)
 
         return mkpts0, mkpts1, None, None, None, None

@@ -62,12 +62,12 @@ class NewMatcher(BaseMatcher):
         output = self.matcher(batch)
 
         # postprocess model output to get kpts, desc, etc
-        desc0 = to_numpy(output["desc0"].cpu().numpy())
-        desc1 = to_numpy(output["desc1"].cpu().numpy())
-        keypoints_0 = to_numpy(output["keypoints0"].cpu().numpy())
-        keypoints_1 = to_numpy(output["keypoints1"].cpu().numpy())
-        mkpts0 = to_numpy(output["mkpts0"].cpu().numpy())
-        mkpts1 = to_numpy(output["mkpts1"].cpu().numpy())
+        desc0 = output["desc0"]
+        desc1 = output["desc1"]
+        keypoints_0 = output["keypoints0"]
+        keypoints_1 = output["keypoints1"]
+        mkpts0 = output["mkpts0"]
+        mkpts1 = output["mkpts1"]
 
         # if we had to resize the img to divisible, then rescale the kpts back to input img size
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]

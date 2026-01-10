@@ -3,7 +3,7 @@ from argparse import Namespace
 from huggingface_hub import hf_hub_download
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, add_to_path
+from matching.utils import add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"), insert=0)
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA/third_party/RoMa"))
@@ -44,8 +44,8 @@ class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
         batch = {"image0": img0, "image1": img1}
         batch = self.matcher(batch)
 
-        mkpts0 = to_numpy(batch["keypoints0"])
-        mkpts1 = to_numpy(batch["keypoints1"])
+        mkpts0 = batch["keypoints0"]
+        mkpts1 = batch["keypoints1"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
@@ -76,8 +76,8 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
 
         self.matcher(batch)
 
-        mkpts0 = to_numpy(batch["mkpts0_f"])
-        mkpts1 = to_numpy(batch["mkpts1_f"])
+        mkpts0 = batch["mkpts0_f"]
+        mkpts1 = batch["mkpts1_f"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
@@ -144,8 +144,8 @@ class MINIMAXoFTRMatcher(MINIMAMatcher):
 
         self.matcher(batch)
 
-        mkpts0 = to_numpy(batch["mkpts0_f"])
-        mkpts1 = to_numpy(batch["mkpts1_f"])
+        mkpts0 = batch["mkpts0_f"]
+        mkpts1 = batch["mkpts1_f"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)

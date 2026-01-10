@@ -12,7 +12,6 @@ from kornia.color import rgb_to_grayscale
 from safetensors.torch import load_file
 
 from matching import BaseMatcher
-from matching.utils import to_numpy
 
 
 def simple_nms(scores, radius=4):
@@ -400,11 +399,4 @@ class SilkMatcher(BaseMatcher):
         all_kpts0 = kpts0[:, :2][:, [1, 0]] if len(kpts0) > 0 else torch.zeros((0, 2), device=self.device)
         all_kpts1 = kpts1[:, :2][:, [1, 0]] if len(kpts1) > 0 else torch.zeros((0, 2), device=self.device)
 
-        return (
-            to_numpy(mkpts0),
-            to_numpy(mkpts1),
-            to_numpy(all_kpts0),
-            to_numpy(all_kpts1),
-            to_numpy(desc0),
-            to_numpy(desc1),
-        )
+        return mkpts0, mkpts1, all_kpts0, all_kpts1, desc0, desc1

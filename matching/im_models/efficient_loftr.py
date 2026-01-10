@@ -6,7 +6,7 @@ import torchvision.transforms as tfm
 
 
 from matching import THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, add_to_path
+from matching.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("EfficientLoFTR"), insert=0)
 
@@ -52,8 +52,8 @@ class EfficientLoFTRMatcher(BaseMatcher):
         else:
             self.matcher(batch)
 
-        mkpts0 = to_numpy(batch["mkpts0_f"])
-        mkpts1 = to_numpy(batch["mkpts1_f"])
+        mkpts0 = batch["mkpts0_f"]
+        mkpts1 = batch["mkpts1_f"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)

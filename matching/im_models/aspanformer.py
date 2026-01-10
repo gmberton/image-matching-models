@@ -5,7 +5,7 @@ import torchvision.transforms as tfm
 import tarfile
 
 from matching import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
-from matching.utils import to_numpy, resize_to_divisible, lower_config, add_to_path
+from matching.utils import resize_to_divisible, lower_config, add_to_path
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("aspanformer")
 add_to_path(BASE_PATH)
@@ -61,8 +61,8 @@ class AspanformerMatcher(BaseMatcher):
         batch = {"image0": img0, "image1": img1}
         self.matcher(batch)
 
-        mkpts0 = to_numpy(batch["mkpts0_f"])
-        mkpts1 = to_numpy(batch["mkpts1_f"])
+        mkpts0 = batch["mkpts0_f"]
+        mkpts1 = batch["mkpts1_f"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
