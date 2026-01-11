@@ -571,7 +571,8 @@ def run_matching(
         img0=image0,
         img1=image1,
         result=pred,
-        show_matched_kpts=False,
+        show_matched_kpts=True,
+        show_inlier_kpts=False,
         show_all_kpts=True,
     )
     output_matches_raw = plot_to_array(fig_output_matches_raw)
