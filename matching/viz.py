@@ -73,8 +73,11 @@ def plot_matches(
             ratio = "N/A"
         viz2d.add_text(
             0,
-            "KeyPoints: {}\n{}, inliers: {} matches\n({}) inlier ratio)".format(
-                kpts_info, len(result["matched_kpts1"]), len(result["inlier_kpts0"]), ratio
+            "{}\nInliers: {} / {} \n({}) inlier ratio)".format(
+                kpts_info,
+                len(result["inlier_kpts0"]),
+                len(result["matched_kpts0"]),
+                ratio,
             ),
             fs=17,
             lwidth=2,
