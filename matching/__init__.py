@@ -1,10 +1,11 @@
 """
 File to import matchers. The module's import are within the functions, so that
-a module is imported only iff needed, reducing the number of raised errors and
+a module is imported only if needed, reducing the number of raised errors and
 warnings due to unused modules.
 """
 
 from pathlib import Path
+from types import ModuleType
 from .utils import add_to_path, get_default_device  # noqa: F401 - for quick import later 'from matching import get_default_device'
 from .base_matcher import BaseMatcher  # noqa: F401 - for quick import later 'from matching import BaseMatcher'
 
@@ -91,13 +92,19 @@ available_models = [
 ]
 
 
-def get_version(pkg):
+def get_version(pkg: ModuleType) -> tuple[int, int, int]:
     version_num = pkg.__version__.split("-")[0]
     major, minor, patch = [int(num) for num in version_num.split(".")]
     return major, minor, patch
 
 
-def get_matcher(matcher_name="sift-lightglue", device="cpu", max_num_keypoints=2048, *args, **kwargs):
+def get_matcher(
+    matcher_name: str | list[str] = "sift-lightglue",
+    device: str = "cpu",
+    max_num_keypoints: int = 2048,
+    *args,
+    **kwargs,
+) -> BaseMatcher:
     if isinstance(matcher_name, list):
         from matching.base_matcher import EnsembleMatcher
 

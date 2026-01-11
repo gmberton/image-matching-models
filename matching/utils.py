@@ -6,11 +6,23 @@ import torchvision.transforms as tfm
 from yacs.config import CfgNode as CN
 import sys
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
-def get_image_pairs_paths(inputs):
+def get_image_pairs_paths(inputs: list[Path] | Path) -> list[tuple[Path, Path]]:
+    """process input to produce a list of image pairs paths
+
+    Args:
+        inputs (list[Path] | Path): input path, which could be one of:
+            (1) two image paths
+            (2) dir with two images
+            (3) dir with dirs with image pairs
+            (4) txt file with two image paths per line
+
+    Returns:
+        list[tuple[Path, Path]]: list of pairs of image paths
+    """
     if len(inputs) > 2:
         raise ValueError(f"--input should be one or two paths, not {len(inputs)} paths like {inputs}")
 
@@ -89,36 +101,20 @@ def to_tensor(x: np.ndarray | torch.Tensor, device: str = None) -> torch.Tensor:
 
     if device is not None:
         return x.to(device)
+    else:
+        return x
 
 
-def dict_to_device(data_dict, device: str = "cuda"):
-    """Recursively move tensor values in a dict to `device`."""
-    data_dict_device = {}
-    for k, v in data_dict.items():
-        if isinstance(v, torch.Tensor):
-            data_dict_device[k] = v.to(device)
-        elif isinstance(v, dict):
-            data_dict_device[k] = dict_to_device(v, device=device)
-        elif isinstance(v, list):
-            data_dict_device[k] = list_to_device(v, device=device)
-        else:
-            data_dict_device[k] = v
-    return data_dict_device
-
-
-def list_to_device(data_list, device: str = "cuda"):
-    """Recursively move tensor values in a list to `device`."""
-    data_list_device = []
-    for obj in data_list:
-        if isinstance(obj, torch.Tensor):
-            data_list_device.append(obj.to(device))
-        elif isinstance(obj, dict):
-            data_list_device.append(dict_to_device(obj, device=device))
-        elif isinstance(obj, list):
-            data_list_device.append(list_to_device(obj, device=device))
-        else:
-            data_list_device.append(obj)
-    return data_list_device
+def to_device(data: torch.Tensor | dict | list, device: str = "cuda"):
+    """Recursively move tensors in nested data structures to `device`."""
+    if isinstance(data, torch.Tensor):
+        return data.to(device)
+    elif isinstance(data, dict):
+        return {k: to_device(v, device) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [to_device(item, device) for item in data]
+    else:
+        return data
 
 
 def to_normalized_coords(pts: np.ndarray | torch.Tensor, height: int, width: int):
@@ -182,7 +178,8 @@ def resize_to_divisible(img: torch.Tensor, divisible_by: int = 14) -> torch.Tens
     return img
 
 
-def lower_config(yacs_cfg):
+def lower_config(yacs_cfg: CN) -> dict:
+    """Convert yacs config to lower-case dict recursively."""
     if not isinstance(yacs_cfg, CN):
         return yacs_cfg
     return {k.lower(): lower_config(v) for k, v in yacs_cfg.items()}
@@ -207,7 +204,13 @@ def load_module(module_name: str, module_path: Path | str) -> None:
     spec.loader.exec_module(module)
 
 
-def add_to_path(path: str | Path, insert=None) -> None:
+def add_to_path(path: str | Path, insert: int | None = None) -> None:
+    """Add input path to sys.path ($PATH), allowing for imports from the specified path
+
+    Args:
+        path (str | Path): path to add to sys.path
+        insert (int | None, optional): insert location / order. Defaults to None, which inserts at end of sys.path
+    """
     path = str(path)
     if path in sys.path:
         sys.path.remove(path)
@@ -217,19 +220,34 @@ def add_to_path(path: str | Path, insert=None) -> None:
         sys.path.insert(insert, path)
 
 
-def get_default_device():
+def get_default_device() -> str:
+    """get best available device for torch: cuda, mps (mac), else cpu
+
+    Returns:
+        str: best available device as str
+    """
+    # default device is cpu
     device = "cpu"
 
+    # test for mac device (darwin) and mps availability
     if sys.platform == "darwin" and torch.backends.mps.is_available():
         device = "mps"
 
+    # check cuda availability
     elif torch.cuda.is_available():
         device = "cuda"
 
     return device
 
 
-def flow_to_matches(flow, covisibility, num_samples=1000, min_confidence=0.0, method="probabilistic", rng=None):
+def flow_to_matches(
+    flow: np.ndarray,
+    covisibility: np.ndarray,
+    num_samples: int = 1000,
+    min_confidence: float = 0.0,
+    method: str = "probabilistic",
+    rng: np.random.RandomState | np.random.Generator = None,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Convert a dense optical flow + covisibility map to sparse keypoint matches.
 
     Args:
