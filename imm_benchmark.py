@@ -13,7 +13,6 @@ import warnings
 import os
 import subprocess
 import sys
-import shutil
 import json
 from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
@@ -103,7 +102,7 @@ def main():
         print("\033[0m", end="")
 
         # Run each matcher in a subprocess for isolation
-        cmd = ["imm-benchmark"] if shutil.which("imm-benchmark") else [sys.executable, __file__]
+        cmd = [sys.executable, "-m", "imm_benchmark"]
         cmd.extend(
             [
                 "--single-matcher-json",
