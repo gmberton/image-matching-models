@@ -67,6 +67,8 @@ pip install .[all]
 
 ## Use
 
+### Python API
+
 You can use any of the over 50 matchers simply like this. You never need to download weights, it's all taken care in the code.
 ```python
 from matching import get_matcher
@@ -91,6 +93,8 @@ result = matcher.extract(img0)
 plot_kpts(img0, result, save_path="plot_kpts.png")
 ```
 
+### Command Line Interface
+
 You can also run matching or extraction as standalone scripts, to get the same results as above. Matching:
 ```bash
 python imm_match.py --matcher superpoint-lightglue --out_dir outputs_superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
@@ -108,6 +112,22 @@ python imm_match.py -h
 # or
 python imm_extract.py -h
 ```
+
+### Web UI
+
+<details>
+<summary><strong>Basic Usage Commands</strong> (click to expand)</summary>
+
+To launch the web interface:
+
+```bash
+python app.py
+```
+
+The interface will be available at `http://localhost:7860`.
+
+The Web UI is based on [image-matching-webui](https://github.com/Vincentqyw/image-matching-webui) by Vincent Qin, adapted to work with the image-matching-models library.
+</details>
 
 
 ## Available Models
