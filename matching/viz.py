@@ -34,7 +34,7 @@ def plot_matches(
     Returns:
         List[plt.Axes]: plot axes
     """
-    fig, ax = plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])  # fix: original function reterns nothing
+    fig, ax = plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])  # fix: original function returns nothing
 
     if show_matched_kpts and "matched_kpts0" in result.keys():
         viz2d.plot_matches(
@@ -46,9 +46,7 @@ def plot_matches(
         )
 
     if show_all_kpts and result["all_kpts0"] is not None:
-        viz2d.plot_keypoints(
-            [result["all_kpts0"], result["all_kpts1"]], colors="red", ps=2
-        )
+        viz2d.plot_keypoints([result["all_kpts0"], result["all_kpts1"]], colors="red", ps=2)
         kpts_info = f"#Img0 kpts: {len(result['all_kpts0'])}\n#Img1 kpts: {len(result['all_kpts1'])}"
         viz2d.add_text(
             0,
@@ -59,7 +57,6 @@ def plot_matches(
     else:
         # use raw matches num
         kpts_info = "N/A"
-
 
     if show_inlier_kpts and "inlier_kpts0" in result.keys():
         viz2d.plot_matches(
@@ -91,6 +88,7 @@ def plot_matches(
 
     return fig, ax
 
+
 # ref: https://github.com/cvg/LightGlue/blob/1fd587b6f5a7a0befd31188f1e5d2f05740006d7/lightglue/viz2d.py
 def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True):
     """Plot a set of images horizontally.
@@ -102,9 +100,7 @@ def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
     """
     # conversion to (H, W, 3) for torch.Tensor
     imgs = [
-        img.permute(1, 2, 0).cpu().numpy()
-        if (isinstance(img, torch.Tensor) and img.dim() == 3)
-        else img
+        (img.permute(1, 2, 0).cpu().numpy() if (isinstance(img, torch.Tensor) and img.dim() == 3) else img)
         for img in imgs
     ]
 
@@ -117,9 +113,7 @@ def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
     else:
         ratios = [4 / 3] * n
     figsize = [sum(ratios) * 4.5, 4.5]
-    fig, ax = plt.subplots(
-        1, n, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": ratios}
-    )
+    fig, ax = plt.subplots(1, n, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": ratios})
     if n == 1:
         ax = [ax]
     for i in range(n):
@@ -150,7 +144,7 @@ def plot_kpts(img0, result, model_name="", save_path=None):
     """
     if len(model_name):
         model_name = " - " + model_name
-    ax = plot_images([np.clip(img0, 0, 1)])
+    _, ax = plot_images([np.clip(img0, 0, 1)])
     viz2d.plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
     viz2d.add_text(0, f"{len(result['all_kpts0'])} kpts" + model_name, fs=20)
     if model_name is not None:
