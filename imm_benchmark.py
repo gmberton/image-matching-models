@@ -126,7 +126,7 @@ def main():
                 print(f"{matcher_name:<30} {output['runtime']:.3f}      {status_with_error:<15}")
             else:
                 error_msg = output["error"]
-                pretty_error = error_msg if len(error_msg) < 100 else error_msg[:200] + "..."
+                pretty_error = error_msg if len(error_msg) < 200 else error_msg[:200] + "..."
                 print(f"{matcher_name:<30} error: {pretty_error}")
         except (json.JSONDecodeError, KeyError, subprocess.TimeoutExpired):
             print(f"{matcher_name:<30} error: subprocess failed or timed out")

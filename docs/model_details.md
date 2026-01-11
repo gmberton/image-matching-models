@@ -1,6 +1,8 @@
 ## Model Details
 > [!IMPORTANT]
-> Check the `LICENSE` of each model/original code base before use in your application. Some are heavily restricted. 
+> Check the `LICENSE` of each model/original code base before use in your application. Some are heavily restricted.
+
+Most models can run on both CPU and GPU. If a runtime shows ❌, that model cannot run on that device. MPS (Apple Silicon) is not tested.
 
 <table>
   <thead>
@@ -289,6 +291,8 @@
 Our implementation of Patch2Pix (+ Patch2PixSuperGlue), R2D2, and D2Net are based on the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main) (IMT). LoFTR and DeDoDe-Lightglue are from [Kornia](https://github.com/kornia/kornia). Other models are based on the offical repos above.
 
 Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in the `assets/example_pairs` folder at image size 512x512. Benchmark is done using `imm_benchmark.py` on an NVIDIA RTX A4000 GPU. Results rounded to the hundredths place.
+
+\* `SphereGlue` requires `torch-geometric` and `torch-cluster`. Install with: `pip install .[all] -f https://data.pyg.org/whl/torch-2.5.0+cu124.html` (replace `cu124` with `cpu` for CPU). See [PyG installation docs](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
 
 \* `SphereGlue` model runtimes are listed in the order: `SIFT, SuperPoint`
 
