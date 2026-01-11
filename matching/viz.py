@@ -34,7 +34,7 @@ def plot_matches(
     Returns:
         List[plt.Axes]: plot axes
     """
-    fig, ax = plot_images([img0, img1])
+    fig, ax = plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])  # fix: original function reterns nothing
 
     if show_matched_kpts and "matched_kpts0" in result.keys():
         viz2d.plot_matches(
