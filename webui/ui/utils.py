@@ -147,8 +147,8 @@ def gen_examples(data_root: Path):
     ]
     example_algos_rotation_robust = [
         "sift-nn",
-        # "rord",
         "sift-lightglue",
+        "gim-lightglue",
     ]
     data_root = Path(data_root)
     if not Path(data_root).exists():

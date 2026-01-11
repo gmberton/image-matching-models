@@ -33,3 +33,4 @@ flow_vis # for UFM
 -e ./matching/third_party/UFM/UniCeption
 -e ./matching/third_party/UFM
 h5py
+gradio==5.38.0  # for webui
