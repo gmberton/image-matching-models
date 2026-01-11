@@ -1,8 +1,11 @@
 .spyproject
 .idea
+.vscode
 __pycache__
 model_weights
 matching/model_weights
 outputs_*
 *.egg-info/*
 build
+webui/datasets
+output.pkl

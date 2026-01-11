@@ -1,10 +1,11 @@
 import sys
-from matching import viz2d
 import numpy as np
 import cv2
 import matplotlib
+import matplotlib.pyplot as plt
 from kornia.utils import tensor_to_image
 import torch
+from matching import viz2d
 
 # This is to be able to use matplotlib also without a GUI
 if not hasattr(sys, "ps1"):
@@ -16,6 +17,7 @@ def plot_matches(
     img1: np.ndarray,
     result: dict,
     show_matched_kpts=True,
+    show_inlier_kpts=True,
     show_all_kpts=False,
     save_path=None,
 ):
@@ -32,7 +34,7 @@ def plot_matches(
     Returns:
         List[plt.Axes]: plot axes
     """
-    ax = viz2d.plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])
+    fig, ax = plot_images([img0, img1])
 
     if show_matched_kpts and "matched_kpts0" in result.keys():
         viz2d.plot_matches(
@@ -44,19 +46,42 @@ def plot_matches(
         )
 
     if show_all_kpts and result["all_kpts0"] is not None:
-        viz2d.plot_keypoints([result["all_kpts0"], result["all_kpts1"]], colors="red", ps=2)
-
-    viz2d.plot_matches(result["inlier_kpts0"], result["inlier_kpts1"], color="lime", lw=0.2)
-    if len(result["matched_kpts1"]):
-        ratio = f"{len(result['inlier_kpts0']) / len(result['matched_kpts1']):0.2f}"
+        viz2d.plot_keypoints(
+            [result["all_kpts0"], result["all_kpts1"]], colors="red", ps=2
+        )
+        kpts_info = f"#Img0 kpts: {len(result['all_kpts0'])}\n#Img1 kpts: {len(result['all_kpts1'])}"
+        viz2d.add_text(
+            0,
+            f"{kpts_info}",
+            fs=17,
+            lwidth=2,
+        )
     else:
-        ratio = "N/A"
-    viz2d.add_text(
-        0,
-        f"{len(result['inlier_kpts0'])} inliers / {len(result['matched_kpts1'])} matches\ninlier ratio: {ratio}",
-        fs=17,
-        lwidth=2,
-    )
+        # use raw matches num
+        kpts_info = "N/A"
+
+
+    if show_inlier_kpts and "inlier_kpts0" in result.keys():
+        viz2d.plot_matches(
+            result["inlier_kpts0"],
+            result["inlier_kpts1"],
+            color="lime",
+            lw=0.2,
+        )
+
+    if show_inlier_kpts and show_matched_kpts:
+        if len(result["matched_kpts1"]):
+            ratio = f"{len(result['inlier_kpts0'])/len(result['matched_kpts1']):0.2f}"
+        else:
+            ratio = "N/A"
+        viz2d.add_text(
+            0,
+            "KeyPoints: {}\n{}, inliers: {} matches\n({}) inlier ratio)".format(
+                kpts_info, len(result["matched_kpts1"]), len(result["inlier_kpts0"]), ratio
+            ),
+            fs=17,
+            lwidth=2,
+        )
 
     viz2d.add_text(0, "Img0", pos=(0.01, 0.01), va="bottom")
     viz2d.add_text(1, "Img1", pos=(0.01, 0.01), va="bottom")
@@ -64,7 +89,51 @@ def plot_matches(
     if save_path is not None:
         viz2d.save_plot(save_path)
 
-    return ax
+    return fig, ax
+
+# ref: https://github.com/cvg/LightGlue/blob/1fd587b6f5a7a0befd31188f1e5d2f05740006d7/lightglue/viz2d.py
+def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True):
+    """Plot a set of images horizontally.
+    Args:
+        imgs: list of NumPy RGB (H, W, 3) or PyTorch RGB (3, H, W) or mono (H, W).
+        titles: a list of strings, as titles for each image.
+        cmaps: colormaps for monochrome images.
+        adaptive: whether the figure size should fit the image aspect ratios.
+    """
+    # conversion to (H, W, 3) for torch.Tensor
+    imgs = [
+        img.permute(1, 2, 0).cpu().numpy()
+        if (isinstance(img, torch.Tensor) and img.dim() == 3)
+        else img
+        for img in imgs
+    ]
+
+    n = len(imgs)
+    if not isinstance(cmaps, (list, tuple)):
+        cmaps = [cmaps] * n
+
+    if adaptive:
+        ratios = [i.shape[1] / i.shape[0] for i in imgs]  # W / H
+    else:
+        ratios = [4 / 3] * n
+    figsize = [sum(ratios) * 4.5, 4.5]
+    fig, ax = plt.subplots(
+        1, n, figsize=figsize, dpi=dpi, gridspec_kw={"width_ratios": ratios}
+    )
+    if n == 1:
+        ax = [ax]
+    for i in range(n):
+        ax[i].imshow(imgs[i], cmap=plt.get_cmap(cmaps[i]))
+        ax[i].get_yaxis().set_ticks([])
+        ax[i].get_xaxis().set_ticks([])
+        ax[i].set_axis_off()
+        for spine in ax[i].spines.values():  # remove frame
+            spine.set_visible(False)
+        if titles:
+            ax[i].set_title(titles[i])
+    fig.tight_layout(pad=pad)
+
+    return fig, ax
 
 
 def plot_kpts(img0, result, model_name="", save_path=None):
@@ -81,7 +150,7 @@ def plot_kpts(img0, result, model_name="", save_path=None):
     """
     if len(model_name):
         model_name = " - " + model_name
-    ax = viz2d.plot_images([np.clip(img0, 0, 1)])
+    ax = plot_images([np.clip(img0, 0, 1)])
     viz2d.plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
     viz2d.add_text(0, f"{len(result['all_kpts0'])} kpts" + model_name, fs=20)
     if model_name is not None:
@@ -156,3 +225,20 @@ def stitch(img0: np.ndarray | torch.Tensor, img1: np.ndarray | torch.Tensor, res
     stitched_imgs[translation[1] : translation[1] + h1, translation[0] : translation[0] + w1] = img1
 
     return stitched_imgs
+
+
+def plot_to_array(fig: matplotlib.figure.Figure) -> np.ndarray:
+    """
+    Convert a matplotlib figure to a numpy array with RGB values.
+
+    Args:
+        fig: A matplotlib figure.
+
+    Returns:
+        A numpy array with shape (height, width, 3) and dtype uint8 containing
+        the RGB values of the figure.
+    """
+    fig.canvas.draw()
+    (width, height) = fig.canvas.get_width_height()
+    buf_ndarray = np.frombuffer(fig.canvas.tostring_rgb(), dtype="u1")
+    return buf_ndarray.reshape(height, width, 3)
