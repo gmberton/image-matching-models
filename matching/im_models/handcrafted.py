@@ -27,9 +27,6 @@ class HandcraftedBaseMatcher(BaseMatcher):
         return im
 
     def _forward(self, img0, img1):
-        """
-        "det_descr" is instantiated by the subclasses.
-        """
         # convert tensors to numpy 255-based for OpenCV
         img0 = self.preprocess(img0)
         img1 = self.preprocess(img1)

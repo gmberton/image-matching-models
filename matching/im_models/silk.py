@@ -23,18 +23,17 @@ def simple_nms(scores, radius=4):
 
 
 def extract_keypoints(logits, detection_threshold=0.0, nms_radius=4, top_k=10000, border_dist=4):
-    """
-    Extract keypoints from detector logits.
+    """Extract keypoints from detector logits.
 
     Args:
-        logits: (B, 1, H, W) detector output
-        detection_threshold: minimum score threshold
-        nms_radius: radius for non-maximum suppression
-        top_k: maximum number of keypoints to return
-        border_dist: distance from border to exclude keypoints
+        logits (torch.Tensor): (B, 1, H, W) detector output
+        detection_threshold (float, optional): minimum score threshold. Defaults to 0.0.
+        nms_radius (int, optional): radius for non-maximum suppression. Defaults to 4.
+        top_k (int, optional): maximum number of keypoints to return. Defaults to 10000.
+        border_dist (int, optional): distance from border to exclude keypoints. Defaults to 4.
 
     Returns:
-        List of (N, 3) tensors with (row, col, score) for each batch item
+        list[torch.Tensor]: list of (N, 3) tensors with (row, col, score) for each batch item
     """
     B, _, H, W = logits.shape
     scores = torch.sigmoid(logits)
@@ -78,15 +77,15 @@ def extract_keypoints(logits, detection_threshold=0.0, nms_radius=4, top_k=10000
 
 
 def sample_descriptors(descriptors, keypoints, mode="bilinear"):
-    """
-    Sample descriptors at keypoint locations.
+    """Sample descriptors at keypoint locations.
 
     Args:
-        descriptors: (B, C, H, W) descriptor map
-        keypoints: list of (N, 3) tensors with (row, col, score)
+        descriptors (torch.Tensor): (B, C, H, W) descriptor map
+        keypoints (list[torch.Tensor]): list of (N, 3) tensors with (row, col, score)
+        mode (str, optional): interpolation mode. Defaults to "bilinear".
 
     Returns:
-        List of (N, C) descriptor tensors
+        list[torch.Tensor]: list of (N, C) descriptor tensors
     """
     B, C, H, W = descriptors.shape
     desc_list = []
@@ -118,17 +117,16 @@ def sample_descriptors(descriptors, keypoints, mode="bilinear"):
 
 
 def match_descriptors_mnn(desc0, desc1, threshold=0.8, mode="ratio-test"):
-    """
-    Match descriptors using mutual nearest neighbors with optional ratio test.
+    """Match descriptors using mutual nearest neighbors with optional ratio test.
 
     Args:
-        desc0: (N, C) descriptors from image 0
-        desc1: (M, C) descriptors from image 1
-        threshold: ratio threshold (for ratio-test) or distance threshold (for mnn)
-        mode: "ratio-test", "mnn", or "double-softmax"
+        desc0 (torch.Tensor): (N, C) descriptors from image 0
+        desc1 (torch.Tensor): (M, C) descriptors from image 1
+        threshold (float, optional): ratio threshold (for ratio-test) or distance threshold. Defaults to 0.8.
+        mode (str, optional): "ratio-test", "mnn", or "double-softmax". Defaults to "ratio-test".
 
     Returns:
-        (K, 2) tensor of match indices
+        torch.Tensor: (K, 2) tensor of match indices
     """
     if len(desc0) == 0 or len(desc1) == 0:
         return torch.zeros((0, 2), dtype=torch.long, device=desc0.device)
@@ -282,13 +280,15 @@ class SiLKModel(nn.Module):
         self.descriptor_scale_factor = nn.Parameter(torch.tensor(1.0))
 
     def forward(self, x):
-        """
+        """Run SiLK model forward pass.
+
         Args:
-            x: (B, 1, H, W) grayscale image
+            x (torch.Tensor): (B, 1, H, W) grayscale image
 
         Returns:
-            logits: (B, 1, H, W) detector logits
-            descriptors: (B, C, H, W) descriptor map
+            tuple: (logits, descriptors) where:
+                - logits (torch.Tensor): (B, 1, H, W) detector logits
+                - descriptors (torch.Tensor): (B, C, H, W) descriptor map
         """
         features = self.backbone(x)
         logits = self.detector_head(features)

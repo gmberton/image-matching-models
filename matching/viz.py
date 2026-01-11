@@ -73,7 +73,8 @@ def plot_kpts(img0, result, model_name="", save_path=None):
     Args:
         img0 (np.ndarray): img keypoints are detected from.
         result (dict): return from BaseMatcher. Must contain ['all_kpts0']
-        save_path (str| Path, optional): path to save file to. Not saved if None. Defaults to None.
+        model_name (str, optional): model name to display on plot. Defaults to "".
+        save_path (str | Path, optional): path to save file to. Not saved if None. Defaults to None.
 
     Returns:
         List[plt.Axes]: plot axes

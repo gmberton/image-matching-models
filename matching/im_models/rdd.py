@@ -101,12 +101,7 @@ class RDDMatcher(BaseMatcher):
 
 
 class _rdd_lightglue_wrapper(LightGlue):
-    """
-    This wrapper is required to fix the hardcoded rdd_lightglue weights path in the LightGlue matcher.
-
-    Args:
-        LightGlue (nn.Module): RDD LightGlue module
-    """
+    """Wrapper to fix the hardcoded rdd_lightglue weights path in the LightGlue matcher."""
 
     def __init__(self, feature_type, weights_path=None, *args, **kwargs):
         # Fix the hardcoded path BEFORE parent init so it uses the correct weights

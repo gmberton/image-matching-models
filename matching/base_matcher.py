@@ -97,29 +97,24 @@ class BaseMatcher(torch.nn.Module):
 
     @torch.inference_mode()
     def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path) -> dict:
-        """
-        All sub-classes implement the following interface:
+        """Run matching pipeline on two images. All sub-classes implement this interface.
 
-        Parameters
-        ----------
-        img0 : torch.tensor (C x H x W) | str | Path
-        img1 : torch.tensor (C x H x W) | str | Path
+        Args:
+            img0 (torch.Tensor | str | Path): first image as tensor (C x H x W) or path
+            img1 (torch.Tensor | str | Path): second image as tensor (C x H x W) or path
 
-        Returns
-        -------
-        dict with keys: ['num_inliers', 'H', 'all_kpts0', 'all_kpts1', 'all_desc0', 'all_desc1',
-                         'matched_kpts0', 'matched_kpts1', 'inlier_kpts0', 'inlier_kpts1']
-
-        num_inliers : int, number of inliers after RANSAC, i.e. len(inlier_kpts0)
-        H : np.array (3 x 3), the homography matrix to map matched_kpts0 to matched_kpts1
-        all_kpts0 : np.ndarray (N0 x 2), all detected keypoints from img0
-        all_kpts1 : np.ndarray (N1 x 2), all detected keypoints from img1
-        all_desc0 : np.ndarray (N0 x D), all descriptors from img0
-        all_desc1 : np.ndarray (N1 x D), all descriptors from img1
-        matched_kpts0 : np.ndarray (N2 x 2), keypoints from img0 that match matched_kpts1 (pre-RANSAC)
-        matched_kpts1 : np.ndarray (N2 x 2), keypoints from img1 that match matched_kpts0 (pre-RANSAC)
-        inlier_kpts0 : np.ndarray (N3 x 2), filtered matched_kpts0 that fit the H model (post-RANSAC matched_kpts)
-        inlier_kpts1 : np.ndarray (N3 x 2), filtered matched_kpts1 that fit the H model (post-RANSAC matched_kpts)
+        Returns:
+            dict: result dict with keys:
+                - num_inliers (int): number of inliers after RANSAC, i.e. len(inlier_kpts0)
+                - H (np.ndarray): (3 x 3) homography matrix to map matched_kpts0 to matched_kpts1
+                - all_kpts0 (np.ndarray): (N0 x 2) all detected keypoints from img0
+                - all_kpts1 (np.ndarray): (N1 x 2) all detected keypoints from img1
+                - all_desc0 (np.ndarray): (N0 x D) all descriptors from img0
+                - all_desc1 (np.ndarray): (N1 x D) all descriptors from img1
+                - matched_kpts0 (np.ndarray): (N2 x 2) keypoints from img0 that match matched_kpts1 (pre-RANSAC)
+                - matched_kpts1 (np.ndarray): (N2 x 2) keypoints from img1 that match matched_kpts0 (pre-RANSAC)
+                - inlier_kpts0 (np.ndarray): (N3 x 2) filtered matched_kpts0 that fit the H model (post-RANSAC)
+                - inlier_kpts1 (np.ndarray): (N3 x 2) filtered matched_kpts1 that fit the H model (post-RANSAC)
         """
         # Take as input a pair of images (not a batch)
         if isinstance(img0, (str, Path)):
@@ -173,6 +168,16 @@ class BaseMatcher(torch.nn.Module):
         }
 
     def extract(self, img: str | Path | torch.Tensor) -> dict:
+        """Extract keypoints and descriptors from a single image.
+
+        Args:
+            img (str | Path | torch.Tensor): image as tensor (C, H, W) or path
+
+        Returns:
+            dict: result dict with keys:
+                - all_kpts0 (np.ndarray): (N, 2) detected keypoints
+                - all_desc0 (np.ndarray): (N, D) descriptors
+        """
         result = self.forward(img, img)
         kpts = result["matched_kpts0"] if isinstance(self, EnsembleMatcher) else result["all_kpts0"]
         return {"all_kpts0": kpts, "all_desc0": result["all_desc0"]}

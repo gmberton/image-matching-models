@@ -230,22 +230,21 @@ def get_default_device():
 
 
 def flow_to_matches(flow, covisibility, num_samples=1000, min_confidence=0.0, method="probabilistic", rng=None):
-    """
-    Convert a dense optical flow + covisibility map to sparse keypoint matches.
-    - flow: np.ndarray, shape (2, H, W) or (H, W, 2). Interpreted as (dx, dy) per pixel.
-    - covisibility: np.ndarray, shape (H, W) with confidence in [0, 1] (or any non-negative scores).
-    - num_samples: max number of matches to return.
-    - min_confidence: ignore pixels with covisibility <= min_confidence.
-    - method: one of:
-        * "probabilistic" - sample pixels with probability proportional to covisibility.
-        * "topk"          - pick top-k pixels by covisibility.
-        * "grid"          - sample a uniform grid (best-effort to get ~num_samples).
-    - rng: optional np.random.RandomState or np.random.Generator for reproducibility.
+    """Convert a dense optical flow + covisibility map to sparse keypoint matches.
+
+    Args:
+        flow (np.ndarray): shape (2, H, W) or (H, W, 2). Interpreted as (dx, dy) per pixel.
+        covisibility (np.ndarray): shape (H, W) with confidence in [0, 1] (or any non-negative scores).
+        num_samples (int, optional): max number of matches to return. Defaults to 1000.
+        min_confidence (float, optional): ignore pixels with covisibility <= min_confidence. Defaults to 0.0.
+        method (str, optional): sampling method, one of "probabilistic", "topk", or "grid". Defaults to "probabilistic".
+        rng (np.random.RandomState | np.random.Generator, optional): for reproducibility. Defaults to None.
 
     Returns:
-    - matches0: (N,2) numpy array of source keypoints as (x, y) (float32)
-    - matches1: (N,2) numpy array of target keypoints as (x, y) = source + flow (float32)
-    - confidences: (N,) numpy array of covisibility/confidence values (float32)
+        tuple: (matches0, matches1, confidences) where:
+            - matches0 (np.ndarray): (N, 2) source keypoints as (x, y) (float32)
+            - matches1 (np.ndarray): (N, 2) target keypoints as (x, y) = source + flow (float32)
+            - confidences (np.ndarray): (N,) covisibility/confidence values (float32)
     """
     if rng is None:
         rng = np.random

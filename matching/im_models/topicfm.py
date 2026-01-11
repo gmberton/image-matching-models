@@ -16,12 +16,11 @@ from src import get_model_cfg  # noqa: E402
 
 class TopicFMMatcher(BaseMatcher):
     def __init__(self, device="cpu", variant="fast", *args, **kwargs):
-        """
-        TopicFM matcher.
+        """TopicFM matcher.
 
         Args:
-            device: 'cpu' or 'cuda'
-            variant: 'fast' or 'plus' - which pretrained model to use
+            device (str, optional): 'cpu' or 'cuda'. Defaults to "cpu".
+            variant (str, optional): 'fast' or 'plus' - which pretrained model to use. Defaults to "fast".
         """
         super().__init__(device, **kwargs)
 
@@ -66,16 +65,6 @@ class TopicFMMatcher(BaseMatcher):
         return tfm.Grayscale()(img).unsqueeze(0)
 
     def _forward(self, img0, img1):
-        """
-        Run TopicFM matching on a pair of images.
-
-        Args:
-            img0: First image tensor (C, H, W)
-            img1: Second image tensor (C, H, W)
-
-        Returns:
-            Tuple of (mkpts0, mkpts1, None, None, None, None)
-        """
         # Preprocess images
         img0 = self.preprocess(img0).to(self.device)
         img1 = self.preprocess(img1).to(self.device)
