@@ -4,5 +4,6 @@ __pycache__
 model_weights
 matching/model_weights
 outputs_*
+outputs
 *.egg-info/*
 build

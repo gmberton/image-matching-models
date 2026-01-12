@@ -28,7 +28,7 @@ loguru
 timm
 omegaconf
 poselib
-lightning==2.0.0 # from EDM
+lightning==2.3.3 # from EDM
 flow_vis # for UFM
 uniception==0.1.1 # for UFM
 h5py

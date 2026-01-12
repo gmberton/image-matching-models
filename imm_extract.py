@@ -51,7 +51,7 @@ def parse_args():
     args = parser.parse_args()
 
     if args.out_dir is None:
-        args.out_dir = Path(f"outputs_{args.matcher}")
+        args.out_dir = Path("outputs") / args.matcher
 
     return args
 
