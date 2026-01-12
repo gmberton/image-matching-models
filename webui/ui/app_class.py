@@ -7,7 +7,6 @@ import numpy as np
 from .utils import (
     GRADIO_VERSION,
     gen_examples,
-    get_matcher_zoo,
     load_config,
     ransac_zoo,
     run_matching,
@@ -50,7 +49,7 @@ class ImageMatchingApp:
         self.server_port = server_port
         self.config_path = kwargs.get("config", Path(__file__).parent / "config.yaml")
         self.cfg = load_config(self.config_path)
-        self.matcher_zoo = get_matcher_zoo(self.cfg["matcher_zoo"])
+        self.matcher_zoo = {}  # get_matcher_zoo(self.cfg["matcher_zoo"])
         self.app = None
         self.example_data_root = kwargs.get(
             "example_data_root", Path(__file__).parents[1] / "datasets"
@@ -515,12 +514,11 @@ class ImageMatchingApp:
             return "[{}]({})".format(tag, link) if link is not None else "None"
 
         data = []
-        cfg = self.cfg["matcher_zoo"]
         if style == "md":
             markdown_table = "| Algo. | Conference | Code | Project | Paper |\n"
             markdown_table += "| ----- | ---------- | ---- | ------- | ----- |\n"
 
-            for _, v in cfg.items():
+            for _, v in self.cfg.get("matcher_zoo", {}).items():
                 if not v["info"].get("display", True):
                     continue
                 github_link = get_link(v["info"].get("github", ""))
@@ -561,8 +559,5 @@ class ImageMatchingApp:
                 column_count=5,
                 column_limits=(5, 5),
                 value=data,
-                # wrap=True,
-                # min_width = 1000,
-                # height=1000,
             )
             return tab

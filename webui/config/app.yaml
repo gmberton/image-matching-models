@@ -53,12 +53,3 @@ matcher_zoo:
       github: https://github.com/Parskatt/dad
       display: true
       efficiency: medium  # low, medium, high
-
-
-retrieval_zoo:
-  netvlad:
-    enable: true
-  openibl:
-    enable: true
-  cosplace:
-    enable: true

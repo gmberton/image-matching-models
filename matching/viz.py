@@ -20,6 +20,7 @@ def plot_matches(
     show_inlier_kpts=True,
     show_all_kpts=False,
     save_path=None,
+    fs=15,
 ) -> list[matplotlib.axes.Axes]:
     """Plot matches between two images. Inlier matches are shown in green.
 
@@ -28,8 +29,10 @@ def plot_matches(
         img1 (np.ndarray): img1 from matching procedure
         result (dict): result from BaseMatcher, must contain keys: ['inlier_kpts0', 'inlier_kpts1', 'matched_kpts0', 'matched_kpts1']
         show_matched_kpts (bool, optional): Show matched kpts in addition to inliers. Matched kpts are blue. Defaults to True.
+        show_inlier_kpts (bool, optional): Show inlier kpts in addition to matched kpts. Inlier kpts are green. Defaults to True.
         show_all_kpts (bool, optional): Show all detected kpts in red. Defaults to False.
         save_path (str| Path, optional): path to save file to. Not saved if None. Defaults to None.
+        fs (int, optional): font size. Defaults to 15.
 
     Returns:
         list[matplotlib.axes.Axes]: plot axes
@@ -51,7 +54,7 @@ def plot_matches(
         viz2d.add_text(
             0,
             f"{kpts_info}",
-            fs=17,
+            fs=fs,
             lwidth=2,
         )
     else:
@@ -79,7 +82,7 @@ def plot_matches(
                 len(result["matched_kpts0"]),
                 ratio,
             ),
-            fs=17,
+            fs=fs,
             lwidth=2,
         )
 

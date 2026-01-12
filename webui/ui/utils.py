@@ -5,7 +5,7 @@ import time
 import warnings
 from itertools import combinations
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from datasets import load_dataset
 import torchvision.transforms as tfm
 import cv2
@@ -17,16 +17,16 @@ from PIL import Image
 from loguru import logger
 from tqdm import tqdm
 
-from matching import get_matcher, get_default_device
+from matching import get_matcher
 
-DATASETS_REPO_ID = "Realcat/imcui_datasets"
 
-from matching import available_models
 from matching.viz import plot_matches, plot_images, plot_kpts, plot_to_array
 
 # from .modelcache import ARCSizeAwareModelCache as ModelCache
 
 warnings.simplefilter("ignore")
+
+DATASETS_REPO_ID = "Realcat/imcui_datasets"
 
 ROOT = Path(__file__).parents[1]
 # some default values
@@ -66,35 +66,6 @@ def load_config(config_name: str) -> Dict[str, Any]:
         except yaml.YAMLError as exc:
             logger.error(exc)
     return config
-
-
-def get_matcher_zoo(
-    matcher_zoo: Dict[str, Dict[str, Union[str, bool]]],
-) -> Dict[str, Dict[str, Union[Callable, bool]]]:
-    """
-    Restore matcher configurations from a dictionary.
-
-    Args:
-        matcher_zoo: A dictionary with the matcher configurations,
-            where the configuration is a dictionary as loaded from a YAML file.
-
-    Returns:
-        A dictionary with the matcher configurations, where the configuration is
-            a function or a function instead of a string.
-    """
-    matcher_zoo_restored = {}
-    for k, v in matcher_zoo.items():
-        matcher_zoo_restored[v["matcher"]] = parse_match_config(v)
-    return matcher_zoo_restored
-
-
-def parse_match_config(conf):
-    # get_matcher(matcher_name="sift-lightglue", device="cpu", max_num_keypoints=2048, *args, **kwargs)
-    return {
-        "matcher_name": conf.get("matcher", "sift-lightglue"),
-        "max_num_keypoints": 2048,
-        "info": conf.get("info", {}),
-    }
 
 
 def download_example_images(repo_id, output_dir):
@@ -263,19 +234,6 @@ def gen_examples(data_root: Path):
             ]
         )
     return input_lists
-
-
-def set_null_pred(feature_type: str, pred: dict):
-    if feature_type == "KEYPOINT":
-        pred["mmkeypoints0_orig"] = np.array([])
-        pred["mmkeypoints1_orig"] = np.array([])
-        pred["mmconf"] = np.array([])
-    elif feature_type == "LINE":
-        pred["mline_keypoints0_orig"] = np.array([])
-        pred["mline_keypoints1_orig"] = np.array([])
-    pred["H"] = None
-    pred["geom_info"] = {}
-    return pred
 
 
 def wrap_images(
@@ -554,6 +512,7 @@ def run_matching(
         show_matched_kpts=False,
         show_inlier_kpts=False,
         show_all_kpts=True,
+        fs=12,
     )
     output_keypoints = plot_to_array(fig_output_keypoints)
 
@@ -574,6 +533,7 @@ def run_matching(
         show_matched_kpts=True,
         show_inlier_kpts=False,
         show_all_kpts=True,
+        fs=12,
     )
     output_matches_raw = plot_to_array(fig_output_matches_raw)
     num_matches_raw = len(pred["matched_kpts0"])
@@ -596,6 +556,7 @@ def run_matching(
         result=pred,
         show_matched_kpts=True,
         show_all_kpts=True,
+        fs=12,
     )
     output_matches_ransac = plot_to_array(fig_output_matches_ransac)
     num_matches_ransac = len(pred["inlier_kpts0"])
