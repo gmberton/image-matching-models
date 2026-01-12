@@ -58,12 +58,13 @@ uv pip install image-matching-models
 ```
 
 or, for development, clone this git repo and install with:
-```
-Clone recursively and install packages:
+
 ```bash
+# Clone recursively
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
 
+# install packages
 pip install .
 # or, if you want an editable install for dev work
 pip install -e . 
