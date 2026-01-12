@@ -105,9 +105,9 @@ result = matcher.extract(img0)
 plot_kpts(img0, result, save_path="plot_kpts.png")
 ```
 
-## Command Line Interface / Standalone Scripts
+### Command Line Interface / Standalone Scripts
 You can also run matching or extraction as standalone scripts, to get the same results as above. 
-### Matching:
+#### Matching:
 ```bash
 # if you cloned this repo, imm_match.py is available, else see CLI below
 python imm_match.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
@@ -119,7 +119,7 @@ From any location where an python enviroment with IMM installed is active, you c
 # for PyPi install, use CLI entry point
 imm-match --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input path/to/img0 --input path/to/img2
 ```
-### Keypoints extraction:
+#### Keypoints extraction:
 ```bash
 # if you cloned this repo, imm_extract.py is available, else see CLI below
 python imm_extract.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
