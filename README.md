@@ -50,23 +50,38 @@ SIFT and DeDoDe
 </details>
 
 ## Install
+IMM can be installed directly from PyPi using pip or uv (faster)
+```bash
+pip install image-matching-models
+# or
+uv pip install image-matching-models
+```
 
+or, for development, clone this git repo and install with:
+```
 Clone recursively and install packages:
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
+
 pip install .
+# or, if you want an editable install for dev work
+pip install -e . 
 ```
 
 Some models require additional optional dependencies which are not included in the default list, like torch-geometric (required by SphereGlue) and tensorflow (required by OmniGlue). To install these, use
 ```
 pip install .[all]
+# or 
+uv pip install ".[all]"
 ```
 
 
 ## Use
 
-You can use any of the over 50 matchers simply like this. You never need to download weights, it's all taken care in the code.
+You can use any of the over 50 matchers simply like this. All model weights are automatically downloaded by the IMM.
+
+### Python API
 ```python
 from matching import get_matcher
 from matching.viz import plot_matches, plot_kpts
@@ -90,14 +105,32 @@ result = matcher.extract(img0)
 plot_kpts(img0, result, save_path="plot_kpts.png")
 ```
 
-You can also run matching or extraction as standalone scripts, to get the same results as above. Matching:
+## Command Line Interface / Standalone Scripts
+You can also run matching or extraction as standalone scripts, to get the same results as above. 
+### Matching:
 ```bash
-python imm_match.py --matcher superpoint-lightglue --out_dir outputs_superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
+# if you cloned this repo, imm_match.py is available, else see CLI below
+python imm_match.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
+# or
+uv run imm_match.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
 ```
-
-Keypoints extraction:
+From any location where an python enviroment with IMM installed is active, you can also run
 ```bash
-python imm_extract.py --matcher superpoint-lightglue --out_dir outputs_superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
+# for PyPi install, use CLI entry point
+imm-match --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input path/to/img0 --input path/to/img2
+```
+### Keypoints extraction:
+```bash
+# if you cloned this repo, imm_extract.py is available, else see CLI below
+python imm_extract.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
+# or
+uv run imm_extract.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
+```
+From any location where an python enviroment with IMM installed is active, you can also run
+
+```bash
+# for PyPi install, use CLI entry point
+imm-extract --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input path/to/img0
 ```
 
 These scripts can take as input images, folders with multiple images (or multiple pairs of images), or files with pairs of images paths.
