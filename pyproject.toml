@@ -22,7 +22,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
 ]
-dynamic = ["version"]
+dynamic = ["version", "dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
@@ -35,6 +35,7 @@ all = ["image-matching-models[omniglue, sphereglue]"]
 
 [tool.setuptools.dynamic]
 version = {attr = "matching.__version__"}
+dependencies = {file = "requirements.txt"}
 
 [tool.setuptools.packages]
 find = {}
@@ -44,7 +45,10 @@ line-length = 120
 exclude = ["matching/third_party"]
 
 [tool.ruff.lint]
-ignore = ["E402"]
+ignore = ["E402", "E501"]
+
+[tool.uv.extra-build-dependencies]
+torch-cluster = ["torch"]
 
 [tool.setuptools]
 py-modules = ["imm_match", "imm_extract", "imm_benchmark"]
@@ -52,4 +56,3 @@ py-modules = ["imm_match", "imm_extract", "imm_benchmark"]
 [project.scripts]
 imm-match = "imm_match:main"
 imm-extract = "imm_extract:main"
-imm-benchmark = "imm_benchmark:main"

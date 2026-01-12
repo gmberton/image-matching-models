@@ -20,7 +20,7 @@ def plot_matches(
     show_inlier_kpts=True,
     show_all_kpts=False,
     save_path=None,
-):
+) -> list[matplotlib.axes.Axes]:
     """Plot matches between two images. Inlier matches are shown in green.
 
     Args:
@@ -32,7 +32,7 @@ def plot_matches(
         save_path (str| Path, optional): path to save file to. Not saved if None. Defaults to None.
 
     Returns:
-        List[plt.Axes]: plot axes
+        list[matplotlib.axes.Axes]: plot axes
     """
     fig, ax = plot_images([np.clip(img0, 0, 1), np.clip(img1, 0, 1)])  # fix: original function returns nothing
 
@@ -133,7 +133,7 @@ def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
     return fig, ax
 
 
-def plot_kpts(img0, result, model_name="", save_path=None):
+def plot_kpts(img0, result, model_name="", save_path=None) -> list[matplotlib.axes.Axes]:
     """Plot keypoints in one image.
 
     Args:
@@ -143,7 +143,7 @@ def plot_kpts(img0, result, model_name="", save_path=None):
         save_path (str | Path, optional): path to save file to. Not saved if None. Defaults to None.
 
     Returns:
-        List[plt.Axes]: plot axes
+        list[matplotlib.axes.Axes]: plot axes
     """
     if len(model_name):
         model_name = " - " + model_name

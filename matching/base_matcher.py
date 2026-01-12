@@ -4,7 +4,6 @@ import numpy as np
 from PIL import Image
 import torchvision.transforms as tfm
 from pathlib import Path
-from typing import Tuple
 
 from matching.utils import to_normalized_coords, to_px_coords, to_numpy
 
@@ -17,23 +16,33 @@ class BaseMatcher(torch.nn.Module):
     homography estimator
     """
 
-    def __init__(self, device="cpu", **kwargs):
+    def __init__(self, device: str = "cpu", **kwargs):
         super().__init__()
-        self.device = device
+        self.device: str = device
 
-        self.skip_ransac = False
+        self.skip_ransac: bool = False
 
         # OpenCV default ransac params
-        self.ransac_iters = kwargs.get("ransac_iters", 2000)
-        self.ransac_conf = kwargs.get("ransac_conf", 0.95)
-        self.ransac_reproj_thresh = kwargs.get("ransac_reproj_thresh", 3)
+        self.ransac_iters: int = kwargs.get("ransac_iters", 2000)
+        self.ransac_conf: float = kwargs.get("ransac_conf", 0.95)
+        self.ransac_reproj_thresh: float = kwargs.get("ransac_reproj_thresh", 3)
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self.__class__.__name__
 
     @staticmethod
-    def load_image(path: str | Path, resize: int | Tuple = None, rot_angle: float = 0) -> torch.Tensor:
+    def load_image(path: str | Path, resize: int | tuple = None, rot_angle: float = 0) -> torch.Tensor:
+        """load image from filesystem and return as tensor. Optionally rotate and resize.
+
+        Args:
+            path (str | Path): path to image on filesystem
+            resize (int | tuple, optional): size to resize img, either single value for square resize or tuple of (H, W). Defaults to None.
+            rot_angle (float, optional): CCW rotation angle in degrees. Defaults to 0.
+
+        Returns:
+            torch.Tensor: image as tensor (C x H x W)
+        """
         if isinstance(resize, int):
             resize = (resize, resize)
         img = tfm.ToTensor()(Image.open(path).convert("RGB"))
@@ -66,7 +75,7 @@ class BaseMatcher(torch.nn.Module):
 
     def compute_ransac(
         self, matched_kpts0: np.ndarray, matched_kpts1: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Process matches into inliers and the respective Homography using RANSAC.
 
         Args:
@@ -167,7 +176,7 @@ class BaseMatcher(torch.nn.Module):
             "inlier_kpts1": inlier_kpts1,
         }
 
-    def extract(self, img: str | Path | torch.Tensor) -> dict:
+    def extract(self, img: str | Path | torch.Tensor) -> dict[str, np.ndarray]:
         """Extract keypoints and descriptors from a single image.
 
         Args:
@@ -183,7 +192,7 @@ class BaseMatcher(torch.nn.Module):
         return {"all_kpts0": kpts, "all_desc0": result["all_desc0"]}
 
     @staticmethod
-    def get_empty_array_if_none(array):
+    def get_empty_array_if_none(array: np.ndarray | None) -> np.ndarray:
         if array is None or array.size == 0:
             return np.empty([0, 2])
         return array
@@ -192,7 +201,7 @@ class BaseMatcher(torch.nn.Module):
     def check_types(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
         """Check that objects are of accepted types (nd.array, torch.tensor or None)"""
 
-        def is_array_or_tensor_or_none(data):
+        def is_array_or_tensor_or_none(data) -> bool:
             return data is None or isinstance(data, np.ndarray) or isinstance(data, torch.Tensor)
 
         assert is_array_or_tensor_or_none(matched_kpts0)
@@ -206,14 +215,14 @@ class BaseMatcher(torch.nn.Module):
     def check_shapes(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1):
         """Check that objects have appropriate shapes, e.g. keypoints should have shape (N, 2)"""
 
-        def check_kpts(np_array):
+        def check_kpts_shape(np_array) -> bool:
             """Keypoint arrays should be in the form of N x 2"""
             return np_array.ndim == 2 and np_array.shape[1] == 2
 
-        assert check_kpts(matched_kpts0), f"matched_kpts0 shape should be (N x 2) but it is {matched_kpts0.shape}"
-        assert check_kpts(matched_kpts1), f"matched_kpts1 shape should be (N x 2) but it is {matched_kpts1.shape}"
-        assert check_kpts(all_kpts0), f"all_kpts0 shape should be (N x 2) but it is {all_kpts0.shape}"
-        assert check_kpts(all_kpts1), f"all_kpts1 shape should be (N x 2) but it is {all_kpts1.shape}"
+        assert check_kpts_shape(matched_kpts0), f"matched_kpts0 shape should be (N x 2) but it is {matched_kpts0.shape}"
+        assert check_kpts_shape(matched_kpts1), f"matched_kpts1 shape should be (N x 2) but it is {matched_kpts1.shape}"
+        assert check_kpts_shape(all_kpts0), f"all_kpts0 shape should be (N x 2) but it is {all_kpts0.shape}"
+        assert check_kpts_shape(all_kpts1), f"all_kpts1 shape should be (N x 2) but it is {all_kpts1.shape}"
         # Number of matched_kpts should be equal from both images
         assert matched_kpts0.shape == matched_kpts1.shape, f"{matched_kpts0.shape} != {matched_kpts1.shape}"
         # Descriptors should have shape (N x D)
@@ -227,13 +236,13 @@ class BaseMatcher(torch.nn.Module):
 
 
 class EnsembleMatcher(BaseMatcher):
-    def __init__(self, matcher_names=[], device="cpu", **kwargs):
+    def __init__(self, matcher_names: list[str] = [], device: str = "cpu", **kwargs):
         from matching import get_matcher
 
         super().__init__(device, **kwargs)
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
 
-    def _forward(self, img0: torch.Tensor, img1: torch.Tensor) -> Tuple[np.ndarray, np.ndarray, None, None, None, None]:
+    def _forward(self, img0: torch.Tensor, img1: torch.Tensor) -> tuple[np.ndarray, np.ndarray, None, None, None, None]:
         all_matched_kpts0, all_matched_kpts1 = [], []
         for matcher in self.matchers:
             matched_kpts0, matched_kpts1, _, _, _, _ = matcher._forward(img0, img1)

@@ -7,7 +7,7 @@ import torch
 import torch.nn.functional as F
 
 from matching import BaseMatcher, THIRD_PARTY_DIR
-from matching.utils import add_to_path, dict_to_device
+from matching.utils import add_to_path, to_device
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
@@ -120,7 +120,7 @@ class MatchAnythingMatcher(BaseMatcher):
             batch["mask0"] = ts_mask_0[None]
             batch["mask1"] = ts_mask_1[None]
 
-        batch = dict_to_device(batch, device=self.device)
+        batch = to_device(batch, device=self.device)
 
         self.net(batch)
 

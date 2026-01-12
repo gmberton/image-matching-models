@@ -81,4 +81,4 @@
 	url = https://github.com/TruongKhang/TopicFM
 [submodule "matching/third_party/UFM"]
 	path = matching/third_party/UFM
-	url = https://github.com/UniFlowMatch/UFM.git
+	url = https://github.com/alexstoken/UFM.git

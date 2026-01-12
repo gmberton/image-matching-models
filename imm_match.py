@@ -4,47 +4,24 @@ detects keypoints, matches them, and performs RANSAC to find inliers. The result
 and metadata, are saved to the specified output directory.
 """
 
+import warnings
+
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
 import torch
 import argparse
+import time
 from pathlib import Path
+
 
 from matching.utils import get_image_pairs_paths, get_default_device
 from matching import get_matcher, available_models
 from matching.viz import plot_matches
 
 
-def main():
-    args = parse_args()
-    image_size = [args.im_size, args.im_size]
-    args.out_dir.mkdir(exist_ok=True, parents=True)
-
-    # Choose a matcher
-    matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
-
-    pairs_of_paths = get_image_pairs_paths(args.input)
-    for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
-        image0 = matcher.load_image(img0_path, resize=image_size)
-        image1 = matcher.load_image(img1_path, resize=image_size)
-        result = matcher(image0, image1)
-
-        out_str = f"Paths: {str(img0_path), str(img1_path)}. Found {result['num_inliers']} inliers after RANSAC. "
-
-        if not args.no_viz:
-            viz_path = args.out_dir / f"output_{i}_matches.jpg"
-            plot_matches(image0, image1, result, save_path=viz_path)
-            out_str += f"Viz saved in {viz_path}. "
-
-        result["img0_path"] = img0_path
-        result["img1_path"] = img1_path
-        result["matcher"] = args.matcher
-        result["n_kpts"] = args.n_kpts
-        result["im_size"] = args.im_size
-
-        dict_path = args.out_dir / f"output_{i}_result.torch"
-        torch.save(result, dict_path)
-        out_str += f"Output saved in {dict_path}"
-
-        print(out_str)
+COL_WIDTH = 22
 
 
 def parse_args():
@@ -80,9 +57,48 @@ def parse_args():
     args = parser.parse_args()
 
     if args.out_dir is None:
-        args.out_dir = Path(f"outputs_{args.matcher}")
+        args.out_dir = Path("outputs") / args.matcher
 
     return args
+
+
+def main():
+    args = parse_args()
+    image_size = [args.im_size, args.im_size]
+    args.out_dir.mkdir(exist_ok=True, parents=True)
+
+    # Choose a matcher
+    matcher = get_matcher(args.matcher, device=args.device, max_num_keypoints=args.n_kpts)
+    print(f"Using matcher: {args.matcher} on device: {args.device}")
+    print("=" * 80)
+
+    pairs_of_paths = get_image_pairs_paths(args.input)
+    for i, (img0_path, img1_path) in enumerate(pairs_of_paths):
+        start = time.time()
+        image0 = matcher.load_image(img0_path, resize=image_size)
+        image1 = matcher.load_image(img1_path, resize=image_size)
+        result = matcher(image0, image1)
+
+        out_str = f"{'Paths':<{COL_WIDTH}}: {img0_path}, {img1_path}\n"
+        out_str += f"{'Inliers (post-RANSAC)':<{COL_WIDTH}}: {result['num_inliers']}\n"
+
+        if not args.no_viz:
+            viz_path = args.out_dir / f"output_{i}_matches.jpg"
+            plot_matches(image0, image1, result, save_path=viz_path)
+            out_str += f"{'Viz saved in':<{COL_WIDTH}}: {viz_path}\n"
+
+        result["img0_path"] = img0_path
+        result["img1_path"] = img1_path
+        result["matcher"] = args.matcher
+        result["n_kpts"] = args.n_kpts
+        result["im_size"] = args.im_size
+
+        dict_path = args.out_dir / f"output_{i}_result.torch"
+        torch.save(result, dict_path)
+        out_str += f"{'Output saved in':<{COL_WIDTH}}: {dict_path}\n"
+        out_str += f"{'Time taken (s)':<{COL_WIDTH}}: {time.time() - start:.3f}\n"
+
+        print(out_str)
 
 
 if __name__ == "__main__":
