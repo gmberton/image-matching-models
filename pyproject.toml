@@ -22,7 +22,7 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
 ]
-dynamic = ["version"]
+dynamic = ["version", "dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
@@ -35,6 +35,7 @@ all = ["image-matching-models[omniglue, sphereglue]"]
 
 [tool.setuptools.dynamic]
 version = {attr = "matching.__version__"}
+dependencies = {file = "requirements.txt"}
 
 [tool.setuptools.packages]
 find = {}

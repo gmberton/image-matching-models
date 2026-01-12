@@ -55,7 +55,6 @@ Clone recursively and install packages:
 ```bash
 git clone --recursive https://github.com/gmberton/image-matching-models
 cd image-matching-models
-pip install -r requirements.txt  # required to support editable dependencies
 pip install .
 ```
 

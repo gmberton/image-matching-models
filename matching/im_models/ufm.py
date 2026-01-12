@@ -1,11 +1,12 @@
 import torch
 
-from matching import BaseMatcher
-from matching.utils import flow_to_matches
+from matching import BaseMatcher, THIRD_PARTY_DIR
+from matching.utils import flow_to_matches, add_to_path
 from skimage import img_as_ubyte
 from kornia import tensor_to_image
 import numpy as np
 
+add_to_path(THIRD_PARTY_DIR / "UFM")
 from uniflowmatch.models.ufm import (
     UniFlowMatchConfidence,
     UniFlowMatchClassificationRefinement,
