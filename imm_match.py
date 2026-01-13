@@ -25,17 +25,23 @@ COL_WIDTH = 22
 
 
 def parse_args():
+    # Format available matchers in columns, shown at the end of the help message (python imm_match.py -h)
+    matchers, cols, width = sorted(available_models), 4, 35
+    matcher_lines = ["  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)]
+
     parser = argparse.ArgumentParser(
-        description="Image Matching Models",
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+        prog="imm-match",
+        description="Match keypoints between image pairs. Outputs match visualizations and result dicts.",
+        epilog=f"Available matchers ({len(matchers)}):\n" + "\n".join(matcher_lines),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    # Choose matcher
     parser.add_argument(
         "--matcher",
         type=str,
         default="sift-lightglue",
         choices=available_models,
-        help="choose your matcher",
+        metavar="MODEL",
+        help="matcher to use (default: %(default)s). See list below",
     )
 
     # Hyperparameters shared by all methods:

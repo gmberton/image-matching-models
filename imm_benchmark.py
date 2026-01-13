@@ -5,7 +5,7 @@ as one is a warping of the other.
 """
 
 from matching import get_matcher, available_models, get_default_device
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import cv2
 import time
 import numpy as np
@@ -19,12 +19,28 @@ from io import StringIO
 
 
 def parse_args():
-    parser = ArgumentParser()
-    parser.add_argument("--matchers", type=str, nargs="+", default="all", help="models to benchmark")
-    parser.add_argument("--img-size", type=int, default=512, help="image size")
-    parser.add_argument("--device", type=str, default=get_default_device(), help="device")
+    # Format available matchers in columns, shown at the end of the help message (python imm_benchmark.py -h)
+    matchers, cols, width = sorted(available_models), 4, 35
+    matcher_lines = ["  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)]
+
+    parser = ArgumentParser(
+        prog="imm-benchmark",
+        description="Benchmark matchers on a synthetic homography test. Reports speed and accuracy.",
+        epilog=f"Available matchers ({len(matchers)}):\n" + "\n".join(matcher_lines),
+        formatter_class=RawDescriptionHelpFormatter,
+    )
     parser.add_argument(
-        "--single-matcher-json", type=str, help="Run single matcher and output JSON (for subprocess use)"
+        "--matchers",
+        type=str,
+        nargs="+",
+        default="all",
+        metavar="MODEL",
+        help="models to benchmark, or 'all' (default: all)",
+    )
+    parser.add_argument("--img-size", type=int, default=512, help="image size (default: %(default)s)")
+    parser.add_argument("--device", type=str, default=get_default_device(), help="device (default: %(default)s)")
+    parser.add_argument(
+        "--single-matcher-json", type=str, metavar="MODEL", help="run single matcher and output JSON (internal use)"
     )
     args = parser.parse_args()
 
