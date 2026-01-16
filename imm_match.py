@@ -47,7 +47,7 @@ def parse_args():
     )
 
     # Hyperparameters shared by all methods:
-    parser.add_argument("--img-size", type=int, default=512, help="resize img to im_size x im_size")
+    parser.add_argument("--img-size", type=int, default=512, help="resize img to img-size x img-size")
     parser.add_argument("--n-kpts", type=int, default=2048, help="max num keypoints")
     parser.add_argument("--device", type=str, default=get_default_device(), choices=["cpu", "cuda"])
     parser.add_argument("--no-viz", action="store_true", help="avoid saving visualizations")
@@ -99,7 +99,7 @@ def main():
         result["img1_path"] = img1_path
         result["matcher"] = args.matcher
         result["n_kpts"] = args.n_kpts
-        result["im_size"] = args.im_size
+        result["im_size"] = args.img_size
 
         dict_path = args.out_dir / f"output_{i}_result.torch"
         torch.save(result, dict_path)

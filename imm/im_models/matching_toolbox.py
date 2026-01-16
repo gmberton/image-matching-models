@@ -32,6 +32,7 @@ class Patch2pixMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
+        assert torch.cuda.is_available() and "cuda" in device, "Patch2Pix requires CUDA"
 
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]

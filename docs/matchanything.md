@@ -7,7 +7,7 @@ The `matchanything-eloftr` and `matchanything-roma` wrappers use the upstream Ma
 If you cloned without submodules:
 
 ```bash
-git submodule update --init --recursive matching/third_party/MatchAnything
+git submodule update --init --recursive imm/third_party/MatchAnything
 ```
 
 ## Use
@@ -15,17 +15,17 @@ git submodule update --init --recursive matching/third_party/MatchAnything
 Run either variant via:
 ```bash
 # ELoFTR backbone (defaults to 832px NPE size)
-python imm_match.py --matcher matchanything-eloftr --device cuda --im_size 832 --out_dir outputs_matchanything-eloftr
+python imm_match.py --matcher matchanything-eloftr --device cuda --img-size 832 --out-dir outputs_matchanything-eloftr
 
 # RoMa backbone (AMP disabled on CPU automatically)
-python imm_match.py --matcher matchanything-roma --device cuda --im_size 832 --out_dir outputs_matchanything-roma
+python imm_match.py --matcher matchanything-roma --device cuda --img-size 832 --out-dir outputs_matchanything-roma
 ```
-Weights download automatically on first MatchAnything use and are cached under `matching/model_weights/matchanything`.
+Weights download automatically on first MatchAnything use and are cached under `imm/model_weights/matchanything`.
 For submodule setup and troubleshooting, see [docs/matchanything.md](docs/matchanything.md).
 
 ## Weights cache location
 
-Checkpoints are cached under `matching/model_weights/matchanything`:
+Checkpoints are cached under `imm/model_weights/matchanything`:
 
 - `matchanything_eloftr.ckpt`
 - `matchanything_roma.ckpt`

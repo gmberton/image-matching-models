@@ -1,4 +1,5 @@
 from torch import Tensor
+from huggingface_hub import hf_hub_download
 
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path
@@ -12,7 +13,12 @@ class xFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         assert mode in ["sparse", "semi-dense", "lighterglue"]
 
-        self.model = XFeat()
+        self.model_path = hf_hub_download(repo_id="image-matching-models/xfeat", filename="xfeat.pt")
+
+        self.model = XFeat(weights=self.model_path)
+        self.model.net = self.model.net.to(device)
+        self.model.dev = device
+
         self.max_num_keypoints = max_num_keypoints
         self.mode = mode
 

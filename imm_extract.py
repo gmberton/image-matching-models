@@ -44,7 +44,7 @@ def parse_args():
     )
 
     # Hyperparameters shared by all methods:
-    parser.add_argument("--img-size", type=int, default=512, help="resize img to im_size x im_size")
+    parser.add_argument("--img-size", type=int, default=512, help="resize img to img_size x img_size")
     parser.add_argument("--n-kpts", type=int, default=2048, help="max num keypoints")
     parser.add_argument("--device", type=str, default=get_default_device(), choices=["cpu", "cuda"])
     parser.add_argument("--no-viz", action="store_true", help="avoid saving visualizations")

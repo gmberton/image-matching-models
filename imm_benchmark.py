@@ -4,7 +4,9 @@ homography between two images is computed correctly. The two images are generate
 as one is a warping of the other.
 """
 
+from pathlib import Path
 from imm import get_matcher, available_models, get_default_device
+import imm
 from argparse import ArgumentParser, RawDescriptionHelpFormatter
 import cv2
 import time
@@ -70,8 +72,9 @@ def run_single_matcher(matcher_name, img_size, device):
 
 def benchmark_and_test(matcher, img_size=512, runs=5):
     """Runs the homography test multiple times to get both speed and accuracy."""
-    img0_path = "imm/assets/example_test/warped.jpg"
-    img1_path = "imm/assets/example_test/original.jpg"
+    asset_dir = Path(imm.__path__[0]) / "assets" / "example_test"
+    img0_path = asset_dir / "warped.jpg"
+    img1_path = asset_dir / "original.jpg"
     ground_truth = np.array([[0.1500, 0.3500], [0.9500, 0.1500], [0.9000, 0.7000], [0.2500, 0.7000]])
 
     # Pre-load to avoid I/O overhead in loop if desired, or keep inside if part of test
