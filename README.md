@@ -119,27 +119,27 @@ You can also run matching or extraction as standalone scripts, to get the same r
 #### Matching:
 ```bash
 # if you cloned this repo, imm_match.py is available, else see CLI below
-python imm_match.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
+python imm_match.py --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
 # or
-uv run imm_match.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
+uv run imm_match.py --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg assets/example_pairs/outdoor/montmartre_far.jpg
 ```
 From any location where an python enviroment with IMM installed is active, you can also run
 ```bash
 # for PyPi install, use CLI entry point
-imm-match --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input path/to/img0 --input path/to/img2
+imm-match --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input path/to/img0 --input path/to/img2
 ```
 #### Keypoints extraction:
 ```bash
 # if you cloned this repo, imm_extract.py is available, else see CLI below
-python imm_extract.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
+python imm_extract.py --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
 # or
-uv run imm_extract.py --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
+uv run imm_extract.py --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input assets/example_pairs/outdoor/montmartre_close.jpg
 ```
 From any location where an python enviroment with IMM installed is active, you can also run
 
 ```bash
 # for PyPi install, use CLI entry point
-imm-extract --matcher superpoint-lightglue --out_dir outputs/superpoint-lightglue --input path/to/img0
+imm-extract --matcher superpoint-lightglue --out-dir outputs/superpoint-lightglue --input path/to/img0
 ```
 
 These scripts can take as input images, folders with multiple images (or multiple pairs of images), or files with pairs of images paths.

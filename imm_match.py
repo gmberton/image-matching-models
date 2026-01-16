@@ -47,10 +47,10 @@ def parse_args():
     )
 
     # Hyperparameters shared by all methods:
-    parser.add_argument("--im_size", type=int, default=512, help="resize img to im_size x im_size")
-    parser.add_argument("--n_kpts", type=int, default=2048, help="max num keypoints")
+    parser.add_argument("--img-size", type=int, default=512, help="resize img to im_size x im_size")
+    parser.add_argument("--n-kpts", type=int, default=2048, help="max num keypoints")
     parser.add_argument("--device", type=str, default=get_default_device(), choices=["cpu", "cuda"])
-    parser.add_argument("--no_viz", action="store_true", help="avoid saving visualizations")
+    parser.add_argument("--no-viz", action="store_true", help="avoid saving visualizations")
 
     parser.add_argument(
         "--input",
@@ -60,7 +60,7 @@ def parse_args():
         help="path to either (1) two image paths or (2) dir with two images or (3) dir with dirs with image pairs or "
         "(4) txt file with two image paths per line",
     )
-    parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
+    parser.add_argument("--out-dir", type=Path, default=None, help="path where outputs are saved")
 
     args = parser.parse_args()
 
@@ -72,7 +72,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    image_size = [args.im_size, args.im_size]
+    image_size = [args.img_size, args.img_size]
     args.out_dir.mkdir(exist_ok=True, parents=True)
 
     # Choose a matcher
