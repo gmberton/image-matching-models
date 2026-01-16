@@ -27,6 +27,8 @@ dynamic = ["version", "dependencies"]
 [project.urls]
 Homepage = "https://github.com/gmberton/image-matching-models"
 Repository = "https://github.com/gmberton/image-matching-models"
+HuggingFace = "https://huggingface.co/image-matching-models"
+
 
 [project.optional-dependencies]
 omniglue = ["tensorflow"]
@@ -36,6 +38,9 @@ all = ["image-matching-models[omniglue, sphereglue]"]
 [tool.setuptools.dynamic]
 version = {attr = "matching.__version__"}
 dependencies = {file = "requirements.txt"}
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.yml"]
 
 [tool.setuptools.packages]
 find = {}
@@ -52,6 +57,7 @@ torch-cluster = ["torch"]
 
 [tool.setuptools]
 py-modules = ["imm_match", "imm_extract", "imm_benchmark"]
+include-package-data = true
 
 [project.scripts]
 imm-match = "imm_match:main"
