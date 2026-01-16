@@ -21,12 +21,12 @@ Compare matching models across various scenes. For example, we show `SIFT-LightG
 SIFT-LightGlue
 </summary>
 <p float="left">
-  <img src="assets/example_sift-lightglue/output_3_matches.jpg" width="195" />
-  <img src="assets/example_sift-lightglue/output_2_matches.jpg" width="195" />
-  <img src="assets/example_sift-lightglue/output_4_matches.jpg" width="195" />
-  <img src="assets/example_sift-lightglue/output_1_matches.jpg" width="195" />
-  <img src="assets/example_sift-lightglue/output_0_matches.jpg" width="195" />
-    <img src="assets/example_sift-lightglue/output_5_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_3_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_2_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_4_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_1_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_0_matches.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_5_matches.jpg" width="195" />
 
 </p>
 </details>
@@ -35,12 +35,12 @@ SIFT-LightGlue
 LoFTR
 </summary>
 <p float="left">
-  <img src="assets/example_loftr/output_3_matches.jpg" width="195" />
-  <img src="assets/example_loftr/output_2_matches.jpg" width="195" />
-  <img src="assets/example_loftr/output_4_matches.jpg" width="195" />
-  <img src="assets/example_loftr/output_1_matches.jpg" width="195" />
-  <img src="assets/example_loftr/output_0_matches.jpg" width="195" />
-  <img src="assets/example_loftr/output_5_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_3_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_2_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_4_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_1_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_0_matches.jpg" width="195" />
+  <img src="imm/assets/example_loftr/output_5_matches.jpg" width="195" />
 </p>
 </details>
 
@@ -50,10 +50,10 @@ You can also extract keypoints and associated descriptors.
 SIFT and DeDoDe
 </summary>
 <p float="left">
-  <img src="assets/example_sift-lightglue/output_8_kpts.jpg" width="195" />
-  <img src="assets/example_dedode/output_8_kpts.jpg" width="195" />
-  <img src="assets/example_sift-lightglue/output_0_kpts.jpg" width="195" />
-  <img src="assets/example_dedode/output_0_kpts.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_8_kpts.jpg" width="195" />
+  <img src="imm/assets/example_dedode/output_8_kpts.jpg" width="195" />
+  <img src="imm/assets/example_sift-lightglue/output_0_kpts.jpg" width="195" />
+  <img src="imm/assets/example_dedode/output_0_kpts.jpg" width="195" />
 </p>
 </details>
 
