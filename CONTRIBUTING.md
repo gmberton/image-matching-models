@@ -1,15 +1,15 @@
 # To add a new method:
 Let's for example add a matcher called new_matcher.
-1. Copy the template to create a new file: `cp matching/TEMPLATE.py matching/im_models/new_matcher.py`
+1. Copy the template to create a new file: `cp imm/TEMPLATE.py imm/im_models/new_matcher.py`
 2. If the method requires external modules (for example the offical repository of new_matcher), use `git submodule add`: for example, I used this command to add the LightGlue module
    ```bash
-   git submodule add https://github.com/cvg/LightGlue matching/third_party/LightGlue
+   git submodule add https://github.com/cvg/LightGlue imm/third_party/LightGlue
    ```
-   This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `matching/third_party`.
+   This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `imm/third_party`.
 
-3. In `matching/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`. The template has more details on how to implement the class.
+3. In `imm/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`. The template has more details on how to implement the class.
 
-4. Open `matching/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
+4. Open `imm/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
 
 5. If it requires additional dependencies, add them to `requirements.txt` or to the `[project.optional-dependencies]` of `pyproject.toml`.
 
@@ -31,7 +31,7 @@ Let's for example add a matcher called new_matcher.
 Note: as authors update their model repos, consider updating the submodule reference here using the below:
 To update a submodule to the head of the remote, run 
 ```bash
-git submodule update --remote matching/third_party/[submodule_name]
+git submodule update --remote imm/third_party/[submodule_name]
 ```
 
 ## Optional: add docs

@@ -16,9 +16,9 @@ import time
 from pathlib import Path
 
 
-from matching.utils import get_image_pairs_paths, get_default_device
-from matching import get_matcher, available_models
-from matching.viz import plot_matches
+from imm.utils import get_image_pairs_paths, get_default_device
+from imm import get_matcher, available_models
+from imm.viz import plot_matches
 
 
 COL_WIDTH = 22
@@ -27,7 +27,9 @@ COL_WIDTH = 22
 def parse_args():
     # Format available matchers in columns, shown at the end of the help message (python imm_match.py -h)
     matchers, cols, width = sorted(available_models), 4, 35
-    matcher_lines = ["  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)]
+    matcher_lines = [
+        "  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)
+    ]
 
     parser = argparse.ArgumentParser(
         prog="imm-match",
@@ -54,7 +56,7 @@ def parse_args():
         "--input",
         type=Path,
         nargs="+",  # Accept one or more arguments
-        default=[Path("assets/example_pairs")],
+        default=[Path("imm/assets/example_pairs")],
         help="path to either (1) two image paths or (2) dir with two images or (3) dir with dirs with image pairs or "
         "(4) txt file with two image paths per line",
     )

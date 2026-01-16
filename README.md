@@ -60,9 +60,9 @@ SIFT and DeDoDe
 ## Install
 IMM can be installed directly from PyPi using pip or uv (faster)
 ```bash
-pip install image-matching-models
+pip install imm
 # or
-uv pip install image-matching-models
+uv pip install imm
 ```
 
 or, for development, clone this git repo and install with:
@@ -92,8 +92,8 @@ You can use any of the over 50 matchers simply like this. All model weights are 
 
 ### Python API
 ```python
-from matching import get_matcher
-from matching.viz import plot_matches, plot_kpts
+from imm import get_matcher
+from imm.viz import plot_matches, plot_kpts
 
 # Choose any of the 50+ matchers listed below
 matcher = get_matcher("superpoint-lightglue", device="cuda")

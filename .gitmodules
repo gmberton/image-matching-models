@@ -1,84 +1,84 @@
 [submodule "matching/third_party/LightGlue"]
-	path = matching/third_party/LightGlue
+	path = imm/third_party/LightGlue
 	url = https://github.com/cvg/LightGlue.git
 [submodule "matching/third_party/RoMa"]
-	path = matching/third_party/RoMa
+	path = imm/third_party/RoMa
 	url = https://github.com/Parskatt/RoMa
 [submodule "matching/third_party/DeDoDe"]
-	path = matching/third_party/DeDoDe
+	path = imm/third_party/DeDoDe
 	url = https://github.com/Parskatt/DeDoDe
 [submodule "matching/third_party/imatch-toolbox"]
-	path = matching/third_party/imatch-toolbox
+	path = imm/third_party/imatch-toolbox
 	url = https://github.com/ga1i13o/image-matching-toolbox
 [submodule "matching/third_party/duster"]
-	path = matching/third_party/duster
+	path = imm/third_party/duster
 	url = https://github.com/naver/dust3r
 [submodule "matching/third_party/Steerers"]
-	path = matching/third_party/Steerers
+	path = imm/third_party/Steerers
 	url = https://github.com/georg-bn/rotation-steerers.git
 [submodule "matching/third_party/accelerated_features"]
-	path = matching/third_party/accelerated_features
+	path = imm/third_party/accelerated_features
 	url = https://github.com/verlab/accelerated_features.git
 [submodule "matching/third_party/omniglue"]
-	path = matching/third_party/omniglue
+	path = imm/third_party/omniglue
 	url = https://github.com/google-research/omniglue.git
 [submodule "matching/third_party/gim"]
-	path = matching/third_party/gim
+	path = imm/third_party/gim
 	url = https://github.com/alexstoken/gim.git
 [submodule "matching/third_party/EfficientLoFTR"]
-	path = matching/third_party/EfficientLoFTR
+	path = imm/third_party/EfficientLoFTR
 	url = https://github.com/zju3dv/EfficientLoFTR
 [submodule "matching/third_party/Se2_LoFTR"]
-	path = matching/third_party/Se2_LoFTR
+	path = imm/third_party/Se2_LoFTR
 	url = https://github.com/alexstoken/se2-loftr.git
 [submodule "matching/third_party/aspanformer"]
-	path = matching/third_party/aspanformer
+	path = imm/third_party/aspanformer
 	url = https://github.com/alexstoken/ml-aspanformer.git
 [submodule "matching/third_party/MatchFormer"]
-	path = matching/third_party/MatchFormer
+	path = imm/third_party/MatchFormer
 	url = https://github.com/jamycheung/MatchFormer.git
 [submodule "matching/third_party/mast3r"]
-	path = matching/third_party/mast3r
+	path = imm/third_party/mast3r
 	url = https://github.com/naver/mast3r.git
 [submodule "matching/third_party/keypt2subpx"]
-	path = matching/third_party/keypt2subpx
+	path = imm/third_party/keypt2subpx
 	url = https://github.com/KimSinjeong/keypt2subpx.git
 [submodule "matching/third_party/SphereGlue"]
-	path = matching/third_party/SphereGlue
+	path = imm/third_party/SphereGlue
 	url = https://github.com/alexstoken/SphereGlue.git
 [submodule "matching/third_party/affine-steerers"]
-	path = matching/third_party/affine-steerers
+	path = imm/third_party/affine-steerers
 	url = https://github.com/georg-bn/affine-steerers.git
 [submodule "matching/third_party/XoFTR"]
-	path = matching/third_party/XoFTR
+	path = imm/third_party/XoFTR
 	url = https://github.com/OnderT/XoFTR
 [submodule "matching/third_party/MINIMA"]
-	path = matching/third_party/MINIMA
+	path = imm/third_party/MINIMA
 	url = https://github.com/LSXI7/MINIMA
 [submodule "matching/third_party/rdd"]
-	path = matching/third_party/rdd
+	path = imm/third_party/rdd
 	url = https://github.com/xtcpete/rdd.git
 [submodule "matching/third_party/LiftFeat"]
-	path = matching/third_party/LiftFeat
+	path = imm/third_party/LiftFeat
 	url = https://github.com/lyp-deeplearning/LiftFeat.git
 [submodule "matching/third_party/EDM"]
-	path = matching/third_party/EDM
+	path = imm/third_party/EDM
 	url = https://github.com/chicleee/EDM
 [submodule "matching/third_party/LISRD"]
-	path = matching/third_party/LISRD
+	path = imm/third_party/LISRD
 	url = https://github.com/rpautrat/LISRD.git
 [submodule "matching/third_party/RIPE"]
-	path = matching/third_party/RIPE
+	path = imm/third_party/RIPE
 	url = https://github.com/fraunhoferhhi/RIPE.git
 [submodule "matching/third_party/MatchAnything"]
-	path = matching/third_party/MatchAnything
+	path = imm/third_party/MatchAnything
 	url = https://huggingface.co/spaces/LittleFrog/MatchAnything
 [submodule "matching/third_party/RoMaV2"]
-	path = matching/third_party/RoMaV2
+	path = imm/third_party/RoMaV2
 	url = https://github.com/Parskatt/RoMaV2
 [submodule "matching/third_party/TopicFM"]
-	path = matching/third_party/TopicFM
+	path = imm/third_party/TopicFM
 	url = https://github.com/TruongKhang/TopicFM
 [submodule "matching/third_party/UFM"]
-	path = matching/third_party/UFM
+	path = imm/third_party/UFM
 	url = https://github.com/alexstoken/UFM.git

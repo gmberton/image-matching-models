@@ -14,9 +14,9 @@ warnings.filterwarnings("ignore", category=UserWarning)
 import argparse
 from pathlib import Path
 
-from matching import get_matcher, available_models
-from matching.utils import get_default_device
-from matching.viz import plot_kpts
+from imm import get_matcher, available_models
+from imm.utils import get_default_device
+from imm.viz import plot_kpts
 
 COL_WIDTH = 15
 
@@ -24,7 +24,9 @@ COL_WIDTH = 15
 def parse_args():
     # Format available matchers in columns, shown at the end of the help message (python imm_extract.py -h)
     matchers, cols, width = sorted(available_models), 4, 35
-    matcher_lines = ["  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)]
+    matcher_lines = [
+        "  " + "".join(m.ljust(width) for m in matchers[i : i + cols]) for i in range(0, len(matchers), cols)
+    ]
 
     parser = argparse.ArgumentParser(
         prog="imm-extract",
@@ -49,7 +51,7 @@ def parse_args():
     parser.add_argument(
         "--input",
         type=Path,
-        default=Path("assets/example_pairs"),
+        default=Path("imm/assets/example_pairs"),
         help="path to image or directory with images (the search is recursive over jpg and png images)",
     )
     parser.add_argument("--out_dir", type=Path, default=None, help="path where outputs are saved")
