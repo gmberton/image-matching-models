@@ -18,7 +18,7 @@ from lightglue import viz2d  # noqa: F401 - for quick import later 'from imm imp
 WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
 WEIGHTS_DIR.mkdir(exist_ok=True)
 
-__version__ = "1.0.1.dev0"
+__version__ = "1.1.0"
 
 available_models = [
     "liftfeat",
