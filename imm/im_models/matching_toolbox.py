@@ -6,6 +6,7 @@ import os
 import torchvision.transforms as tfm
 import torch
 from huggingface_hub import hf_hub_download
+from pathlib import Path
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
 _original_torch_load = torch.load
@@ -20,7 +21,7 @@ def _patched_torch_load(*args, **kwargs):
 torch.load = _patched_torch_load
 
 from imm.utils import add_to_path, resize_to_divisible
-from imm import THIRD_PARTY_DIR, BaseMatcher
+from imm import THIRD_PARTY_DIR, BaseMatcher, WEIGHTS_DIR
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("imatch-toolbox")
 add_to_path(BASE_PATH)
@@ -39,7 +40,7 @@ class Patch2pixMatcher(BaseMatcher):
 
         args["ckpt"] = hf_hub_download(repo_id="image-matching-models/patch2pix", filename="model.pth")
         self.matcher = immatch.__dict__[args["class"]](args)
-        self.matcher.model.to(device)
+        self.matcher.model = self.matcher.model.to(device)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     def preprocess(self, img):
@@ -76,6 +77,11 @@ class Patch2pixMatcher(BaseMatcher):
 
 
 class SuperGlueMatcher(BaseMatcher):
+    SG_WEIGHTS_URL = "https://github.com/magicleap/SuperGluePretrainedNetwork/blob/c0626d58c843ee0464b0fa1dd4de4059bfae0ab4/models/weights/superglue_MODEL_VERSION.pth?raw=true"
+    SP_WEIGHTS_URL = "https://github.com/magicleap/SuperGluePretrainedNetwork/blob/c0626d58c843ee0464b0fa1dd4de4059bfae0ab4/models/weights/superpoint_v1.pth?raw=true"
+
+    SG_WEIGHTS_DIR = BASE_PATH / "third_party/superglue/models/weights"
+
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.to_gray = tfm.Grayscale()
@@ -83,6 +89,14 @@ class SuperGlueMatcher(BaseMatcher):
         with open(BASE_PATH.joinpath("configs/superglue.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
         args["max_keypoints"] = max_num_keypoints
+
+        self.model_path = self.SG_WEIGHTS_DIR / f"superglue_{args['weights']}.pth"
+        if not self.model_path.exists():
+            py3_wget.download_file(self.SG_WEIGHTS_URL.replace("MODEL_VERSION", args["weights"]), self.model_path)
+        # args["ckpt"] = str(self.model_path)
+        self.sp_path = self.SG_WEIGHTS_DIR / "superpoint_v1.pth"
+        if not self.sp_path.exists():
+            py3_wget.download_file(self.SP_WEIGHTS_URL, self.sp_path)
 
         self.matcher = immatch.__dict__[args["class"]](args)
 
@@ -114,8 +128,15 @@ class R2D2Matcher(BaseMatcher):
 
         # Point directly to third_party instead of copying to pretrained
         # Replace 'pretrained/r2d2' with 'third_party/r2d2/models' in the checkpoint path
-        ckpt_path = args["ckpt"].replace("pretrained/r2d2", "third_party/r2d2/models")
-        args["ckpt"] = BASE_PATH.joinpath(ckpt_path)
+        ckpt_path = Path(args["ckpt"].replace("pretrained/r2d2", "third_party/r2d2/models"))
+        if ckpt_path.exists():
+            self.model_path = str(ckpt_path)
+        else:
+            self.model_path = hf_hub_download(
+                repo_id="image-matching-models/r2d2", filename=args["ckpt"].split("/")[-1]
+            )
+
+        args["ckpt"] = self.model_path
         args["top_k"] = max_num_keypoints
 
         self.model = immatch.__dict__[args["class"]](args)
