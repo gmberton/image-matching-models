@@ -13,6 +13,7 @@
 [submodule "matching/third_party/duster"]
 	path = imm/third_party/duster
 	url = https://github.com/naver/dust3r
+	ignore = untracked
 [submodule "matching/third_party/Steerers"]
 	path = imm/third_party/Steerers
 	url = https://github.com/georg-bn/rotation-steerers.git
@@ -37,9 +38,11 @@
 [submodule "matching/third_party/MatchFormer"]
 	path = imm/third_party/MatchFormer
 	url = https://github.com/jamycheung/MatchFormer.git
+	ignore = untracked
 [submodule "matching/third_party/mast3r"]
 	path = imm/third_party/mast3r
 	url = https://github.com/naver/mast3r.git
+	ignore = untracked
 [submodule "matching/third_party/keypt2subpx"]
 	path = imm/third_party/keypt2subpx
 	url = https://github.com/KimSinjeong/keypt2subpx.git
@@ -52,21 +55,25 @@
 [submodule "matching/third_party/XoFTR"]
 	path = imm/third_party/XoFTR
 	url = https://github.com/OnderT/XoFTR
+	ignore = untracked
 [submodule "matching/third_party/MINIMA"]
 	path = imm/third_party/MINIMA
 	url = https://github.com/LSXI7/MINIMA
+	ignore = untracked
 [submodule "matching/third_party/rdd"]
 	path = imm/third_party/rdd
 	url = https://github.com/xtcpete/rdd.git
 [submodule "matching/third_party/LiftFeat"]
 	path = imm/third_party/LiftFeat
 	url = https://github.com/lyp-deeplearning/LiftFeat.git
+        ignore = untracked
 [submodule "matching/third_party/EDM"]
 	path = imm/third_party/EDM
 	url = https://github.com/chicleee/EDM
 [submodule "matching/third_party/LISRD"]
 	path = imm/third_party/LISRD
 	url = https://github.com/rpautrat/LISRD.git
+	ignore = untracked
 [submodule "matching/third_party/RIPE"]
 	path = imm/third_party/RIPE
 	url = https://github.com/fraunhoferhhi/RIPE.git
