@@ -1,0 +1,16 @@
+graft imm/assets/example_test
+graft imm/assets/example_pairs
+
+# exclude all third party items, then add only what we want to keep
+prune imm/third_party
+recursive-include imm/third_party *.py
+recursive-include imm/third_party/imatch-toolbox *.yml *.yaml
+recursive-include imm/third_party/rdd *.yml *.yaml
+
+global-exclude .DS_Store *.pyc *.pyo __pycache__ *.so *.dylib
+
+# if we wanted to exclude / include *.yml across the third party pacakges
+# but many are just docker configs, so leaving this commented for now
+# in favor of more specific yaml config inclusion above
+# recursive-exclude imm/third_party *.png *.jpg *.gif *.jpeg *.JPG
+# recursive-include imm/third_party *.yml *.yaml

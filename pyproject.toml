@@ -39,12 +39,6 @@ all = ["image-matching-models[omniglue, sphereglue]"]
 version = {attr = "imm.__version__"}
 dependencies = {file = "requirements.txt"}
 
-[tool.setuptools.exclude-package-data]
-"*" = ["*.png", "*.jpg", "*.jpeg"]
-
-[tool.setuptools.package-data]
-"*" = ["*.yaml", "*.yml", "assets/**/*"]
-
 [tool.setuptools.packages]
 find = {}
 
