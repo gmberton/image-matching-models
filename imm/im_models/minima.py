@@ -91,6 +91,10 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
     def __init__(self, device="cpu", model_size="tiny", **kwargs):
         super().__init__(device, **kwargs)
+        assert self.device != "mps", (
+            f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
+        )
+
         assert model_size in self.ALLOWABLE_MODEL_SIZES
 
         self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_roma.pt")

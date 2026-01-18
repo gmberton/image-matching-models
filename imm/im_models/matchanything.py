@@ -75,6 +75,10 @@ class MatchAnythingMatcher(BaseMatcher):
         if self.variant == "eloftr":
             self.net = LoFTR(config=cfg_lower["loftr"])
         else:
+            assert self.device != "mps", (
+                f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
+            )
+
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 
         repo_id = f"image-matching-models/matchanything-{self.variant}"

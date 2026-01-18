@@ -32,11 +32,9 @@ class SteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-
-        if (
-            torch.cuda.is_available() and self.device != "cuda"
-        ):  # only cuda devices work due to autocast in cuda in upstream.
-            raise ValueError("Only device 'cuda' supported for Steerers.")
+        assert self.device == "cuda", (
+            f"Device must be 'cuda', 'mps' and 'cpu' not yet supported for {self.name}. Device = {self.device}"
+        )
 
         # Download weights from HuggingFace Hub
         self.detector_path_L = hf_hub_download(

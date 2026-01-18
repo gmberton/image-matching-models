@@ -35,6 +35,9 @@ class RDDMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", mode="sparse", anchor="mnn", *args, **kwargs):
         super().__init__(device, **kwargs)
+        assert self.device != "mps", (
+            f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
+        )
 
         assert mode in ["sparse", "dense"], "Mode must be 'sparse' or 'dense'"
         self.mode = mode

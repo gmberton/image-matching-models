@@ -22,6 +22,11 @@ class xFeatMatcher(BaseMatcher):
         self.max_num_keypoints = max_num_keypoints
         self.mode = mode
 
+        if self.mode != "semi-dense":
+            assert self.device != "mps", (
+                f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name} with mode {self.mode}. Device = {self.device}"
+            )
+
     def preprocess(self, img: Tensor) -> Tensor:
         # return a [B, C, Hs, W] tensor
         # for sparse/semidense, want [C, H, W]

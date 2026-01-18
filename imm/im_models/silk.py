@@ -327,6 +327,9 @@ class SilkMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
+        assert self.device != "mps", (
+            f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
+        )
 
         self.max_num_keypoints = max_num_keypoints
         self.detection_threshold = detection_threshold
