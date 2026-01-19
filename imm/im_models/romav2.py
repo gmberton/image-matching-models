@@ -12,10 +12,6 @@ import romav2.device as romav2_device  # noqa: E402
 class RoMaV2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        assert device in [
-            "cpu",
-            "cuda",
-        ], "RoMaV2Matcher only supports 'cpu' or 'cuda' devices. `mps` has a bug where matches are placed incorrectly."
 
         # Temporarily override the global device for proper initialization
         original_device = romav2_device.device
