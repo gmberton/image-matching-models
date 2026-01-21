@@ -21,6 +21,11 @@ class RoMaV2Matcher(BaseMatcher):
             # Disable compilation to avoid dtype issues
             cfg = RoMaV2.Cfg(compile=False)
             self.romav2_model = RoMaV2(cfg=cfg)
+            # Load pretrained weights (not loaded automatically when custom cfg is provided)
+            weights = torch.hub.load_state_dict_from_url(
+                "https://github.com/Parskatt/RoMaV2/releases/download/weights/romav2.pt"
+            )
+            self.romav2_model.load_state_dict(weights)
         finally:
             # Restore original device
             romav2_device.device = original_device
