@@ -1,7 +1,7 @@
 import torchvision.transforms as tfm
 from argparse import Namespace
-from huggingface_hub import hf_hub_download
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import add_to_path
 
@@ -27,7 +27,7 @@ class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
-        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_lightglue.pt")
+        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_lightglue.pt"
 
         self.matcher = load_sp_lg(self.model_args).model.to(self.device)
 
@@ -59,7 +59,7 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
         super().__init__(device, **kwargs)
 
         self.model_args.thr = 0.2
-        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_loftr.pt")
+        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_loftr.pt"
         self.matcher = load_loftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):
@@ -97,7 +97,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
         assert model_size in self.ALLOWABLE_MODEL_SIZES
 
-        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_roma.pt")
+        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_roma.pt"
         self.model_args.ckpt2 = model_size
         self.matcher = load_roma(self.model_args).model.eval().to(self.device)
 
@@ -131,7 +131,7 @@ class MINIMAXoFTRMatcher(MINIMAMatcher):
 
         self.model_args.match_threshold = 0.3
         self.model_args.fine_threshold = 0.1
-        self.model_args.ckpt = hf_hub_download(repo_id="image-matching-models/minima", filename="minima_xoftr.pt")
+        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_xoftr.pt"
         self.matcher = load_xoftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):

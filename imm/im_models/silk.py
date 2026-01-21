@@ -7,10 +7,10 @@ Paper: https://arxiv.org/abs/2304.06194
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from huggingface_hub import hf_hub_download
 from kornia.color import rgb_to_grayscale
 from safetensors.torch import load_file
 
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher
 
 
@@ -343,7 +343,7 @@ class SilkMatcher(BaseMatcher):
         self.matcher_thresh = matcher_thresh
 
         # Load model
-        weights_path = hf_hub_download(repo_id="image-matching-models/silk", filename="silk.safetensors")
+        weights_path = f"{snapshot_download('image-matching-models/silk')}/silk.safetensors"
         self.model = load_silk_model(weights_path, device)
 
     def preprocess(self, img):

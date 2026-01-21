@@ -1,7 +1,7 @@
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import resize_to_divisible, lower_config, add_to_path
 
@@ -29,8 +29,8 @@ class MatchformerMatcher(BaseMatcher):
         config.MATCHFORMER.COARSE.D_FFN = 256
 
         matcher = Matchformer(config=lower_config(config)["matchformer"])
-        weights_path = hf_hub_download(
-            repo_id="image-matching-models/matchformer", filename="matchformer_outdoor-large-LA.safetensors"
+        weights_path = (
+            f"{snapshot_download('image-matching-models/matchformer')}/matchformer_outdoor-large-LA.safetensors"
         )
         state_dict = load_file(weights_path)
         matcher.load_state_dict({k.replace("matcher.", ""): v for k, v in state_dict.items()})

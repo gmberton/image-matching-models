@@ -1,9 +1,9 @@
 import torch
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
 from kornia.color import rgb_to_grayscale
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import load_module, add_to_path
 
@@ -21,7 +21,7 @@ class GIM_DKM(BaseMatcher):
         self.model = self.model.eval().to(device)
 
     def load_weights(self):
-        weights_path = hf_hub_download(repo_id="image-matching-models/gim-dkm", filename="gim_dkm_100h.safetensors")
+        weights_path = f"{snapshot_download('image-matching-models/gim-dkm')}/gim_dkm_100h.safetensors"
         state_dict = load_file(weights_path)
         for k in list(state_dict.keys()):
             if k.startswith("model."):
@@ -76,9 +76,9 @@ class GIM_LightGlue(BaseMatcher):
         from gluefactory_gim.models.matchers.lightglue import LightGlue
 
         # Download weights from HF and get paths from cache
-        repo_id = "image-matching-models/gim-lightglue"
-        self.ckpt_path = hf_hub_download(repo_id=repo_id, filename="gim_lightglue_100h.ckpt")
-        self.superpoint_v1_path = hf_hub_download(repo_id=repo_id, filename="superpoint_v1.pth")
+        repo = snapshot_download("image-matching-models/gim-lightglue")
+        self.ckpt_path = f"{repo}/gim_lightglue_100h.ckpt"
+        self.superpoint_v1_path = f"{repo}/superpoint_v1.pth"
 
         self.detector = SuperPoint(
             {

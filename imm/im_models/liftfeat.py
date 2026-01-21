@@ -1,7 +1,7 @@
 import torch
 import numpy as np
-from huggingface_hub import hf_hub_download
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import to_numpy, add_to_path
 
@@ -14,7 +14,7 @@ class LiftFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
         self.detect_threshold = detect_threshold
-        weights_path = hf_hub_download(repo_id="image-matching-models/liftfeat", filename="liftfeat.pth")
+        weights_path = f"{snapshot_download('image-matching-models/liftfeat')}/liftfeat.pth"
         self.model = LiftFeat(weight=weights_path, detect_threshold=self.detect_threshold)
 
     def preprocess(self, img):

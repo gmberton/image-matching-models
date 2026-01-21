@@ -1,6 +1,6 @@
 import torch
-from huggingface_hub import hf_hub_download
 
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path
 
@@ -35,7 +35,7 @@ class LISRDMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         print("WARNING: LISRD may take awhile to load.")
 
-        model_path = hf_hub_download(repo_id="image-matching-models/lisrd", filename="lisrd_vidit.pth")
+        model_path = f"{snapshot_download('image-matching-models/lisrd')}/lisrd_vidit.pth"
 
         self.model = Lisrd(None, self.model_config, device)
 

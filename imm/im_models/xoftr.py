@@ -1,7 +1,7 @@
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import resize_to_divisible, add_to_path
 
@@ -42,9 +42,7 @@ class XoFTRMatcher(BaseMatcher):
         matcher = XoFTR(config=config["xoftr"])
 
         # Load model from HuggingFace
-        weights_path = hf_hub_download(
-            repo_id="image-matching-models/xoftr", filename=f"xoftr_{self.pretrained_size}.safetensors"
-        )
+        weights_path = f"{snapshot_download('image-matching-models/xoftr')}/xoftr_{self.pretrained_size}.safetensors"
         matcher.load_state_dict(load_file(weights_path), strict=True)
 
         return matcher.eval().to(self.device)

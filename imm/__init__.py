@@ -6,6 +6,7 @@ warnings due to unused modules.
 
 from pathlib import Path
 from types import ModuleType
+from huggingface_hub import snapshot_download
 from .utils import add_to_path, get_default_device  # noqa: F401 - for quick import later 'from imm import get_default_device'
 from .base_matcher import BaseMatcher  # noqa: F401 - for quick import later 'from imm import BaseMatcher'
 
@@ -85,7 +86,7 @@ available_models = [
     "topicfm",
     "topicfm-plus",
     "silk",
-    # "xfeat-steerers-perm",  # Temporarily commented as weights are unavailable
+    # "xfeat-steerers-perm",  # Temporarily commented as weights are no longer available
     # "xfeat-steerers-learned",
     # "xfeat-star-steerers-perm",
     # "xfeat-star-steerers-learned",
@@ -105,6 +106,13 @@ def get_matcher(
     *args,
     **kwargs,
 ) -> BaseMatcher:
+    # Track usage via HF (downloads repo on first access)
+    for name in [matcher_name] if isinstance(matcher_name, str) else matcher_name:
+        try:
+            snapshot_download(f"image-matching-models/{name}")
+        except Exception as e:
+            print(f"\n{'!' * 70}\n!!! HF repo 'image-matching-models/{name}' not found: {e}\n{'!' * 70}\n")
+
     if isinstance(matcher_name, list):
         from imm.base_matcher import EnsembleMatcher
 

@@ -1,10 +1,10 @@
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from kornia.feature import DeDoDe
 from safetensors.torch import load_file
 import kornia
 
+from huggingface_hub import snapshot_download
 from imm import get_version, THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import add_to_path, resize_to_divisible
 
@@ -28,13 +28,12 @@ class DedodeMatcher(BaseMatcher):
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        detector_filename = (
-            "dedode_detector_L.safetensors" if detector_version == 1 else "dedode_detector_L_v2.safetensors"
-        )
-        detector_path = hf_hub_download(repo_id="image-matching-models/dedode", filename=detector_filename)
-        descriptor_path = hf_hub_download(
-            repo_id="image-matching-models/dedode", filename="dedode_descriptor_G.safetensors"
-        )
+        repo = snapshot_download("image-matching-models/dedode")
+        if detector_version == 1:
+            detector_path = f"{repo}/dedode_detector_L.safetensors"
+        else:
+            detector_path = f"{repo}/dedode_detector_L_v2.safetensors"
+        descriptor_path = f"{repo}/dedode_descriptor_G.safetensors"
 
         self.detector = dedode_detector_L(weights=load_file(detector_path), device=device)
         self.descriptor = dedode_descriptor_G(weights=load_file(descriptor_path), device=device)

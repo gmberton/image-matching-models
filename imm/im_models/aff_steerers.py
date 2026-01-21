@@ -1,8 +1,8 @@
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import resize_to_divisible, add_to_path
 
@@ -46,20 +46,16 @@ class AffSteererMatcher(BaseMatcher):
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher()
 
     def build_matcher(self):
-        detector_path = hf_hub_download(
-            repo_id="image-matching-models/affine-steerers", filename="dedode_detector_C4.safetensors"
-        )
-        detector = dedode_detector_L(weights=load_file(detector_path))
+        repo = snapshot_download("image-matching-models/affine-steerers")
+        detector = dedode_detector_L(weights=load_file(f"{repo}/dedode_detector_C4.safetensors"))
 
-        descriptor_filename = f"descriptor_aff_{self.steerer_type}.safetensors"
-        descriptor_path = hf_hub_download(repo_id="image-matching-models/affine-steerers", filename=descriptor_filename)
+        descriptor_path = f"{repo}/descriptor_aff_{self.steerer_type}.safetensors"
         if "G" in self.steerer_type:
             descriptor = dedode_descriptor_G(weights=load_file(descriptor_path))
         else:
             descriptor = dedode_descriptor_B(weights=load_file(descriptor_path))
 
-        steerer_filename = f"steerer_aff_{self.steerer_type}.safetensors"
-        steerer_path = hf_hub_download(repo_id="image-matching-models/affine-steerers", filename=steerer_filename)
+        steerer_path = f"{repo}/steerer_aff_{self.steerer_type}.safetensors"
         steerer = self.load_steerer(steerer_path).to(self.device).eval()
 
         steerer.use_prototype_affines = True

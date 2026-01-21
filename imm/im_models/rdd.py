@@ -2,7 +2,6 @@
 
 import torch
 import torch.nn.functional as F
-from huggingface_hub import hf_hub_download
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
 _original_torch_load = torch.load
@@ -16,6 +15,7 @@ def _patched_torch_load(*args, **kwargs):
 
 torch.load = _patched_torch_load
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import resize_to_divisible, add_to_path
 
@@ -45,7 +45,8 @@ class RDDMatcher(BaseMatcher):
         self.thresh = 0.01
         self.anchor = anchor
 
-        self.model_path = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_v2.pt")
+        repo = snapshot_download("image-matching-models/rdd")
+        self.model_path = f"{repo}/rdd_v2.pt"
 
         config = read_config(self.config_path)
         config["device"] = device
@@ -116,7 +117,7 @@ class _rdd_lightglue_wrapper(LightGlue):
 class RDD_LightGlueMatcher(RDDMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         # Get LightGlue weights path before calling super().__init__
-        self.model_path_lightglue = hf_hub_download(repo_id="image-matching-models/rdd", filename="rdd_lg_v2.pt")
+        self.model_path_lightglue = f"{snapshot_download('image-matching-models/rdd')}/rdd_lg_v2.pt"
 
         # Set up lightglue_conf with the weights path
         self.lightglue_conf = {

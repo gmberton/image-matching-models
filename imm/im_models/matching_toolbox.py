@@ -5,7 +5,6 @@ import numpy as np
 import os
 import torchvision.transforms as tfm
 import torch
-from huggingface_hub import hf_hub_download
 from pathlib import Path
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
@@ -21,7 +20,8 @@ def _patched_torch_load(*args, **kwargs):
 torch.load = _patched_torch_load
 
 from imm.utils import add_to_path, resize_to_divisible
-from imm import THIRD_PARTY_DIR, BaseMatcher, WEIGHTS_DIR
+from huggingface_hub import snapshot_download
+from imm import THIRD_PARTY_DIR, BaseMatcher
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("imatch-toolbox")
 add_to_path(BASE_PATH)
@@ -40,7 +40,7 @@ class Patch2pixMatcher(BaseMatcher):
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
 
-        args["ckpt"] = hf_hub_download(repo_id="image-matching-models/patch2pix", filename="model.pth")
+        args["ckpt"] = f"{snapshot_download('image-matching-models/patch2pix')}/model.pth"
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model = self.matcher.model.to(device)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -134,9 +134,7 @@ class R2D2Matcher(BaseMatcher):
         if ckpt_path.exists():
             self.model_path = str(ckpt_path)
         else:
-            self.model_path = hf_hub_download(
-                repo_id="image-matching-models/r2d2", filename=args["ckpt"].split("/")[-1]
-            )
+            self.model_path = f"{snapshot_download('image-matching-models/r2d2')}/{args['ckpt'].split('/')[-1]}"
 
         args["ckpt"] = self.model_path
         args["top_k"] = max_num_keypoints

@@ -1,9 +1,9 @@
 import torch
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
 from imm.im_models.lightglue import SIFT, SuperPoint
 from imm.utils import add_to_path
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 
 add_to_path(THIRD_PARTY_DIR.joinpath("SphereGlue"))
@@ -83,7 +83,7 @@ class SiftSphereGlue(SphereGlueBase):
         self.sphereglue_cfg.update({"descriptor_dim": 128, "output_dim": 128 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        weights_path = hf_hub_download(repo_id="image-matching-models/sift-sphereglue", filename="model.safetensors")
+        weights_path = f"{snapshot_download('image-matching-models/sift-sphereglue')}/model.safetensors"
         self.matcher.load_state_dict(load_file(weights_path))
 
 
@@ -93,7 +93,5 @@ class SuperpointSphereGlue(SphereGlueBase):
         self.sphereglue_cfg.update({"descriptor_dim": 256, "output_dim": 256 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        weights_path = hf_hub_download(
-            repo_id="image-matching-models/superpoint-sphereglue", filename="model.safetensors"
-        )
+        weights_path = f"{snapshot_download('image-matching-models/superpoint-sphereglue')}/model.safetensors"
         self.matcher.load_state_dict(load_file(weights_path))

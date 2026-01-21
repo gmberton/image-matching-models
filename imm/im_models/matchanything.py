@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
-from huggingface_hub import hf_hub_download
 from PIL import Image
 from safetensors.torch import load_file
 import torch
 import torch.nn.functional as F
 
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path, to_device
 
@@ -81,8 +81,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 
-        repo_id = f"image-matching-models/matchanything-{self.variant}"
-        weights_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
+        weights_path = f"{snapshot_download(f'image-matching-models/matchanything-{self.variant}')}/model.safetensors"
         state_dict = load_file(weights_path)
         self.net.load_state_dict(state_dict, strict=False)
         self.net.eval().to(self.device)

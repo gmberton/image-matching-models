@@ -1,8 +1,8 @@
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file
 
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path
 
@@ -50,12 +50,8 @@ class TopicFMMatcher(BaseMatcher):
         self.model = TopicFM(config=conf)
 
         # Download and load pretrained weights
-        if self.variant == "fast":
-            repo_id = "image-matching-models/topicfm"
-        else:  # plus
-            repo_id = "image-matching-models/topicfm-plus"
-
-        weights_path = hf_hub_download(repo_id=repo_id, filename="model.safetensors")
+        repo = "image-matching-models/topicfm" if self.variant == "fast" else "image-matching-models/topicfm-plus"
+        weights_path = f"{snapshot_download(repo)}/model.safetensors"
         self.model.load_state_dict(load_file(weights_path))
 
         self.model = self.model.eval().to(self.device)

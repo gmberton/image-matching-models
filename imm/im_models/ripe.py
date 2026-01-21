@@ -1,6 +1,6 @@
 from pathlib import Path
-from huggingface_hub import hf_hub_download
 
+from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import add_to_path
 
@@ -16,7 +16,7 @@ class RIPEMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, thresh=0.5, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        model_path = Path(hf_hub_download(repo_id="image-matching-models/ripe", filename="ripe.pth"))
+        model_path = Path(f"{snapshot_download('image-matching-models/ripe')}/ripe.pth")
 
         self.thresh = thresh
         self.max_num_keypoints = max_num_keypoints

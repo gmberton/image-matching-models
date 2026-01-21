@@ -1,6 +1,6 @@
 import torch
 import torchvision.transforms as tfm
-from huggingface_hub import hf_hub_download
+from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import resize_to_divisible, add_to_path
 
@@ -37,24 +37,13 @@ class SteererMatcher(BaseMatcher):
         )
 
         # Download weights from HuggingFace Hub
-        self.detector_path_L = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="dedode_detector_L.pth"
-        )
-        self.descriptor_path_G = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="dedode_descriptor_G.pth"
-        )
-        self.descriptor_path_B_C4 = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="B_C4_Perm_descriptor_setting_C.pth"
-        )
-        self.descriptor_path_B_SO2 = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="B_SO2_Spread_descriptor_setting_B.pth"
-        )
-        self.steerer_path_C = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="B_C4_Perm_steerer_setting_C.pth"
-        )
-        self.steerer_path_B = hf_hub_download(
-            repo_id="image-matching-models/steerers", filename="B_SO2_Spread_steerer_setting_B.pth"
-        )
+        repo = snapshot_download("image-matching-models/steerers")
+        self.detector_path_L = f"{repo}/dedode_detector_L.pth"
+        self.descriptor_path_G = f"{repo}/dedode_descriptor_G.pth"
+        self.descriptor_path_B_C4 = f"{repo}/B_C4_Perm_descriptor_setting_C.pth"
+        self.descriptor_path_B_SO2 = f"{repo}/B_SO2_Spread_descriptor_setting_B.pth"
+        self.steerer_path_C = f"{repo}/B_C4_Perm_steerer_setting_C.pth"
+        self.steerer_path_B = f"{repo}/B_SO2_Spread_steerer_setting_B.pth"
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh

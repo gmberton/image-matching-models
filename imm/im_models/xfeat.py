@@ -1,5 +1,5 @@
 from torch import Tensor
-from huggingface_hub import hf_hub_download
+from huggingface_hub import snapshot_download
 
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path
@@ -13,7 +13,7 @@ class xFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         assert mode in ["sparse", "semi-dense", "lighterglue"]
 
-        self.model_path = hf_hub_download(repo_id="image-matching-models/xfeat", filename="xfeat.pt")
+        self.model_path = f"{snapshot_download('image-matching-models/xfeat')}/xfeat.pt"
 
         self.model = XFeat(weights=self.model_path)
         self.model.net = self.model.net.to(device)
