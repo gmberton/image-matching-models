@@ -32,20 +32,28 @@ class BaseMatcher(torch.nn.Module):
         return self.__class__.__name__
 
     @staticmethod
-    def load_image(path: str | Path, resize: int | tuple = None, rot_angle: float = 0) -> torch.Tensor:
-        """load image from filesystem and return as tensor. Optionally rotate and resize.
+    def load_image(path: str | Path = None, image: Image = None,
+                   resize: int | tuple = None, rot_angle: float = 0) -> torch.Tensor:
+        """Load image from filesystem or a Pillow image instance and return as tensor.
+           Optionally rotate and resize.
 
         Args:
-            path (str | Path): path to image on filesystem
+            path (str | Path): path to image on filesystem; must be present if `image` is None
+            image (Image): Pillow image instance; must be present if `path` is None, and ignored if `path` is provided
             resize (int | tuple, optional): size to resize img, either single value for square resize or tuple of (H, W). Defaults to None.
             rot_angle (float, optional): CCW rotation angle in degrees. Defaults to 0.
 
         Returns:
             torch.Tensor: image as tensor (C x H x W)
         """
+        if path:
+            image = Image.open(path).convert("RGB")
+        elif not image:
+            raise ValueError(f"Either path or image must be provided.")
+
+        img = tfm.ToTensor()(image)
         if isinstance(resize, int):
             resize = (resize, resize)
-        img = tfm.ToTensor()(Image.open(path).convert("RGB"))
         if resize is not None:
             img = tfm.Resize(resize, antialias=True)(img)
         img = tfm.functional.rotate(img, rot_angle)
