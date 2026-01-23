@@ -11,11 +11,7 @@ from huggingface_hub.utils import disable_progress_bars
 from .utils import add_to_path, get_default_device  # noqa: F401 - for quick import later 'from imm import get_default_device'
 from .base_matcher import BaseMatcher  # noqa: F401 - for quick import later 'from imm import BaseMatcher'
 
-# add viz2d from lightglue to namespace - thanks lightglue!
-THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")
-
-add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
-from lightglue import viz2d  # noqa: F401 - for quick import later 'from imm import viz2d'
+THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")  # exported for use by matcher modules
 
 disable_progress_bars()  # disable all HF progress bars
 

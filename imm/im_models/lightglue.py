@@ -1,10 +1,10 @@
 from imm import BaseMatcher, THIRD_PARTY_DIR
 from imm.utils import add_to_path
 
+add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
+
 from lightglue import match_pair
 from lightglue import LightGlue, SuperPoint, DISK, SIFT, ALIKED, DoGHardNet
-
-add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 
 
 class LightGlueBase(BaseMatcher):
