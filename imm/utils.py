@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 import numpy as np
 import torch
+from PIL import Image
 import torchvision.transforms as tfm
 from yacs.config import CfgNode as CN
 import sys
@@ -340,3 +341,36 @@ def flow_to_matches(
     matches1 = (matches0 + np.stack([dx, dy], axis=1)).astype(np.float32)
 
     return matches0, matches1, confs
+
+
+def _load_image(path: str | Path, resize: int | tuple = None, rot_angle: float = 0) -> torch.Tensor:
+    """load image from filesystem and return as tensor. Optionally rotate and resize.
+
+    Args:
+        path (str | Path): path to image on filesystem
+        resize (int | tuple, optional): size to resize img, either single value for square resize or tuple of (H, W). Defaults to None.
+        rot_angle (float, optional): CCW rotation angle in degrees. Defaults to 0.
+
+    Returns:
+        torch.Tensor: image as tensor (C x H x W)
+    """
+    if isinstance(resize, int):
+        resize = (resize, resize)
+    img = tfm.ToTensor()(Image.open(path).convert("RGB"))
+    if resize is not None:
+        img = tfm.Resize(resize, antialias=True)(img)
+    img = tfm.functional.rotate(img, rot_angle)
+    return img
+
+
+def to_tensor_image(img):
+    if isinstance(img, (str, Path)):
+        img = _load_image(img)
+    elif isinstance(img, Image.Image):
+        img = tfm.ToTensor()(img.convert("RGB"))
+    assert isinstance(img, torch.Tensor), "img should be a torch.Tensor, a path, or a PIL Image"
+    assert img.ndim == 3 and img.shape[0] == 3, f"img should have shape (3, H, W), got {img.shape}"
+    # Small toleranc of 0.2 because images after bicubic resizing can slightly exceed the [0, 1] range
+    # This is expected, not a bug, see https://github.com/opencv/opencv/issues/7195
+    assert -0.2 <= img.min() and img.max() <= 1.2, f"img should be in [0, 1], got [{img.min()}, {img.max()}]"
+    return img

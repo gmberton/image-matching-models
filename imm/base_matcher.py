@@ -2,10 +2,9 @@ import cv2
 import torch
 import numpy as np
 from PIL import Image
-import torchvision.transforms as tfm
 from pathlib import Path
 
-from imm.utils import to_normalized_coords, to_px_coords, to_numpy
+from imm.utils import to_normalized_coords, to_px_coords, to_numpy, _load_image, to_tensor_image
 
 
 class BaseMatcher(torch.nn.Module):
@@ -43,13 +42,7 @@ class BaseMatcher(torch.nn.Module):
         Returns:
             torch.Tensor: image as tensor (C x H x W)
         """
-        if isinstance(resize, int):
-            resize = (resize, resize)
-        img = tfm.ToTensor()(Image.open(path).convert("RGB"))
-        if resize is not None:
-            img = tfm.Resize(resize, antialias=True)(img)
-        img = tfm.functional.rotate(img, rot_angle)
-        return img
+        return _load_image(path=path, resize=resize, rot_angle=rot_angle)
 
     def rescale_coords(
         self,
@@ -105,12 +98,14 @@ class BaseMatcher(torch.nn.Module):
         return H, inlier_kpts0, inlier_kpts1
 
     @torch.inference_mode()
-    def forward(self, img0: torch.Tensor | str | Path, img1: torch.Tensor | str | Path) -> dict:
+    def forward(
+        self, img0: torch.Tensor | str | Path | Image.Image, img1: torch.Tensor | str | Path | Image.Image
+    ) -> dict:
         """Run matching pipeline on two images. All sub-classes implement this interface.
 
         Args:
-            img0 (torch.Tensor | str | Path): first image as tensor (C x H x W) or path
-            img1 (torch.Tensor | str | Path): second image as tensor (C x H x W) or path
+            img0 (torch.Tensor | str | Path | Image.Image): first image as tensor (3, H, W) in [0, 1] range, path, or PIL Image
+            img1 (torch.Tensor | str | Path | Image.Image): second image as tensor (3, H, W) in [0, 1] range, path, or PIL Image
 
         Returns:
             dict: result dict with keys:
@@ -125,17 +120,10 @@ class BaseMatcher(torch.nn.Module):
                 - inlier_kpts0 (np.ndarray): (N3 x 2) filtered matched_kpts0 that fit the H model (post-RANSAC)
                 - inlier_kpts1 (np.ndarray): (N3 x 2) filtered matched_kpts1 that fit the H model (post-RANSAC)
         """
+
         # Take as input a pair of images (not a batch)
-        if isinstance(img0, (str, Path)):
-            img0 = BaseMatcher.load_image(img0)
-        if isinstance(img1, (str, Path)):
-            img1 = BaseMatcher.load_image(img1)
-
-        assert isinstance(img0, torch.Tensor)
-        assert isinstance(img1, torch.Tensor)
-
-        img0 = img0.to(self.device)
-        img1 = img1.to(self.device)
+        img0 = to_tensor_image(img0).to(self.device)
+        img1 = to_tensor_image(img1).to(self.device)
 
         # self._forward() is implemented by the children modules
         matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1 = self._forward(img0, img1)
@@ -176,11 +164,11 @@ class BaseMatcher(torch.nn.Module):
             "inlier_kpts1": inlier_kpts1,
         }
 
-    def extract(self, img: str | Path | torch.Tensor) -> dict[str, np.ndarray]:
+    def extract(self, img: str | Path | torch.Tensor | Image.Image) -> dict[str, np.ndarray]:
         """Extract keypoints and descriptors from a single image.
 
         Args:
-            img (str | Path | torch.Tensor): image as tensor (C, H, W) or path
+            img (str | Path | torch.Tensor | Image.Image): image as tensor (C, H, W), path, or PIL Image
 
         Returns:
             dict: result dict with keys:
