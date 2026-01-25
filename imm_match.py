@@ -88,12 +88,12 @@ def main():
         image1 = matcher.load_image(img1_path, resize=image_size)
         result = matcher(image0, image1)
 
-        out_str = f"{'Paths':<{COL_WIDTH}}: {img0_path}, {img1_path}\n"
+        out_str = f"{'Input':<{COL_WIDTH}}: {img0_path}, {img1_path}\n"
         out_str += f"{'Inliers (post-RANSAC)':<{COL_WIDTH}}: {result['num_inliers']}\n"
 
         if not args.no_viz:
             viz_path = args.out_dir / f"output_{i}_matches.jpg"
-            plot_matches(image0, image1, result, save_path=viz_path)
+            plot_matches(image0, image1, result, save_path=viz_path, show_all_kpts=True)
             out_str += f"{'Viz saved in':<{COL_WIDTH}}: {viz_path}\n"
 
         result["img0_path"] = img0_path

@@ -16,7 +16,7 @@ from pathlib import Path
 
 from imm import get_matcher, available_models
 from imm.utils import get_default_device
-from imm.viz import plot_kpts
+from imm.viz import plot_keypoints
 
 COL_WIDTH = 15
 
@@ -87,13 +87,13 @@ def main():
         if result["all_kpts0"] is None:
             print(f"Matcher {args.matcher} does not extract keypoints")
             break
-        out_str = f"{'Path':<{COL_WIDTH}}: {img_path}\n"
+        out_str = f"{'Input':<{COL_WIDTH}}: {img_path}\n"
 
         out_str += f"{'Num keypoints':<{COL_WIDTH}}: {len(result['all_kpts0'])}\n"
 
         if not args.no_viz:
             viz_path = args.out_dir / f"output_{i}_kpts.jpg"
-            plot_kpts(image, result, model_name=args.matcher, save_path=viz_path)
+            plot_keypoints(image, result, model_name=args.matcher, save_path=viz_path)
             out_str += f"{'Viz saved in':<{COL_WIDTH}}: {viz_path}\n"
 
         print(out_str)

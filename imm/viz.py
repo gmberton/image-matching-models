@@ -12,80 +12,111 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from kornia.utils import tensor_to_image
+from imm.utils import to_numpy
+from pathlib import Path
 
 if not hasattr(sys, "ps1"):
     matplotlib.use("Agg")
 
 
-def plot_images(imgs, titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True):
+def plot_images(
+    imgs: list[torch.Tensor | np.ndarray], titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
+) -> np.ndarray[matplotlib.axes.Axes]:
     """Plot a set of images horizontally."""
-    imgs = [
-        np.clip(img.permute(1, 2, 0).cpu().numpy(), 0, 1)
-        if (isinstance(img, torch.Tensor) and img.dim() == 3)
-        else np.clip(img, 0, 1)
-        for img in imgs
-    ]
-    n = len(imgs)
+
+    imgs = [np.clip(tensor_to_image(img), 0, 1) for img in imgs if isinstance(img, torch.Tensor)]
+
+    num_imgs = len(imgs)
+
     if not isinstance(cmaps, (list, tuple)):
-        cmaps = [cmaps] * n
-    ratios = [i.shape[1] / i.shape[0] for i in imgs] if adaptive else [4 / 3] * n
-    fig, ax = plt.subplots(1, n, figsize=[sum(ratios) * 4.5, 4.5], dpi=dpi, gridspec_kw={"width_ratios": ratios})
-    if n == 1:
-        ax = [ax]
-    for i in range(n):
-        ax[i].imshow(imgs[i], cmap=plt.get_cmap(cmaps[i]))
-        ax[i].set_axis_off()
+        cmaps = [cmaps] * num_imgs
+    ratios = [img.shape[1] / img.shape[0] for img in imgs] if adaptive else [4 / 3] * num_imgs
+    fig, axs = plt.subplots(
+        1, num_imgs, figsize=[sum(ratios) * 4.5, 4.5], dpi=dpi, gridspec_kw={"width_ratios": ratios}
+    )
+    if num_imgs == 1:
+        axs = np.array([axs])
+    for idx in range(num_imgs):
+        axs[idx].imshow(imgs[idx], cmap=plt.get_cmap(cmaps[idx]))
+        axs[idx].set_axis_off()
         if titles:
-            ax[i].set_title(titles[i])
+            axs[idx].set_title(titles[idx])
     fig.tight_layout(pad=pad)
+    return axs
+
+
+def _draw_kpts(
+    kpts: list[np.ndarray | torch.Tensor], axs: list[matplotlib.axes.Axes], colors: str = "lime", point_size: int = 4
+) -> list[matplotlib.axes.Axes]:
+    """Plot keypoints on axes."""
+    assert len(kpts) == len(axs), "Number of keypoints sets must match number of axes."
+    if not isinstance(colors, list):
+        colors = [colors] * len(kpts)
+    if axs is None:
+        axs = plt.gcf().axes
+
+    for ax, kpts, color in zip(np.array(axs).flatten(), kpts, colors):
+        kpts = to_numpy(kpts)
+        ax.scatter(kpts[:, 0], kpts[:, 1], c=color, s=point_size, linewidths=0)
+    return axs
+
+
+def add_text(
+    ax: matplotlib.axes.Axes,
+    text: str,
+    pos: tuple[float, float] = (0.01, 0.99),
+    fs: int = 15,
+    color="w",
+    outline_color="k",
+    outline_width=2,
+    va="top",
+) -> matplotlib.axes.Axes:
+    """Add text with outline to an image axis."""
+    text = ax.text(*pos, text, fontsize=fs, ha="left", va=va, color=color, transform=ax.transAxes)
+    if outline_color is not None:
+        text.set_path_effects(
+            [path_effects.Stroke(linewidth=outline_width, foreground=outline_color), path_effects.Normal()]
+        )
     return ax
 
 
-def plot_keypoints(kpts, colors="lime", ps=4):
-    """Plot keypoints on current figure's axes."""
-    if not isinstance(colors, list):
-        colors = [colors] * len(kpts)
-    for ax, k, c in zip(plt.gcf().axes, kpts, colors):
-        if isinstance(k, torch.Tensor):
-            k = k.cpu().numpy()
-        ax.scatter(k[:, 0], k[:, 1], c=c, s=ps, linewidths=0)
-
-
-def add_text(idx, text, pos=(0.01, 0.99), fs=15, color="w", lcolor="k", lwidth=2, va="top"):
-    """Add text with outline to an image axis."""
-    ax = plt.gcf().axes[idx]
-    t = ax.text(*pos, text, fontsize=fs, ha="left", va=va, color=color, transform=ax.transAxes)
-    if lcolor is not None:
-        t.set_path_effects([path_effects.Stroke(linewidth=lwidth, foreground=lcolor), path_effects.Normal()])
-
-
-def save_plot(path, **kw):
+def save_plot(fig=None, path: str | Path = None, **kw) -> Path:
     """Save the current figure without any white margin."""
-    plt.savefig(path, bbox_inches="tight", pad_inches=0, **kw)
+    if fig is None:
+        fig = plt.gcf()
+    fig.savefig(path, bbox_inches="tight", pad_inches=0, **kw)
+    return Path(path).resolve()
 
 
-def _draw_matches(kpts0, kpts1, color, lw, ps):
-    """Draw match lines between keypoints on current figure."""
-    if isinstance(kpts0, torch.Tensor):
-        kpts0 = kpts0.cpu().numpy()
-    if isinstance(kpts1, torch.Tensor):
-        kpts1 = kpts1.cpu().numpy()
+def _draw_matches(
+    kpts0: np.ndarray | torch.Tensor,
+    kpts1: np.ndarray | torch.Tensor,
+    fig: matplotlib.figure.Figure,
+    color: str = "lime",
+    lw: float = 0.2,
+    point_size: int = 4,
+):
+    """Draw match lines between keypoints on figure."""
+    kpts0, kpts1 = to_numpy(kpts0), to_numpy(kpts1)
+
     if len(kpts0) == 0:
         return
 
-    fig = plt.gcf()
+    if fig is None:
+        fig = plt.gcf()
+
     ax0, ax1 = fig.axes[0], fig.axes[1]
     colors = [color] * len(kpts0)
 
-    for i in range(len(kpts0)):
+    for idx in range(len(kpts0)):
         line = matplotlib.patches.ConnectionPatch(
-            xyA=(kpts0[i, 0], kpts0[i, 1]),
-            xyB=(kpts1[i, 0], kpts1[i, 1]),
+            xyA=(kpts0[idx, 0], kpts0[idx, 1]),
+            xyB=(kpts1[idx, 0], kpts1[idx, 1]),
             coordsA=ax0.transData,
             coordsB=ax1.transData,
             axesA=ax0,
             axesB=ax1,
-            color=colors[i],
+            color=colors[idx],
             linewidth=lw,
         )
         line.set_annotation_clip(True)
@@ -93,57 +124,71 @@ def _draw_matches(kpts0, kpts1, color, lw, ps):
 
     ax0.autoscale(enable=False)
     ax1.autoscale(enable=False)
-    if ps > 0:
-        ax0.scatter(kpts0[:, 0], kpts0[:, 1], c=colors, s=ps)
-        ax1.scatter(kpts1[:, 0], kpts1[:, 1], c=colors, s=ps)
+
+    # plot points on the respective axes
+    if point_size > 0:
+        ax0.scatter(kpts0[:, 0], kpts0[:, 1], c=colors, s=point_size)
+        ax1.scatter(kpts1[:, 0], kpts1[:, 1], c=colors, s=point_size)
+
+    return fig
 
 
 def plot_matches(
-    img0,
-    img1,
-    result,
-    show_matched_kpts=True,
-    show_all_kpts=False,
-    save_path=None,
-    color="lime",
-    lw=0.2,
-    ps=4,
-    show_text=True,
+    img0: torch.Tensor,
+    img1: torch.Tensor,
+    result: dict,
+    show_matched_kpts: bool = True,
+    show_all_kpts: bool = False,
+    save_path: str | Path | None = None,
+    color: str = "lime",
+    lw: float = 0.2,
+    point_size: int = 4,
+    show_text: bool = True,
 ):
     """Plot matches between two images."""
-    ax = plot_images([img0, img1])
+    axs = plot_images([img0, img1])
+    fig = axs[0].get_figure()
 
+    # draw all matches (even non-inliers) in blue
     if show_matched_kpts and "matched_kpts0" in result:
-        _draw_matches(result["matched_kpts0"], result["matched_kpts1"], "blue", lw * 0.25, ps * 0.5)
+        _draw_matches(result["matched_kpts0"], result["matched_kpts1"], fig, "blue", lw * 0.25, point_size * 0.5)
+    # draw all keypoints in orange
     if show_all_kpts and result.get("all_kpts0") is not None:
-        plot_keypoints([result["all_kpts0"], result["all_kpts1"]], colors="red", ps=ps * 0.5)
+        _draw_kpts([result["all_kpts0"], result["all_kpts1"]], axs, colors="orange", point_size=point_size * 0.5)
 
-    _draw_matches(result["inlier_kpts0"], result["inlier_kpts1"], color, lw, ps)
+    _draw_matches(result["inlier_kpts0"], result["inlier_kpts1"], fig, color, lw, point_size)
 
     if show_text:
-        n_inliers, n_matches = len(result["inlier_kpts0"]), len(result["matched_kpts1"])
-        ratio = f"{n_inliers / n_matches:.2f}" if n_matches else "N/A"
-        add_text(0, f"{n_inliers} inliers / {n_matches} matches\ninlier ratio: {ratio}", fs=17, lwidth=2)
-        add_text(0, "Img0", pos=(0.01, 0.01), va="bottom")
-        add_text(1, "Img1", pos=(0.01, 0.01), va="bottom")
+        num_inliers, num_matches = len(result["inlier_kpts0"]), len(result["matched_kpts1"])
+        ratio = f"{num_inliers / num_matches:.2f}" if num_matches else "N/A"
+        add_text(
+            axs[0], f"{num_inliers} inliers / {num_matches} matches\ninlier ratio: {ratio}", fs=17, outline_width=2
+        )
+        add_text(axs[0], "Img0", pos=(0.01, 0.01), va="bottom")
+        add_text(axs[1], "Img1", pos=(0.01, 0.01), va="bottom")
 
     if save_path is not None:
-        save_plot(save_path)
-    return ax
+        save_plot(fig, save_path)
+    return axs
 
 
-def plot_kpts(img0, result, model_name="", save_path=None):
+def plot_keypoints(
+    img0: torch.Tensor, result: dict, model_name: str = "", color="orange", save_path: str | Path | None = None
+) -> matplotlib.axes.Axes:
     """Plot keypoints in one image."""
-    ax = plot_images([img0])
-    plot_keypoints([result["all_kpts0"]], colors="orange", ps=10)
+    ax = plot_images([img0])[0]
+    _draw_kpts([result["all_kpts0"]], [ax], colors=color, point_size=10)
+
     label = f"{len(result['all_kpts0'])} kpts" + (f" - {model_name}" if model_name else "")
-    add_text(0, label, fs=20)
+    add_text(ax, label, fs=20)
+
     if save_path is not None:
-        save_plot(save_path)
+        fig = ax.get_figure()
+        save_plot(fig, save_path)
     return ax
 
 
-def stitch(img0, img1, result):
+def stitch(img0: torch.Tensor | np.ndarray, img1: torch.Tensor | np.ndarray, result) -> np.ndarray:
     """Stitch two images together using homography."""
     if isinstance(img0, torch.Tensor):
         img0 = tensor_to_image(img0)
