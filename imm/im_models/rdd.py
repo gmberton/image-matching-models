@@ -19,6 +19,7 @@ from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
 from imm.utils import resize_to_divisible, add_to_path
 
+add_to_path(THIRD_PARTY_DIR.joinpath("LightGlue"))
 add_to_path(THIRD_PARTY_DIR.joinpath("rdd"))
 
 from RDD.RDD import build
