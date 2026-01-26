@@ -1,5 +1,5 @@
 import torch
-from huggingface_hub import hf_hub_download
+from huggingface_hub import snapshot_download
 from safetensors.torch import load_file
 from copy import deepcopy
 import torchvision.transforms as tfm
@@ -14,8 +14,6 @@ from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 
 
 class EfficientLoFTRMatcher(BaseMatcher):
-    repo_id = "ariG23498/eloftr"
-    weight_filename = "eloftr_outdoors.safetensors"
     divisible_size = 32
 
     def __init__(self, device="cpu", cfg="full", **kwargs):
@@ -23,7 +21,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         self.precision = kwargs.get("precision", self.get_precision())
 
-        model_path = hf_hub_download(repo_id=self.repo_id, filename=self.weight_filename)
+        model_path = f"{snapshot_download('image-matching-models/eloftr')}/eloftr_outdoors.safetensors"
 
         self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg))
 
