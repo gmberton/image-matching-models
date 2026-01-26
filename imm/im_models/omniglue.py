@@ -1,3 +1,4 @@
+import tensorflow  # must import before torch to avoid segfault (github.com/tensorflow/tensorflow/issues/14812)
 import py3_wget
 import tarfile
 import zipfile
