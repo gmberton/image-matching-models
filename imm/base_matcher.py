@@ -99,13 +99,15 @@ class BaseMatcher(torch.nn.Module):
 
     @torch.inference_mode()
     def forward(
-        self, img0: torch.Tensor | str | Path | Image.Image, img1: torch.Tensor | str | Path | Image.Image
+        self,
+        img0: torch.Tensor | np.ndarray | str | Path | Image.Image,
+        img1: torch.Tensor | np.ndarray | str | Path | Image.Image,
     ) -> dict:
         """Run matching pipeline on two images. All sub-classes implement this interface.
 
         Args:
-            img0 (torch.Tensor | str | Path | Image.Image): first image as tensor (3, H, W) in [0, 1] range, path, or PIL Image
-            img1 (torch.Tensor | str | Path | Image.Image): second image as tensor (3, H, W) in [0, 1] range, path, or PIL Image
+            img0 (torch.Tensor | np.ndarray | str | Path | Image.Image): image as (3, H, W) array in [0, 1] range, path, or PIL Image
+            img1 (torch.Tensor | np.ndarray | str | Path | Image.Image): image as (3, H, W) array in [0, 1] range, path, or PIL Image
 
         Returns:
             dict: result dict with keys:
@@ -164,11 +166,11 @@ class BaseMatcher(torch.nn.Module):
             "inlier_kpts1": inlier_kpts1,
         }
 
-    def extract(self, img: str | Path | torch.Tensor | Image.Image) -> dict[str, np.ndarray]:
+    def extract(self, img: torch.Tensor | np.ndarray | str | Path | Image.Image) -> dict[str, np.ndarray]:
         """Extract keypoints and descriptors from a single image.
 
         Args:
-            img (str | Path | torch.Tensor | Image.Image): image as tensor (C, H, W), path, or PIL Image
+            img (torch.Tensor | np.ndarray | str | Path | Image.Image): image as (3, H, W) array in [0, 1] range, path, or PIL Image
 
         Returns:
             dict: result dict with keys:

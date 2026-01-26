@@ -368,6 +368,8 @@ def to_tensor_image(img):
         img = _load_image(img)
     elif isinstance(img, Image.Image):
         img = tfm.ToTensor()(img.convert("RGB"))
+    elif isinstance(img, np.ndarray):
+        img = torch.from_numpy(img)
     assert isinstance(img, torch.Tensor), "img should be a torch.Tensor, a path, or a PIL Image"
     assert img.ndim == 3 and img.shape[0] == 3, f"img should have shape (3, H, W), got {img.shape}"
     # Small toleranc of 0.2 because images after bicubic resizing can slightly exceed the [0, 1] range

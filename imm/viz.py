@@ -11,8 +11,9 @@ import matplotlib.patheffects as path_effects
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from PIL import Image
 from kornia.utils import tensor_to_image
-from imm.utils import to_numpy
+from imm.utils import to_numpy, to_tensor_image
 from pathlib import Path
 
 if not hasattr(sys, "ps1"):
@@ -20,11 +21,16 @@ if not hasattr(sys, "ps1"):
 
 
 def plot_images(
-    imgs: list[torch.Tensor | np.ndarray], titles=None, cmaps="gray", dpi=100, pad=0.5, adaptive=True
+    imgs: list[torch.Tensor | np.ndarray | str | Path | Image.Image],
+    titles=None,
+    cmaps="gray",
+    dpi=100,
+    pad=0.5,
+    adaptive=True,
 ) -> np.ndarray[matplotlib.axes.Axes]:
     """Plot a set of images horizontally."""
-
-    imgs = [np.clip(tensor_to_image(img), 0, 1) for img in imgs if isinstance(img, torch.Tensor)]
+    imgs = [to_tensor_image(img) for img in imgs]
+    imgs = [np.clip(tensor_to_image(img), 0, 1) for img in imgs]
 
     num_imgs = len(imgs)
 
