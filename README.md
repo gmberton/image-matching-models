@@ -60,9 +60,9 @@ SIFT and DeDoDe
 ## Install
 IMM can be installed directly from PyPi using pip or uv (faster)
 ```bash
-pip install imm
+pip install image-matching-models
 # or
-uv pip install imm
+uv pip install image-matching-models
 ```
 
 or, for development, clone this git repo and install with:
