@@ -46,12 +46,14 @@ class Patch2pixMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     def preprocess(self, img):
+        _, h, w = img.shape
+        orig_shape = h, w
         img = resize_to_divisible(img, self.divisible_by)
-        return self.normalize(img).unsqueeze(0)
+        return self.normalize(img).unsqueeze(0), orig_shape
 
     def _forward(self, img0, img1):
-        img0 = self.preprocess(img0)
-        img1 = self.preprocess(img1)
+        img0, img0_orig_shape = self.preprocess(img0)
+        img1, img1_orig_shape = self.preprocess(img1)
 
         # Fine matches
         fine_matches, fine_scores, coarse_matches = self.matcher.model.predict_fine(
@@ -74,6 +76,10 @@ class Patch2pixMatcher(BaseMatcher):
 
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
+
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
+        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
+        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
         return mkpts0, mkpts1, None, None, None, None
 

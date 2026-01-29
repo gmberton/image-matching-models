@@ -3,7 +3,7 @@ from argparse import Namespace
 
 from huggingface_hub import snapshot_download
 from imm import THIRD_PARTY_DIR, BaseMatcher
-from imm.utils import add_to_path
+from imm.utils import add_to_path, resize_to_divisible
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"), insert=0)
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA/third_party/RoMa"))
@@ -55,6 +55,8 @@ class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
 
 
 class MINIMALoFTRMatcher(MINIMAMatcher):
+    divisible_size = 8
+
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
@@ -65,6 +67,7 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
+        img = resize_to_divisible(img, self.divisible_size)
         img = tfm.Grayscale()(img)
         return img.unsqueeze(0).to(self.device), orig_shape
 
@@ -126,6 +129,8 @@ class MINIMARomaMatcher(MINIMAMatcher):
 
 
 class MINIMAXoFTRMatcher(MINIMAMatcher):
+    divisible_size = 8
+
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
@@ -137,6 +142,7 @@ class MINIMAXoFTRMatcher(MINIMAMatcher):
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
+        img = resize_to_divisible(img, self.divisible_size)
         img = tfm.Grayscale()(img)
         return img.unsqueeze(0).to(self.device), orig_shape
 

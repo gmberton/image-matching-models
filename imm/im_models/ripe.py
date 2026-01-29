@@ -30,9 +30,6 @@ class RIPEMatcher(BaseMatcher):
         _, h, w = img.shape
         orig_shape = h, w
 
-        if img.max() > 1:
-            img = img.float() / 255.0
-
         return img, orig_shape
 
     def _forward(self, img0, img1):

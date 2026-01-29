@@ -1,3 +1,4 @@
+import importlib
 import logging
 from pathlib import Path
 import numpy as np
@@ -197,8 +198,6 @@ def load_module(module_name: str, module_path: Path | str) -> None:
         module_name (str): module name (will be used to import from later, as in `from module_name import my_function`)
         module_path (Path | str): path to module (usually an __init__.py file)
     """
-    import importlib
-
     # load gluefactory into namespace
     # module_name = 'gluefactory'
     spec = importlib.util.spec_from_file_location(module_name, module_path)
@@ -372,7 +371,7 @@ def to_tensor_image(img):
         img = torch.from_numpy(img)
     assert isinstance(img, torch.Tensor), "img should be a torch.Tensor, a path, or a PIL Image"
     assert img.ndim == 3 and img.shape[0] == 3, f"img should have shape (3, H, W), got {img.shape}"
-    # Small toleranc of 0.2 because images after bicubic resizing can slightly exceed the [0, 1] range
+    # Small tolerance of 0.2 because images after bicubic resizing can slightly exceed the [0, 1] range
     # This is expected, not a bug, see https://github.com/opencv/opencv/issues/7195
     assert -0.2 <= img.min() and img.max() <= 1.2, f"img should be in [0, 1], got [{img.min()}, {img.max()}]"
     return img

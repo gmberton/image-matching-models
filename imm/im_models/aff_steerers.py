@@ -9,6 +9,7 @@ from imm.utils import resize_to_divisible, add_to_path
 add_to_path(THIRD_PARTY_DIR.joinpath("affine-steerers"))
 from affine_steerers.utils import build_affine
 from affine_steerers.matchers.dual_softmax_matcher import MaxSimilarityMatcher
+from affine_steerers.steerers import SteererSpread
 from affine_steerers import dedode_detector_L, dedode_descriptor_B, dedode_descriptor_G
 
 
@@ -78,8 +79,6 @@ class AffSteererMatcher(BaseMatcher):
 
     @staticmethod
     def load_steerer(steerer_path, prototypes=True, feat_dim=256):
-        from affine_steerers.steerers import SteererSpread
-
         sd = load_file(steerer_path)
 
         nbr_prototypes = 0

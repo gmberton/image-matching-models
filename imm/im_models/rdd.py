@@ -64,10 +64,9 @@ class RDDMatcher(BaseMatcher):
         # need "batch" dimension for RDD
         if len(img.shape) == 3:
             img = img[None, ...]
-        if img.max() > 1.0:
-            img = img / 255.0
         _, _, h, w = img.shape
         orig_shape = h, w
+        img = resize_to_divisible(img, 32)
         return img, orig_shape
 
     def _forward(self, img0, img1):

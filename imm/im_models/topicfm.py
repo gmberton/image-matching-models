@@ -4,7 +4,7 @@ from safetensors.torch import load_file
 
 from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
-from imm.utils import add_to_path
+from imm.utils import add_to_path, resize_to_divisible
 
 # Add TopicFM to path
 add_to_path(THIRD_PARTY_DIR.joinpath("TopicFM"))
@@ -15,6 +15,8 @@ from src import get_model_cfg  # noqa: E402
 
 
 class TopicFMMatcher(BaseMatcher):
+    divisible_size = 16
+
     def __init__(self, device="cpu", variant="fast", *args, **kwargs):
         """TopicFM matcher.
 
@@ -57,13 +59,18 @@ class TopicFMMatcher(BaseMatcher):
         self.model = self.model.eval().to(self.device)
 
     def preprocess(self, img):
-        """Convert RGB image to grayscale and add batch dimension."""
-        return tfm.Grayscale()(img).unsqueeze(0)
+        """Convert RGB image to grayscale, resize to divisible, and add batch dimension."""
+        _, h, w = img.shape
+        orig_shape = h, w
+        img = resize_to_divisible(img, self.divisible_size)
+        return tfm.Grayscale()(img).unsqueeze(0), orig_shape
 
     def _forward(self, img0, img1):
         # Preprocess images
-        img0 = self.preprocess(img0).to(self.device)
-        img1 = self.preprocess(img1).to(self.device)
+        img0, img0_orig_shape = self.preprocess(img0)
+        img1, img1_orig_shape = self.preprocess(img1)
+        img0 = img0.to(self.device)
+        img1 = img1.to(self.device)
 
         # Prepare data dict
         data = {
@@ -76,7 +83,11 @@ class TopicFMMatcher(BaseMatcher):
             self.model(data)
 
         # Extract matched keypoints
-        mkpts0 = data["mkpts0_f"].cpu().numpy()
-        mkpts1 = data["mkpts1_f"].cpu().numpy()
+        mkpts0 = data["mkpts0_f"]
+        mkpts1 = data["mkpts1_f"]
+
+        H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
+        mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
+        mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
         return mkpts0, mkpts1, None, None, None, None

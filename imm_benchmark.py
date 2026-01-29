@@ -41,12 +41,22 @@ def parse_args():
         metavar="MODEL",
         help="models to benchmark, or 'all' (default: all)",
     )
-    parser.add_argument("--img-size", type=int, default=512, help="image size (default: %(default)s)")
+    # default img_size is intentionally non-divisible by 8 to catch models that don't handle arbitrary sizes
+    parser.add_argument(
+        "--img-size", type=int, nargs="+", default=[313, 471], help="image size H [W] (default: %(default)s)"
+    )
     parser.add_argument("--device", type=str, default=get_default_device(), help="device (default: %(default)s)")
     parser.add_argument(
         "--single-matcher-json", type=str, metavar="MODEL", help="run single matcher and output JSON (internal use)"
     )
     args = parser.parse_args()
+
+    if len(args.img_size) == 1:
+        args.img_size = (args.img_size[0], args.img_size[0])
+    elif len(args.img_size) == 2:
+        args.img_size = tuple(args.img_size)
+    else:
+        parser.error("--img-size takes 1 or 2 values (H [W])")
 
     if args.matchers == "all":
         args.matchers = available_models
@@ -70,12 +80,14 @@ def run_single_matcher(matcher_name, img_size, device):
         return {"success": False, "error": error_str}
 
 
-def benchmark_and_test(matcher, img_size=512, runs=5):
+def benchmark_and_test(matcher, img_size=(313, 471), runs=5):
     """Runs the homography test multiple times to get both speed and accuracy."""
     asset_dir = Path(imm.__path__[0]) / "assets" / "example_test"
     img0_path = asset_dir / "warped.jpg"
     img1_path = asset_dir / "original.jpg"
     ground_truth = np.array([[0.1500, 0.3500], [0.9500, 0.1500], [0.9000, 0.7000], [0.2500, 0.7000]])
+
+    h, w = img_size
 
     # Pre-load to avoid I/O overhead in loop if desired, or keep inside if part of test
     # Keeping inside loop to match original logic of 'load_image'
@@ -92,10 +104,15 @@ def benchmark_and_test(matcher, img_size=512, runs=5):
 
         # Calculate homography error (only needed once)
         if i == 0:
-            pred_homog = np.array([[0, 0], [img_size, 0], [img_size, img_size], [0, img_size]], dtype=np.float32)
-            pred_homog = np.reshape(pred_homog, (4, 1, 2))
-            prediction = cv2.perspectiveTransform(pred_homog, result["H"])[:, 0] / img_size
-            error = np.abs(ground_truth - prediction).max()
+            if result["H"] is None:
+                error = float("inf")
+            else:
+                pred_homog = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype=np.float32)
+                pred_homog = np.reshape(pred_homog, (4, 1, 2))
+                prediction = cv2.perspectiveTransform(pred_homog, result["H"])[:, 0]
+                prediction[:, 0] /= w
+                prediction[:, 1] /= h
+                error = np.abs(ground_truth - prediction).max()
 
     return np.mean(runtimes), error
 
@@ -129,7 +146,8 @@ def main():
                 "--single-matcher-json",
                 matcher_name,
                 "--img-size",
-                str(args.img_size),
+                str(args.img_size[0]),
+                str(args.img_size[1]),
                 "--device",
                 args.device,
             ]
