@@ -7,24 +7,15 @@ from kornia import tensor_to_image
 import numpy as np
 
 add_to_path(THIRD_PARTY_DIR / "UFM")
-from uniflowmatch.models.ufm import (
-    UniFlowMatchConfidence,
-    UniFlowMatchClassificationRefinement,
-)
+from uniflowmatch.models.ufm import UniFlowMatchClassificationRefinement
 
 
 class UFMMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=1024, min_confidence=0.2, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        # Load the base model (for general use)
-        self.model = UniFlowMatchConfidence.from_pretrained("infinity1096/UFM-Base")
-
-        # Or load the refinement model (for higher accuracy)
         self.model = UniFlowMatchClassificationRefinement.from_pretrained("infinity1096/UFM-Refine")
-
-        # Set the model to evaluation mode
-        self.model = self.model.eval()
+        self.model = self.model.eval().to(self.device)
 
         self.max_num_keypoints = max_num_keypoints
         self.min_confidence = min_confidence  # minimum confidence threshold for matches
@@ -39,7 +30,7 @@ class UFMMatcher(BaseMatcher):
         img = img_as_ubyte(np.clip(img, 0, 1))
         assert img.dtype == np.uint8, "Image must be uint8"
         assert img.ndim == 3 and img.shape[2] == 3, "Image must be HxWx3"
-        return torch.from_numpy(img), orig_shape
+        return torch.from_numpy(img).to(self.device), orig_shape
 
     def _forward(self, img0, img1):
         img0, img0_orig_shape = self.preprocess(img0)
