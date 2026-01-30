@@ -78,22 +78,21 @@ class LISRDMatcher(BaseMatcher):
         meta_desc1 = outputs1["meta_descriptors"]
 
         # Sample the descriptors at the keypoint positions
-        desc0, meta_desc0 = extract_descriptors(keypoints0, desc0, meta_desc0, img0_orig_shape)
-        desc1, meta_desc1 = extract_descriptors(keypoints1, desc1, meta_desc1, img1_orig_shape)
+        # keypoints_to_grid expects (row, col) order; extractors return (x, y) = (col, row)
+        desc0, meta_desc0 = extract_descriptors(keypoints0[:, [1, 0]], desc0, meta_desc0, img0_orig_shape)
+        desc1, meta_desc1 = extract_descriptors(keypoints1[:, [1, 0]], desc1, meta_desc1, img1_orig_shape)
         matches = lisrd_matcher(desc0, desc1, meta_desc0, meta_desc1).cpu().numpy()
 
         mkpts0, mkpts1 = (
-            keypoints0[matches[:, 0]][:, [1, 0]],
-            keypoints1[matches[:, 1]][:, [1, 0]],
+            keypoints0[matches[:, 0]],
+            keypoints1[matches[:, 1]],
         )
         return (
             mkpts0,
             mkpts1,
             keypoints0,
             keypoints1,
-            None,
-            None,
-            # desc0,
-            # desc1,
+            None,  # desc0,
+            None,  # desc1,
         )
         # lisrd has N x 4 x D dimensional descriptors, inconsistent with other methods, hence return None as descs

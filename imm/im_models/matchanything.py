@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 from huggingface_hub import snapshot_download
 from imm import BaseMatcher, THIRD_PARTY_DIR
-from imm.utils import add_to_path, to_device
+from imm.utils import add_to_path, to_device, pad_images_to_same_shape
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
@@ -101,6 +101,13 @@ class MatchAnythingMatcher(BaseMatcher):
         img0_proc, img0_size, img0_scale, mask0, img0_orig = self.preprocess(img0)
         img1_proc, img1_size, img1_scale, mask1, img1_orig = self.preprocess(img1)
 
+        # Pad grayscale images to same shape for eloftr and disable masks
+        # (third-party attention code can't handle masks with different True regions)
+        if self.variant == "eloftr":
+            img0_proc, img1_proc = pad_images_to_same_shape(img0_proc, img1_proc)
+            mask0 = None
+            mask1 = None
+
         batch = {
             "image0": img0_proc,
             "image1": img1_proc,
@@ -114,12 +121,18 @@ class MatchAnythingMatcher(BaseMatcher):
         if mask0 is not None and mask1 is not None:
             mask0_t = torch.from_numpy(mask0).to(self.device)
             mask1_t = torch.from_numpy(mask1).to(self.device)
-            ts_mask_0, ts_mask_1 = F.interpolate(
-                torch.stack([mask0_t, mask1_t], dim=0)[None].float(),
+            ts_mask_0 = F.interpolate(
+                mask0_t[None, None].float(),
                 scale_factor=0.125,
                 mode="nearest",
                 recompute_scale_factor=False,
-            )[0].bool()
+            )[0, 0].bool()
+            ts_mask_1 = F.interpolate(
+                mask1_t[None, None].float(),
+                scale_factor=0.125,
+                mode="nearest",
+                recompute_scale_factor=False,
+            )[0, 0].bool()
             batch["mask0"] = ts_mask_0[None]
             batch["mask1"] = ts_mask_1[None]
 

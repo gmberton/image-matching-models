@@ -41,9 +41,12 @@ def parse_args():
         metavar="MODEL",
         help="models to benchmark, or 'all' (default: all)",
     )
-    # default img_size is intentionally non-divisible by 8 to catch models that don't handle arbitrary sizes
+    # default sizes are intentionally non-divisible by 8 to catch models that don't handle arbitrary sizes
     parser.add_argument(
-        "--img-size", type=int, nargs="+", default=[313, 471], help="image size H [W] (default: %(default)s)"
+        "--img-size0", type=int, nargs="+", default=[313, 471], help="size of first image H [W] (default: %(default)s)"
+    )
+    parser.add_argument(
+        "--img-size1", type=int, nargs="+", default=[257, 339], help="size of second image H [W] (default: %(default)s)"
     )
     parser.add_argument("--device", type=str, default=get_default_device(), help="device (default: %(default)s)")
     parser.add_argument(
@@ -51,19 +54,21 @@ def parse_args():
     )
     args = parser.parse_args()
 
-    if len(args.img_size) == 1:
-        args.img_size = (args.img_size[0], args.img_size[0])
-    elif len(args.img_size) == 2:
-        args.img_size = tuple(args.img_size)
-    else:
-        parser.error("--img-size takes 1 or 2 values (H [W])")
+    for attr in ("img_size0", "img_size1"):
+        sz = getattr(args, attr)
+        if len(sz) == 1:
+            setattr(args, attr, (sz[0], sz[0]))
+        elif len(sz) == 2:
+            setattr(args, attr, tuple(sz))
+        else:
+            parser.error(f"--{attr.replace('_', '-')} takes 1 or 2 values (H [W])")
 
     if args.matchers == "all":
         args.matchers = available_models
     return args
 
 
-def run_single_matcher(matcher_name, img_size, device):
+def run_single_matcher(matcher_name, img_size0, img_size1, device):
     """Run a single matcher test and return results as dict."""
     warnings.filterwarnings("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
@@ -72,7 +77,7 @@ def run_single_matcher(matcher_name, img_size, device):
     try:
         with redirect_stdout(f_stdout), redirect_stderr(f_stderr):
             matcher = get_matcher(matcher_name, device=device)
-            avg_runtime, error = benchmark_and_test(matcher, img_size=img_size, runs=5)
+            avg_runtime, error = benchmark_and_test(matcher, img_size0=img_size0, img_size1=img_size1, runs=5)
         passing = error < 0.05
         return {"success": True, "runtime": float(avg_runtime), "passed": bool(passing), "error": float(error)}
     except Exception as e:
@@ -80,22 +85,23 @@ def run_single_matcher(matcher_name, img_size, device):
         return {"success": False, "error": error_str}
 
 
-def benchmark_and_test(matcher, img_size=(313, 471), runs=5):
+def benchmark_and_test(matcher, img_size0=(313, 471), img_size1=(257, 339), runs=5):
     """Runs the homography test multiple times to get both speed and accuracy."""
     asset_dir = Path(imm.__path__[0]) / "assets" / "example_test"
     img0_path = asset_dir / "warped.jpg"
     img1_path = asset_dir / "original.jpg"
     ground_truth = np.array([[0.1500, 0.3500], [0.9500, 0.1500], [0.9000, 0.7000], [0.2500, 0.7000]])
 
-    h, w = img_size
+    h0, w0 = img_size0
+    h1, w1 = img_size1
 
     # Pre-load to avoid I/O overhead in loop if desired, or keep inside if part of test
     # Keeping inside loop to match original logic of 'load_image'
     runtimes = []
 
     for i in range(runs):
-        image0 = matcher.load_image(img0_path, resize=img_size)
-        image1 = matcher.load_image(img1_path, resize=img_size)
+        image0 = matcher.load_image(img0_path, resize=img_size0)
+        image1 = matcher.load_image(img1_path, resize=img_size1)
 
         start = time.time()
         result = matcher(image0, image1)
@@ -107,11 +113,14 @@ def benchmark_and_test(matcher, img_size=(313, 471), runs=5):
             if result["H"] is None:
                 error = float("inf")
             else:
-                pred_homog = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype=np.float32)
+                # Corners of image0 in its pixel coords
+                pred_homog = np.array([[0, 0], [w0, 0], [w0, h0], [0, h0]], dtype=np.float32)
                 pred_homog = np.reshape(pred_homog, (4, 1, 2))
+                # H maps image0 pixels -> image1 pixels
                 prediction = cv2.perspectiveTransform(pred_homog, result["H"])[:, 0]
-                prediction[:, 0] /= w
-                prediction[:, 1] /= h
+                # Normalize by image1 dimensions to compare against ground truth
+                prediction[:, 0] /= w1
+                prediction[:, 1] /= h1
                 error = np.abs(ground_truth - prediction).max()
 
     return np.mean(runtimes), error
@@ -121,7 +130,7 @@ def main():
     args = parse_args()
     # Handle single matcher mode (for subprocess calls)
     if args.single_matcher_json:
-        result = run_single_matcher(args.single_matcher_json, args.img_size, args.device)
+        result = run_single_matcher(args.single_matcher_json, args.img_size0, args.img_size1, args.device)
         print(json.dumps(result))
         return
 
@@ -145,9 +154,12 @@ def main():
             [
                 "--single-matcher-json",
                 matcher_name,
-                "--img-size",
-                str(args.img_size[0]),
-                str(args.img_size[1]),
+                "--img-size0",
+                str(args.img_size0[0]),
+                str(args.img_size0[1]),
+                "--img-size1",
+                str(args.img_size1[0]),
+                str(args.img_size1[1]),
                 "--device",
                 args.device,
             ]

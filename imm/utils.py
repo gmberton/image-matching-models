@@ -163,6 +163,19 @@ def to_px_coords(pts: np.ndarray | torch.Tensor, height: int, width: int) -> np.
     return pts
 
 
+def pad_images_to_same_shape(img0: torch.Tensor, img1: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    """Pad two image tensors to the same spatial dimensions (right/bottom zero-padding)."""
+    h0, w0 = img0.shape[-2:]
+    h1, w1 = img1.shape[-2:]
+    if h0 == h1 and w0 == w1:
+        return img0, img1
+    max_h = max(h0, h1)
+    max_w = max(w0, w1)
+    img0 = torch.nn.functional.pad(img0, (0, max_w - w0, 0, max_h - h0))
+    img1 = torch.nn.functional.pad(img1, (0, max_w - w1, 0, max_h - h1))
+    return img0, img1
+
+
 def resize_to_divisible(img: torch.Tensor, divisible_by: int = 14) -> torch.Tensor:
     """Resize to be divisible by a factor. Useful for ViT based models.
 
