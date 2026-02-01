@@ -49,6 +49,7 @@
 [submodule "imm/third_party/SphereGlue"]
 	path = imm/third_party/SphereGlue
 	url = https://github.com/alexstoken/SphereGlue.git
+	ignore = untracked
 [submodule "imm/third_party/affine-steerers"]
 	path = imm/third_party/affine-steerers
 	url = https://github.com/georg-bn/affine-steerers.git
