@@ -33,9 +33,6 @@ class Patch2pixMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
-        assert torch.cuda.is_available() and "cuda" in device, (
-            f"Device must be 'cuda', 'mps' and 'cpu'not yet supported for {self.name}. Device = {self.device}"
-        )
 
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
@@ -43,6 +40,7 @@ class Patch2pixMatcher(BaseMatcher):
         args["ckpt"] = f"{snapshot_download('image-matching-models/patch2pix')}/model.pth"
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model = self.matcher.model.to(device)
+        self.matcher.model.device = torch.device(device)
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     def preprocess(self, img):

@@ -6,6 +6,7 @@ warnings due to unused modules.
 
 from pathlib import Path
 from types import ModuleType
+import torch
 from huggingface_hub import snapshot_download
 from huggingface_hub.utils import disable_progress_bars
 from .utils import add_to_path, get_default_device  # noqa: F401 - for quick import later 'from imm import get_default_device'
@@ -111,6 +112,10 @@ def get_matcher(
             snapshot_download(f"image-matching-models/{name}")
         except Exception as e:
             print(f"\n{'!' * 70}\n!!! HF repo 'image-matching-models/{name}' not found: {e}\n{'!' * 70}\n")
+
+    device = str(device)  # In case device is passed as torch.device
+    if device.startswith("cuda"):
+        assert torch.cuda.is_available(), f"CUDA not available, cannot use device='{device}'"
 
     if isinstance(matcher_name, list):
         from imm.base_matcher import EnsembleMatcher

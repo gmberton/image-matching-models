@@ -29,9 +29,7 @@ class AffSteererMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
         # only cuda devices work due to autocast in cuda in upstream.
-        assert self.device == "cuda", (
-            f"Device must be 'cuda', 'mps' and 'cpu' not yet supported for {self.name}. Device = {self.device}"
-        )
+        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:

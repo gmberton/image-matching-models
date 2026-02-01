@@ -20,9 +20,7 @@ class DedodeMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        assert torch.cuda.is_available() and "cuda" in self.device, (
-            f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
-        )
+        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh

@@ -32,9 +32,7 @@ class SteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-        assert self.device == "cuda", (
-            f"Device must be 'cuda', 'mps' and 'cpu' not yet supported for {self.name}. Device = {self.device}"
-        )
+        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
         # Download weights from HuggingFace Hub
         repo = snapshot_download("image-matching-models/steerers")
