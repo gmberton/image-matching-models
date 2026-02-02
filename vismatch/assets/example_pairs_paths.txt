@@ -1,0 +1,5 @@
+vismatch/assets/example_pairs/indoor/gcs_close.jpg vismatch/assets/example_pairs/indoor/gcs_far.jpg
+vismatch/assets/example_pairs/false_positive/chartres.jpg vismatch/assets/example_pairs/false_positive/notre_dame.jpg
+vismatch/assets/example_pairs/fresco/fsm.jpg vismatch/assets/example_pairs/fresco/sist_chapel.jpg
+vismatch/assets/example_pairs/sat2iss/photo_from_iss.jpg vismatch/assets/example_pairs/sat2iss/satellite_img.jpg
+vismatch/assets/example_pairs/outdoor/montmartre_close.jpg vismatch/assets/example_pairs/outdoor/montmartre_far.jpg

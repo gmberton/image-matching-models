@@ -1,15 +1,15 @@
 # To add a new method:
 Let's for example add a matcher called new_matcher.
-1. Copy the template to create a new file: `cp imm/TEMPLATE.py imm/im_models/new_matcher.py`
+1. Copy the template to create a new file: `cp vismatch/TEMPLATE.py vismatch/im_models/new_matcher.py`
 2. If the method requires external modules (for example the offical repository of new_matcher), use `git submodule add`: for example, I used this command to add the LightGlue module
    ```bash
-   git submodule add https://github.com/cvg/LightGlue imm/third_party/LightGlue
+   git submodule add https://github.com/cvg/LightGlue vismatch/third_party/LightGlue
    ```
-   This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `imm/third_party`.
+   This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `vismatch/third_party`.
 
-3. In `imm/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`. The template has more details on how to implement the class.
+3. In `vismatch/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`. The template has more details on how to implement the class.
 
-4. Open `imm/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
+4. Open `vismatch/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
 
 5. If it requires additional dependencies, add them to `requirements.txt` or to the `[project.optional-dependencies]` of `pyproject.toml`.
 
@@ -22,16 +22,16 @@ Let's for example add a matcher called new_matcher.
 7. Test your model. Make sure the model weights are downloaded automatically in the code, either with huggingface_hub (if on HF), gdown (if on GDrive), or py3_wget (any other platform or HTTP URL).
    ```
    # Run this and have a look at the generated images in outputs_new_matcher
-   python imm_match.py --matcher new_matcher --out_dir outputs_new_matcher
+   python vismatch_match.py --matcher new_matcher --out_dir outputs_new_matcher
    # Run this and make sure it passes the test
-   python imm_benchmark.py --matcher new_matcher
+   python vismatch_test.py --matcher new_matcher
    ```
    Now submit a PR!
 
 Note: as authors update their model repos, consider updating the submodule reference here using the below:
 To update a submodule to the head of the remote, run 
 ```bash
-git submodule update --remote imm/third_party/[submodule_name]
+git submodule update --remote vismatch/third_party/[submodule_name]
 ```
 
 ## Optional: add docs
@@ -77,4 +77,4 @@ api.upload_file(
 
 You can access the weights here: https://huggingface.co/ariG23498/eloftr
 
-You can now see in this [PR](https://github.com/alexstoken/image-matching-models/pull/46) how we can move holistically to the Hub.
+You can now see in this [PR](https://github.com/alexstoken/vismatch/pull/46) how we can move holistically to the Hub.

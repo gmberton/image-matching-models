@@ -1,92 +1,92 @@
-[submodule "imm/third_party/LightGlue"]
-	path = imm/third_party/LightGlue
+[submodule "vismatch/third_party/LightGlue"]
+	path = vismatch/third_party/LightGlue
 	url = https://github.com/cvg/LightGlue.git
-[submodule "imm/third_party/RoMa"]
-	path = imm/third_party/RoMa
+[submodule "vismatch/third_party/RoMa"]
+	path = vismatch/third_party/RoMa
 	url = https://github.com/Parskatt/RoMa
-[submodule "imm/third_party/DeDoDe"]
-	path = imm/third_party/DeDoDe
+[submodule "vismatch/third_party/DeDoDe"]
+	path = vismatch/third_party/DeDoDe
 	url = https://github.com/Parskatt/DeDoDe
-[submodule "imm/third_party/imatch-toolbox"]
-	path = imm/third_party/imatch-toolbox
+[submodule "vismatch/third_party/imatch-toolbox"]
+	path = vismatch/third_party/imatch-toolbox
 	url = https://github.com/ga1i13o/image-matching-toolbox
-[submodule "imm/third_party/duster"]
-	path = imm/third_party/duster
+[submodule "vismatch/third_party/duster"]
+	path = vismatch/third_party/duster
 	url = https://github.com/naver/dust3r
 	ignore = untracked
-[submodule "imm/third_party/Steerers"]
-	path = imm/third_party/Steerers
+[submodule "vismatch/third_party/Steerers"]
+	path = vismatch/third_party/Steerers
 	url = https://github.com/georg-bn/rotation-steerers.git
-[submodule "imm/third_party/accelerated_features"]
-	path = imm/third_party/accelerated_features
+[submodule "vismatch/third_party/accelerated_features"]
+	path = vismatch/third_party/accelerated_features
 	url = https://github.com/verlab/accelerated_features.git
-[submodule "imm/third_party/omniglue"]
-	path = imm/third_party/omniglue
+[submodule "vismatch/third_party/omniglue"]
+	path = vismatch/third_party/omniglue
 	url = https://github.com/google-research/omniglue.git
-[submodule "imm/third_party/gim"]
-	path = imm/third_party/gim
+[submodule "vismatch/third_party/gim"]
+	path = vismatch/third_party/gim
 	url = https://github.com/alexstoken/gim.git
-[submodule "imm/third_party/EfficientLoFTR"]
-	path = imm/third_party/EfficientLoFTR
+[submodule "vismatch/third_party/EfficientLoFTR"]
+	path = vismatch/third_party/EfficientLoFTR
 	url = https://github.com/zju3dv/EfficientLoFTR
-[submodule "imm/third_party/Se2_LoFTR"]
-	path = imm/third_party/Se2_LoFTR
+[submodule "vismatch/third_party/Se2_LoFTR"]
+	path = vismatch/third_party/Se2_LoFTR
 	url = https://github.com/alexstoken/se2-loftr.git
-[submodule "imm/third_party/aspanformer"]
-	path = imm/third_party/aspanformer
+[submodule "vismatch/third_party/aspanformer"]
+	path = vismatch/third_party/aspanformer
 	url = https://github.com/alexstoken/ml-aspanformer.git
-[submodule "imm/third_party/MatchFormer"]
-	path = imm/third_party/MatchFormer
+[submodule "vismatch/third_party/MatchFormer"]
+	path = vismatch/third_party/MatchFormer
 	url = https://github.com/jamycheung/MatchFormer.git
 	ignore = untracked
-[submodule "imm/third_party/mast3r"]
-	path = imm/third_party/mast3r
+[submodule "vismatch/third_party/mast3r"]
+	path = vismatch/third_party/mast3r
 	url = https://github.com/naver/mast3r.git
 	ignore = untracked
-[submodule "imm/third_party/keypt2subpx"]
-	path = imm/third_party/keypt2subpx
+[submodule "vismatch/third_party/keypt2subpx"]
+	path = vismatch/third_party/keypt2subpx
 	url = https://github.com/KimSinjeong/keypt2subpx.git
-[submodule "imm/third_party/SphereGlue"]
-	path = imm/third_party/SphereGlue
+[submodule "vismatch/third_party/SphereGlue"]
+	path = vismatch/third_party/SphereGlue
 	url = https://github.com/alexstoken/SphereGlue.git
 	ignore = untracked
-[submodule "imm/third_party/affine-steerers"]
-	path = imm/third_party/affine-steerers
+[submodule "vismatch/third_party/affine-steerers"]
+	path = vismatch/third_party/affine-steerers
 	url = https://github.com/georg-bn/affine-steerers.git
-[submodule "imm/third_party/XoFTR"]
-	path = imm/third_party/XoFTR
+[submodule "vismatch/third_party/XoFTR"]
+	path = vismatch/third_party/XoFTR
 	url = https://github.com/OnderT/XoFTR
 	ignore = untracked
-[submodule "imm/third_party/MINIMA"]
-	path = imm/third_party/MINIMA
+[submodule "vismatch/third_party/MINIMA"]
+	path = vismatch/third_party/MINIMA
 	url = https://github.com/LSXI7/MINIMA
 	ignore = untracked
-[submodule "imm/third_party/rdd"]
-	path = imm/third_party/rdd
+[submodule "vismatch/third_party/rdd"]
+	path = vismatch/third_party/rdd
 	url = https://github.com/xtcpete/rdd.git
-[submodule "imm/third_party/LiftFeat"]
-	path = imm/third_party/LiftFeat
+[submodule "vismatch/third_party/LiftFeat"]
+	path = vismatch/third_party/LiftFeat
 	url = https://github.com/lyp-deeplearning/LiftFeat.git
         ignore = untracked
-[submodule "imm/third_party/EDM"]
-	path = imm/third_party/EDM
+[submodule "vismatch/third_party/EDM"]
+	path = vismatch/third_party/EDM
 	url = https://github.com/chicleee/EDM
-[submodule "imm/third_party/LISRD"]
-	path = imm/third_party/LISRD
+[submodule "vismatch/third_party/LISRD"]
+	path = vismatch/third_party/LISRD
 	url = https://github.com/rpautrat/LISRD.git
 	ignore = untracked
-[submodule "imm/third_party/RIPE"]
-	path = imm/third_party/RIPE
+[submodule "vismatch/third_party/RIPE"]
+	path = vismatch/third_party/RIPE
 	url = https://github.com/fraunhoferhhi/RIPE.git
-[submodule "imm/third_party/MatchAnything"]
-	path = imm/third_party/MatchAnything
+[submodule "vismatch/third_party/MatchAnything"]
+	path = vismatch/third_party/MatchAnything
 	url = https://huggingface.co/spaces/LittleFrog/MatchAnything
-[submodule "imm/third_party/RoMaV2"]
-	path = imm/third_party/RoMaV2
+[submodule "vismatch/third_party/RoMaV2"]
+	path = vismatch/third_party/RoMaV2
 	url = https://github.com/Parskatt/RoMaV2
-[submodule "imm/third_party/TopicFM"]
-	path = imm/third_party/TopicFM
+[submodule "vismatch/third_party/TopicFM"]
+	path = vismatch/third_party/TopicFM
 	url = https://github.com/TruongKhang/TopicFM
-[submodule "imm/third_party/UFM"]
-	path = imm/third_party/UFM
+[submodule "vismatch/third_party/UFM"]
+	path = vismatch/third_party/UFM
 	url = https://github.com/alexstoken/UFM.git

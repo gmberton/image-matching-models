@@ -2,7 +2,7 @@
 .idea
 __pycache__
 model_weights
-matching/model_weights
+vismatch/model_weights
 outputs_*
 outputs
 *.egg-info/*
