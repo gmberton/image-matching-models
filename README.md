@@ -7,7 +7,7 @@ Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growi
 <a href="https://colab.research.google.com/github/gmberton/vismatch/blob/main/demo.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="vertical-align: middle;">
 </a>
-<a href="https://huggingface.co/image-matching-models">
+<a href="https://huggingface.co/vismatch">
   <img src="https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg" alt="Model on HF" style="vertical-align: middle;">
 </a>
 

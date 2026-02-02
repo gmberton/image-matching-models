@@ -35,7 +35,7 @@ class SteererMatcher(BaseMatcher):
         assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
         # Download weights from HuggingFace Hub
-        repo = snapshot_download("image-matching-models/steerers")
+        repo = snapshot_download("vismatch/steerers")
         self.detector_path_L = f"{repo}/dedode_detector_L.pth"
         self.descriptor_path_G = f"{repo}/dedode_descriptor_G.pth"
         self.descriptor_path_B_C4 = f"{repo}/B_C4_Perm_descriptor_setting_C.pth"

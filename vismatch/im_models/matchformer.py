@@ -29,7 +29,7 @@ class MatchformerMatcher(BaseMatcher):
         config.MATCHFORMER.COARSE.D_FFN = 256
 
         matcher = Matchformer(config=lower_config(config)["matchformer"])
-        weights_path = f"{snapshot_download('image-matching-models/matchformer')}/matchformer_outdoor-large-LA.safetensors"
+        weights_path = f"{snapshot_download('vismatch/matchformer')}/matchformer_outdoor-large-LA.safetensors"
         state_dict = load_file(weights_path)
         matcher.load_state_dict({k.replace("matcher.", ""): v for k, v in state_dict.items()})
 

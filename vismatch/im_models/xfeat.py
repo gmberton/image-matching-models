@@ -13,7 +13,7 @@ class xFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         assert mode in ["sparse", "semi-dense", "lighterglue"]
 
-        self.model_path = f"{snapshot_download('image-matching-models/xfeat')}/xfeat.pt"
+        self.model_path = f"{snapshot_download('vismatch/xfeat')}/xfeat.pt"
 
         self.model = XFeat(weights=self.model_path)
         self.model.net = self.model.net.to(device)

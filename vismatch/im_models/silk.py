@@ -343,7 +343,7 @@ class SilkMatcher(BaseMatcher):
         self.matcher_thresh = matcher_thresh
 
         # Load model
-        weights_path = f"{snapshot_download('image-matching-models/silk')}/silk.safetensors"
+        weights_path = f"{snapshot_download('vismatch/silk')}/silk.safetensors"
         self.model = load_silk_model(weights_path, device)
 
     def preprocess(self, img):

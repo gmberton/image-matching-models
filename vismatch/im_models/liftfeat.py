@@ -14,7 +14,7 @@ class LiftFeatMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
         self.detect_threshold = detect_threshold
-        weights_path = f"{snapshot_download('image-matching-models/liftfeat')}/liftfeat.pth"
+        weights_path = f"{snapshot_download('vismatch/liftfeat')}/liftfeat.pth"
         self.model = LiftFeat(weight=weights_path, detect_threshold=self.detect_threshold)
 
     def preprocess(self, img):

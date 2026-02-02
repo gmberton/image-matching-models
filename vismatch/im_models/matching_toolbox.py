@@ -37,7 +37,7 @@ class Patch2pixMatcher(BaseMatcher):
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
 
-        args["ckpt"] = f"{snapshot_download('image-matching-models/patch2pix')}/model.pth"
+        args["ckpt"] = f"{snapshot_download('vismatch/patch2pix')}/model.pth"
         self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model = self.matcher.model.to(device)
         self.matcher.model.device = torch.device(device)
@@ -138,7 +138,7 @@ class R2D2Matcher(BaseMatcher):
         if ckpt_path.exists():
             self.model_path = str(ckpt_path)
         else:
-            self.model_path = f"{snapshot_download('image-matching-models/r2d2')}/{args['ckpt'].split('/')[-1]}"
+            self.model_path = f"{snapshot_download('vismatch/r2d2')}/{args['ckpt'].split('/')[-1]}"
 
         args["ckpt"] = self.model_path
         args["top_k"] = max_num_keypoints

@@ -46,7 +46,7 @@ class RDDMatcher(BaseMatcher):
         self.thresh = 0.01
         self.anchor = anchor
 
-        repo = snapshot_download("image-matching-models/rdd")
+        repo = snapshot_download("vismatch/rdd")
         self.model_path = f"{repo}/rdd_v2.pt"
 
         config = read_config(self.config_path)
@@ -117,7 +117,7 @@ class _rdd_lightglue_wrapper(LightGlue):
 class RDD_LightGlueMatcher(RDDMatcher):
     def __init__(self, device="cpu", *args, **kwargs):
         # Get LightGlue weights path before calling super().__init__
-        self.model_path_lightglue = f"{snapshot_download('image-matching-models/rdd')}/rdd_lg_v2.pt"
+        self.model_path_lightglue = f"{snapshot_download('vismatch/rdd')}/rdd_lg_v2.pt"
 
         # Set up lightglue_conf with the weights path
         self.lightglue_conf = {

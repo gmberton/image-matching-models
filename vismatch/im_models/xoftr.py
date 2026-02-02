@@ -42,7 +42,7 @@ class XoFTRMatcher(BaseMatcher):
         matcher = XoFTR(config=config["xoftr"])
 
         # Load model from HuggingFace
-        weights_path = f"{snapshot_download('image-matching-models/xoftr')}/xoftr_{self.pretrained_size}.safetensors"
+        weights_path = f"{snapshot_download('vismatch/xoftr')}/xoftr_{self.pretrained_size}.safetensors"
         matcher.load_state_dict(load_file(weights_path), strict=True)
 
         return matcher.eval().to(self.device)

@@ -21,7 +21,7 @@ class EfficientLoFTRMatcher(BaseMatcher):
 
         self.precision = kwargs.get("precision", self.get_precision())
 
-        model_path = f"{snapshot_download('image-matching-models/eloftr')}/eloftr_outdoors.safetensors"
+        model_path = f"{snapshot_download('vismatch/eloftr')}/eloftr_outdoors.safetensors"
 
         self.matcher = LoFTR(config=deepcopy(full_default_cfg if cfg == "full" else opt_default_cfg))
 

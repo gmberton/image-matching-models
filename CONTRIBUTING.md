@@ -39,7 +39,7 @@ You can create the file `docs/new_matcher.md` to explain how the model is used. 
 
 ## Optional: adding model weights to the Hugging Face Hub
 
-Although not mandatory, we encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/image-matching-models). This will increase model visibility and help track usage of each model.
+Although not mandatory, we encourage authors to upload their models to the Hugging Face Hub, under the [image matching organization](https://huggingface.co/vismatch). This will increase model visibility and help track usage of each model.
 
 Here are the steps that we took to add the ELoFTR model:
 

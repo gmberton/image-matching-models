@@ -109,9 +109,9 @@ def get_matcher(
     # Track usage via HF (downloads repo on first access)
     for name in [matcher_name] if isinstance(matcher_name, str) else matcher_name:
         try:
-            snapshot_download(f"image-matching-models/{name}")
+            snapshot_download(f"vismatch/{name}")
         except Exception as e:
-            print(f"\n{'!' * 70}\n!!! HF repo 'image-matching-models/{name}' not found: {e}\n{'!' * 70}\n")
+            print(f"\n{'!' * 70}\n!!! HF repo 'vismatch/{name}' not found: {e}\n{'!' * 70}\n")
 
     device = str(device)  # In case device is passed as torch.device
     if device.startswith("cuda"):

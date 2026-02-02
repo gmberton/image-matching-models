@@ -38,7 +38,7 @@ class LISRDMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         print("WARNING: LISRD may take awhile to load.")
 
-        model_path = f"{snapshot_download('image-matching-models/lisrd')}/lisrd_vidit.pth"
+        model_path = f"{snapshot_download('vismatch/lisrd')}/lisrd_vidit.pth"
 
         self.model = Lisrd(None, self.model_config, device)
 

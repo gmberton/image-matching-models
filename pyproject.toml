@@ -27,7 +27,7 @@ dynamic = ["version", "dependencies"]
 [project.urls]
 Homepage = "https://github.com/gmberton/vismatch"
 Repository = "https://github.com/gmberton/vismatch"
-HuggingFace = "https://huggingface.co/image-matching-models"
+HuggingFace = "https://huggingface.co/vismatch"
 
 
 [project.optional-dependencies]

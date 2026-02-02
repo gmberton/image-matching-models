@@ -52,7 +52,7 @@ class TopicFMMatcher(BaseMatcher):
         self.model = TopicFM(config=conf)
 
         # Download and load pretrained weights
-        repo = "image-matching-models/topicfm" if self.variant == "fast" else "image-matching-models/topicfm-plus"
+        repo = "vismatch/topicfm" if self.variant == "fast" else "vismatch/topicfm-plus"
         weights_path = f"{snapshot_download(repo)}/model.safetensors"
         self.model.load_state_dict(load_file(weights_path))
 

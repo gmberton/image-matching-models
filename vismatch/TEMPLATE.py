@@ -34,7 +34,7 @@ class NewMatcher(BaseMatcher):
 
     def get_weights(self):
         # Option 1: HuggingFace Hub
-        weights_path = hf_hub_download(repo_id="image-matching-models/your-model", filename="model.safetensors")
+        weights_path = hf_hub_download(repo_id="vismatch/your-model", filename="model.safetensors")
         return weights_path
 
         # # Option 2: Google Drive

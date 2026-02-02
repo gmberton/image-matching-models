@@ -42,7 +42,7 @@ class Se2LoFTRMatcher(BaseMatcher):
 
     def load_model(self, config, device="cpu"):
         model = LoFTR(config=lower_config(Se2LoFTRMatcher.configs[config])["loftr"]).to(self.device)
-        weights_path = f"{snapshot_download('image-matching-models/se2loftr')}/{self.weights_filenames[config]}"
+        weights_path = f"{snapshot_download('vismatch/se2loftr')}/{self.weights_filenames[config]}"
         model.load_state_dict(load_file(weights_path))
         return model.eval()
 

@@ -45,7 +45,7 @@ class AffSteererMatcher(BaseMatcher):
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher()
 
     def build_matcher(self):
-        repo = snapshot_download("image-matching-models/affine-steerers")
+        repo = snapshot_download("vismatch/affine-steerers")
         detector = dedode_detector_L(weights=load_file(f"{repo}/dedode_detector_C4.safetensors"))
 
         descriptor_path = f"{repo}/descriptor_aff_{self.steerer_type}.safetensors"

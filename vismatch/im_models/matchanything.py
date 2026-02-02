@@ -81,7 +81,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 
-        weights_path = f"{snapshot_download(f'image-matching-models/matchanything-{self.variant}')}/model.safetensors"
+        weights_path = f"{snapshot_download(f'vismatch/matchanything-{self.variant}')}/model.safetensors"
         state_dict = load_file(weights_path)
         self.net.load_state_dict(state_dict, strict=False)
         self.net.eval().to(self.device)

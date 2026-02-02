@@ -83,7 +83,7 @@ class SiftSphereGlue(SphereGlueBase):
         self.sphereglue_cfg.update({"descriptor_dim": 128, "output_dim": 128 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SIFT(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        weights_path = f"{snapshot_download('image-matching-models/sift-sphereglue')}/model.safetensors"
+        weights_path = f"{snapshot_download('vismatch/sift-sphereglue')}/model.safetensors"
         self.matcher.load_state_dict(load_file(weights_path))
 
 
@@ -93,5 +93,5 @@ class SuperpointSphereGlue(SphereGlueBase):
         self.sphereglue_cfg.update({"descriptor_dim": 256, "output_dim": 256 * 2, "max_kpts": max_num_keypoints})
         self.extractor = SuperPoint(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = SphereGlue(config=self.sphereglue_cfg).to(self.device)
-        weights_path = f"{snapshot_download('image-matching-models/superpoint-sphereglue')}/model.safetensors"
+        weights_path = f"{snapshot_download('vismatch/superpoint-sphereglue')}/model.safetensors"
         self.matcher.load_state_dict(load_file(weights_path))

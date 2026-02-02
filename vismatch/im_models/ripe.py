@@ -16,7 +16,7 @@ class RIPEMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, thresh=0.5, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        model_path = Path(f"{snapshot_download('image-matching-models/ripe')}/ripe.pth")
+        model_path = Path(f"{snapshot_download('vismatch/ripe')}/ripe.pth")
 
         self.thresh = thresh
         self.max_num_keypoints = max_num_keypoints

@@ -35,7 +35,7 @@ class EDMMatcher(BaseMatcher):
         matcher = EDM(config=config["edm"])
 
         # Load model from HuggingFace
-        weights_path = f"{snapshot_download('image-matching-models/edm')}/edm.safetensors"
+        weights_path = f"{snapshot_download('vismatch/edm')}/edm.safetensors"
         matcher.load_state_dict(load_file(weights_path))
 
         return matcher.eval().to(self.device)

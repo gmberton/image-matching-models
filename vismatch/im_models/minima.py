@@ -27,7 +27,7 @@ class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
 
-        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_lightglue.pt"
+        self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_lightglue.pt"
 
         self.matcher = load_sp_lg(self.model_args).model.to(self.device)
 
@@ -61,7 +61,7 @@ class MINIMALoFTRMatcher(MINIMAMatcher):
         super().__init__(device, **kwargs)
 
         self.model_args.thr = 0.2
-        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_loftr.pt"
+        self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_loftr.pt"
         self.matcher = load_loftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):
@@ -100,7 +100,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
                 f"Device must be 'cuda' for {self.name} with model_size='large'. Device='{self.device}' not supported"
             )
 
-        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_roma.pt"
+        self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_roma.pt"
         self.model_args.ckpt2 = model_size
         self.matcher = load_roma(self.model_args).model.eval().to(self.device)
 
@@ -136,7 +136,7 @@ class MINIMAXoFTRMatcher(MINIMAMatcher):
 
         self.model_args.match_threshold = 0.3
         self.model_args.fine_threshold = 0.1
-        self.model_args.ckpt = f"{snapshot_download('image-matching-models/minima')}/minima_xoftr.pt"
+        self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_xoftr.pt"
         self.matcher = load_xoftr(self.model_args).model.to(self.device)
 
     def preprocess(self, img):

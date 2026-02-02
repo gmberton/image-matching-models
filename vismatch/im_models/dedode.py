@@ -26,7 +26,7 @@ class DedodeMatcher(BaseMatcher):
         self.threshold = dedode_thresh
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
-        repo = snapshot_download("image-matching-models/dedode")
+        repo = snapshot_download("vismatch/dedode")
         if detector_version == 1:
             detector_path = f"{repo}/dedode_detector_L.safetensors"
         else:
