@@ -1,6 +1,6 @@
-# vismatch
+# vismatch (formerly Image Matching Models)
 
-A unified API for quickly and easily trying 50+ (and growing!) image matching models.
+Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growing!) image matching models. This project was formerly known as Image Matching Models (IMM), but will be released under the name `vismatch` going forward.
 
 <!-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/vismatch/blob/main/demo.ipynb)  [![Model on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg)](https://huggingface.co/models) -->
 
