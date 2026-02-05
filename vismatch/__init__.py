@@ -19,7 +19,7 @@ disable_progress_bars()  # disable all HF progress bars
 WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
 WEIGHTS_DIR.mkdir(exist_ok=True)
 
-__version__ = "1.1.0"
+__version__ = "1.1.2"
 
 available_models = [
     "liftfeat",

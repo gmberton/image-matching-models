@@ -19,7 +19,6 @@ from pathlib import Path
 from vismatch.utils import get_image_pairs_paths, get_default_device
 from vismatch import get_matcher, available_models
 from vismatch.viz import plot_matches
-import vismatch
 
 
 COL_WIDTH = 22
@@ -41,27 +40,37 @@ def parse_args():
     parser.add_argument(
         "--matcher",
         type=str,
-        default="sift-lightglue",
+        default="superpoint-lightglue",
         choices=available_models,
         metavar="MODEL",
         help="matcher to use (default: %(default)s). See list below",
     )
 
     # Hyperparameters shared by all methods:
-    parser.add_argument("--img-size", type=int, default=512, help="resize img to img-size x img-size")
-    parser.add_argument("--n-kpts", type=int, default=2048, help="max num keypoints")
-    parser.add_argument("--device", type=str, default=get_default_device(), choices=["cpu", "cuda"])
+    parser.add_argument(
+        "--img-size", type=int, default=512, help="resize img to img-size x img-size (default: %(default)s)"
+    )
+    parser.add_argument("--n-kpts", type=int, default=2048, help="max num keypoints (default: %(default)s)")
+    parser.add_argument(
+        "--device",
+        type=str,
+        default=get_default_device(),
+        choices=["cpu", "cuda"],
+        help="device to run on (default: %(default)s)",
+    )
     parser.add_argument("--no-viz", action="store_true", help="avoid saving visualizations")
 
     parser.add_argument(
         "--input",
         type=Path,
         nargs="+",  # Accept one or more arguments
-        default=[Path(vismatch.__path__[0]) / "assets/example_pairs"],
+        required=True,
         help="path to either (1) two image paths or (2) dir with two images or (3) dir with dirs with image pairs or "
         "(4) txt file with two image paths per line",
     )
-    parser.add_argument("--out-dir", type=Path, default=None, help="path where outputs are saved")
+    parser.add_argument(
+        "--out-dir", type=Path, default=None, help="path where outputs are saved (default: outputs/{matcher})"
+    )
 
     args = parser.parse_args()
 
