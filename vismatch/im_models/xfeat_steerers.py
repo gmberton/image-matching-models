@@ -42,6 +42,7 @@ class xFeatSteerersMatcher(BaseMatcher):
             del state_dict[k]
         self.model.load_state_dict(state_dict)
         self.model.to(device)
+        self.model.dev = device
 
         if steerer_type == "learned":
             self.steerer = torch.nn.Linear(64, 64, bias=False)

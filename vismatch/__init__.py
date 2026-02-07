@@ -87,10 +87,10 @@ available_models = [
     "topicfm-plus",
     "silk",
     "zippypoint",
-    # "xfeat-steerers-perm",  # Temporarily commented as weights are no longer available
-    # "xfeat-steerers-learned",
-    # "xfeat-star-steerers-perm",
-    # "xfeat-star-steerers-learned",
+    "xfeat-steerers-perm",
+    "xfeat-steerers-learned",
+    "xfeat-star-steerers-perm",
+    "xfeat-star-steerers-learned",
 ]
 
 
