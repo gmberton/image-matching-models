@@ -90,3 +90,7 @@
 [submodule "vismatch/third_party/UFM"]
 	path = vismatch/third_party/UFM
 	url = https://github.com/alexstoken/UFM.git
+[submodule "vismatch/third_party/ZippyPoint"]
+	path = vismatch/third_party/ZippyPoint
+	url = https://github.com/menelaoskanakis/ZippyPoint
+	ignore = untracked

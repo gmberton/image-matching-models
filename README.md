@@ -78,7 +78,7 @@ pip install .
 pip install -e . 
 ```
 
-Some models require additional optional dependencies which are not included in the default list, like torch-geometric (required by SphereGlue) and tensorflow (required by OmniGlue). To install these, use
+Some models require additional optional dependencies which are not included in the default list, like torch-geometric (required by SphereGlue) and tensorflow/larq (required by OmniGlue/ZippyPoint). To install these, use
 ```
 pip install .[all]
 # or 
@@ -158,7 +158,7 @@ We support the following methods:
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star, topicfm[-plus]```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd, zippypoint```
 
 See [Model Details](docs/model_details.md) to see runtimes, supported devices, and source of each model.
 

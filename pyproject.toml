@@ -33,7 +33,8 @@ HuggingFace = "https://huggingface.co/vismatch"
 [project.optional-dependencies]
 omniglue = ["tensorflow"]
 sphereglue = ["torch-geometric", "torch-cluster"]
-all = ["vismatch[omniglue, sphereglue]"]
+zippypoint = ["tensorflow>=2.15,<2.16", "keras<3", "larq>=0.12.2"]
+all = ["vismatch[omniglue, sphereglue, zippypoint]"]
 
 [tool.setuptools.dynamic]
 version = {attr = "vismatch.__version__"}

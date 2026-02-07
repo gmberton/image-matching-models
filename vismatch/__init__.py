@@ -86,6 +86,7 @@ available_models = [
     "topicfm",
     "topicfm-plus",
     "silk",
+    "zippypoint",
     # "xfeat-steerers-perm",  # Temporarily commented as weights are no longer available
     # "xfeat-steerers-learned",
     # "xfeat-star-steerers-perm",
@@ -469,6 +470,10 @@ def get_matcher(
         from vismatch.im_models import ufm
 
         return ufm.UFMMatcher(device, max_num_keypoints, *args, **kwargs)
+    elif matcher_name == "zippypoint":
+        from vismatch.im_models import zippypoint
+
+        return zippypoint.ZippyPointMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
