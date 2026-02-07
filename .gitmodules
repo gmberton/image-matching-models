@@ -93,3 +93,4 @@
 [submodule "vismatch/third_party/ZippyPoint"]
 	path = vismatch/third_party/ZippyPoint
 	url = https://github.com/menelaoskanakis/ZippyPoint
+	ignore = untracked

@@ -85,12 +85,6 @@ pip install .[all]
 uv pip install ".[all]"
 ```
 
-For ZippyPoint specifically (clean env), install the pinned compatible stack:
-```bash
-pip install -e ".[zippypoint]"
-```
-The `zippypoint` extra pins `tensorflow>=2.15,<2.16` and `keras<3`.
-
 
 ## Use
 
