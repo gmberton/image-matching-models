@@ -19,6 +19,14 @@ import json
 from contextlib import redirect_stdout, redirect_stderr
 from io import StringIO
 
+# Models that require special packages via pip install (e.g., pip install vismatch[omniglue])
+EXCLUDED_MATCHERS = [
+    "omniglue",  # requires tensorflow
+    "sift-sphereglue",  # requires torch-geometric, torch-cluster (also can't be tested on homography)
+    "superpoint-sphereglue",  # requires torch-geometric, torch-cluster (also can't be tested on homography)
+    "zippypoint",  # requires tensorflow>=2.15,<2.16, keras<3, larq>=0.12.2
+]
+
 
 def parse_args():
     # Format available matchers in columns, shown at the end of the help message (python vismatch_test.py -h)
@@ -64,7 +72,7 @@ def parse_args():
             parser.error(f"--{attr.replace('_', '-')} takes 1 or 2 values (H [W])")
 
     if args.matchers == "all":
-        args.matchers = available_models
+        args.matchers = [m for m in available_models if m not in EXCLUDED_MATCHERS]
     return args
 
 
@@ -142,8 +150,8 @@ def main():
     print("-" * 58)
 
     for matcher_name in args.matchers:
-        if matcher_name in ["sift-sphereglue", "superpoint-sphereglue"]:
-            # Sperical matchers can't be tested on homography
+        if matcher_name in EXCLUDED_MATCHERS:
+            # Skip matchers that require special packages
             continue
 
         print("\033[0m", end="")
