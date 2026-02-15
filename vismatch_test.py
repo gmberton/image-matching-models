@@ -45,9 +45,9 @@ def parse_args():
         "--matchers",
         type=str,
         nargs="+",
-        default="all",
+        default="default",
         metavar="MODEL",
-        help="models to benchmark, or 'all' (default: all)",
+        help="models to benchmark: 'default' (excludes special packages), 'all' (includes all), or specific model names (default: default)",
     )
     # default sizes are intentionally non-divisible by 8 to catch models that don't handle arbitrary sizes
     parser.add_argument(
@@ -71,8 +71,10 @@ def parse_args():
         else:
             parser.error(f"--{attr.replace('_', '-')} takes 1 or 2 values (H [W])")
 
-    if args.matchers == "all":
+    if args.matchers == "default":
         args.matchers = [m for m in available_models if m not in EXCLUDED_MATCHERS]
+    elif args.matchers == "all":
+        args.matchers = available_models
     return args
 
 
@@ -150,10 +152,6 @@ def main():
     print("-" * 58)
 
     for matcher_name in args.matchers:
-        if matcher_name in EXCLUDED_MATCHERS:
-            # Skip matchers that require special packages
-            continue
-
         print("\033[0m", end="")
 
         # Run each matcher in a subprocess for isolation
