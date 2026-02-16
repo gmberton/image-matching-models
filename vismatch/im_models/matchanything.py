@@ -76,7 +76,7 @@ class MatchAnythingMatcher(BaseMatcher):
             self.net = LoFTR(config=cfg_lower["loftr"])
         else:
             assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name}. Device = {self.device}"
+                f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
             )
 
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)

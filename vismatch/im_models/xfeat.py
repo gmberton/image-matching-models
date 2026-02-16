@@ -28,7 +28,7 @@ class xFeatMatcher(BaseMatcher):
             )
         elif self.mode != "semi-dense":
             assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda', 'mps' not yet supported for {self.name} with mode {self.mode}. Device = {self.device}"
+                f"Device must be 'cpu' or 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
             )
 
     def preprocess(self, img: Tensor) -> Tensor:

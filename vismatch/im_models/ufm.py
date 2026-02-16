@@ -13,6 +13,9 @@ from uniflowmatch.models.ufm import UniFlowMatchClassificationRefinement
 class UFMMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=1024, min_confidence=0.2, *args, **kwargs):
         super().__init__(device, **kwargs)
+        assert "cuda" in self.device or self.device == "cpu", (
+            f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
+        )
 
         self.model = UniFlowMatchClassificationRefinement.from_pretrained("infinity1096/UFM-Refine")
         self.model = self.model.eval().to(self.device)

@@ -33,6 +33,9 @@ class Patch2pixMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
+        assert "cuda" in self.device or self.device == "cpu", (
+            f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
+        )
 
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
