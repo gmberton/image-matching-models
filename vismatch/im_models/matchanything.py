@@ -11,7 +11,7 @@ from vismatch.utils import add_to_path, to_device, pad_images_to_same_shape
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
-add_to_path(MATCHANYTHING_DIR)
+add_to_path(MATCHANYTHING_DIR, insert=0)
 
 # Also add ROMA to path for its internal imports (e.g., "from roma.models import ...")
 # Use insert=0 to give it priority over other potential 'roma' modules
