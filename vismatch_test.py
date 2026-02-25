@@ -45,7 +45,7 @@ def parse_args():
         "--matchers",
         type=str,
         nargs="+",
-        default="default",
+        default=["default"],
         metavar="MODEL",
         help="models to benchmark: 'default' (excludes special packages), 'all' (includes all), or specific model names (default: default)",
     )
@@ -71,9 +71,9 @@ def parse_args():
         else:
             parser.error(f"--{attr.replace('_', '-')} takes 1 or 2 values (H [W])")
 
-    if args.matchers == "default":
+    if args.matchers == ["default"]:
         args.matchers = [m for m in available_models if m not in EXCLUDED_MATCHERS]
-    elif args.matchers == "all":
+    elif args.matchers == ["all"]:
         args.matchers = available_models
     return args
 
