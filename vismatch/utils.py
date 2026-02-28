@@ -199,8 +199,8 @@ def resize_to_divisible(img: torch.Tensor, divisible_by: int = 14) -> torch.Tens
     """
     h, w = img.shape[-2:]
 
-    divisible_h = round(h / divisible_by) * divisible_by
-    divisible_w = round(w / divisible_by) * divisible_by
+    divisible_h = max(divisible_by, round(h / divisible_by) * divisible_by)
+    divisible_w = max(divisible_by, round(w / divisible_by) * divisible_by)
     img = tfm.functional.resize(img, [divisible_h, divisible_w], antialias=True)
 
     return img

@@ -63,7 +63,7 @@ class AspanformerMatcher(BaseMatcher):
         img0, img1 = pad_images_to_same_shape(img0, img1)
 
         batch = {"image0": img0, "image1": img1}
-        self.matcher(batch)
+        self.matcher(batch, online_resize=True)  # online_resize prevents breaking at very high res
 
         mkpts0 = batch["mkpts0_f"]
         mkpts1 = batch["mkpts1_f"]
