@@ -56,6 +56,12 @@ def parse_args():
     parser.add_argument(
         "--img-size1", type=int, nargs="+", default=[257, 339], help="size of second image H [W] (default: %(default)s)"
     )
+    parser.add_argument(
+        "--num-runs",
+        type=int,
+        default=1,
+        help="number of runs per matcher, increase for reliable timing (default: %(default)s)",
+    )
     parser.add_argument("--device", type=str, default=get_default_device(), help="device (default: %(default)s)")
     parser.add_argument(
         "--single-matcher-json", type=str, metavar="MODEL", help="run single matcher and output JSON (internal use)"
@@ -78,7 +84,7 @@ def parse_args():
     return args
 
 
-def run_single_matcher(matcher_name, img_size0, img_size1, device):
+def run_single_matcher(matcher_name, img_size0, img_size1, device, num_runs):
     """Run a single matcher test and return results as dict."""
     warnings.filterwarnings("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
@@ -87,15 +93,17 @@ def run_single_matcher(matcher_name, img_size0, img_size1, device):
     try:
         with redirect_stdout(f_stdout), redirect_stderr(f_stderr):
             matcher = get_matcher(matcher_name, device=device)
-            avg_runtime, error = benchmark_and_test(matcher, img_size0=img_size0, img_size1=img_size1, runs=1)
-        passing = error < 0.05
+            avg_runtime, error = benchmark_and_test(
+                matcher, img_size0=img_size0, img_size1=img_size1, num_runs=num_runs
+            )
+        passing = error <= 0.05
         return {"success": True, "runtime": float(avg_runtime), "passed": bool(passing), "error": float(error)}
     except Exception as e:
         error_str = str(e).strip().replace("\n", " ")
         return {"success": False, "error": error_str}
 
 
-def benchmark_and_test(matcher, img_size0=(313, 471), img_size1=(257, 339), runs=1):
+def benchmark_and_test(matcher, img_size0=(313, 471), img_size1=(257, 339), num_runs=1):
     """Runs the homography test multiple times to get both speed and accuracy."""
     asset_dir = Path(vismatch.__path__[0]) / "assets" / "example_test"
     img0_path = asset_dir / "warped.jpg"
@@ -109,7 +117,7 @@ def benchmark_and_test(matcher, img_size0=(313, 471), img_size1=(257, 339), runs
     # Keeping inside loop to match original logic of 'load_image'
     runtimes = []
 
-    for i in range(runs):
+    for i in range(num_runs):
         image0 = matcher.load_image(img0_path, resize=img_size0)
         image1 = matcher.load_image(img1_path, resize=img_size1)
 
@@ -140,7 +148,9 @@ def main():
     args = parse_args()
     # Handle single matcher mode (for subprocess calls)
     if args.single_matcher_json:
-        result = run_single_matcher(args.single_matcher_json, args.img_size0, args.img_size1, args.device)
+        result = run_single_matcher(
+            args.single_matcher_json, args.img_size0, args.img_size1, args.device, args.num_runs
+        )
         print(json.dumps(result))
         return
 
@@ -148,11 +158,13 @@ def main():
     warnings.filterwarnings("ignore")
     os.environ["PYTHONWARNINGS"] = "ignore"
 
-    print(f"{'model_name':<30} {'speed':<10} {'homography test':<15}")
+    if args.num_runs == 1:
+        print("Timing based on a single run. Increase --num-runs for more accurate timing.")
+    print(f"{'model_name':<30} {'sec/pair':<10} {'homography test':<15}")
     print("-" * 58)
 
     for matcher_name in args.matchers:
-        print("\033[0m", end="")
+        print(f"\033[0m{matcher_name:<30} running...", end="\r", flush=True)
 
         # Run each matcher in a subprocess for isolation
         cmd = [sys.executable, "-m", "vismatch_test"]
@@ -166,6 +178,8 @@ def main():
                 "--img-size1",
                 str(args.img_size1[0]),
                 str(args.img_size1[1]),
+                "--num-runs",
+                str(args.num_runs),
                 "--device",
                 args.device,
             ]
