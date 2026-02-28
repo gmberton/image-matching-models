@@ -12,6 +12,17 @@ logger = logging.getLogger(__name__)
 logger.setLevel(31)  # Avoid printing useless low-level logs
 
 
+def disable_xformers():
+    """Disable xformers in all loaded modules, so that models fall back to standard PyTorch attention.
+
+    This is needed on CPU because xformers only supports CUDA. Without this, models using DINOv2
+    (e.g. RoMa, DeDoDe-Kornia) crash on CPU when xformers happens to be installed.
+    """
+    for module in sys.modules.values():
+        if hasattr(module, "XFORMERS_AVAILABLE"):
+            module.XFORMERS_AVAILABLE = False
+
+
 def get_image_pairs_paths(inputs: list[Path] | Path) -> list[tuple[Path, Path]]:
     """process input to produce a list of image pairs paths
 

@@ -44,6 +44,11 @@ class LISRDMatcher(BaseMatcher):
 
         self.model.load(model_path, Mode.EXPORT)
 
+        # On multi-GPU machines, BaseModel wraps _net in DataParallel even when
+        # targeting CPU. Unwrap it so inference works correctly on CPU.
+        if device == "cpu" and isinstance(self.model._net, torch.nn.DataParallel):
+            self.model._net = self.model._net.module
+
         self.model._net.eval()
 
         detector = detector.lower()

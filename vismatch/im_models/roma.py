@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import add_to_path
+from vismatch.utils import add_to_path, disable_xformers
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RoMa"))
 from romatch import roma_outdoor, tiny_roma_v1_outdoor
@@ -26,6 +26,8 @@ class RomaMatcher(BaseMatcher):
         self.max_keypoints = max_num_keypoints
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.roma_model.train(False)
+        if device == "cpu":
+            disable_xformers()
 
     def compute_padding(self, img0, img1):
         _, h0, w0 = img0.shape

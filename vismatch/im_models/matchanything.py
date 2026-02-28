@@ -7,7 +7,7 @@ import torch.nn.functional as F
 
 from huggingface_hub import snapshot_download
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import add_to_path, to_device, pad_images_to_same_shape
+from vismatch.utils import add_to_path, to_device, pad_images_to_same_shape, disable_xformers
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
@@ -53,6 +53,8 @@ class MatchAnythingMatcher(BaseMatcher):
 
         self.model_name = f"matchanything_{self.variant}"
         self._load_model()
+        if device == "cpu":
+            disable_xformers()
 
     def _load_model(self):
         cfg = get_cfg_defaults()

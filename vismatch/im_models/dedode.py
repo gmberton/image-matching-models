@@ -6,7 +6,7 @@ import kornia
 
 from huggingface_hub import snapshot_download
 from vismatch import get_version, THIRD_PARTY_DIR, BaseMatcher
-from vismatch.utils import add_to_path, resize_to_divisible
+from vismatch.utils import add_to_path, resize_to_divisible, disable_xformers
 
 add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
 
@@ -117,6 +117,8 @@ class DedodeKorniaMatcher(BaseMatcher):
             amp_dtype=torch.float32 if device != "cuda" else torch.float16,
         )
         self.model.to(device)
+        if device == "cpu":
+            disable_xformers()
         self.matcher = DualSoftMaxMatcher()
 
         self.threshold = match_thresh
