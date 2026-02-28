@@ -10,9 +10,12 @@ Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growi
 <a href="https://huggingface.co/vismatch">
   <img src="https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg" alt="Model on HF" style="vertical-align: middle;">
 </a>
+<a href="https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html">
+  <img src="https://img.shields.io/badge/Downloads-Tracker-blue" alt="Downloads Tracker" style="vertical-align: middle;">
+</a>
 
 
-Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model / Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite)
+Jump to: [Install](#install) | [Use](#use) | [Models](#available-models) | [Add a Model / Contributing](#adding-a-new-method) | [Acknowledgements](#acknowledgements) | [Cite](#cite) | [Download Stats](#download-stats)
 
 ### Matching Examples
 Compare matching models across various scenes. For example, we show `SIFT-LightGlue` and `LoFTR` matches on pairs: 
@@ -167,6 +170,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for details. We follow the [1st principle
 
 ## Acknowledgements
 Special thanks to the authors of all models included in this repo (links in [Model Details](docs/model_details.md)), and to authors of other libraries we wrap like the [Image Matching Toolbox](https://github.com/GrumpyZhou/image-matching-toolbox/tree/main) and [Kornia](https://github.com/kornia/kornia).
+
+## Download Stats
+Daily downloads across all [vismatch HuggingFace models](https://huggingface.co/vismatch), updated daily.
+Click the plot for the interactive version.
+
+<a href="https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html">
+  <img src="https://raw.githubusercontent.com/gmberton/vismatch-downloads-tracker/main/downloads_per_day.png" width="100%" alt="Downloads per day">
+</a>
 
 ## Cite
 This repo was created as part of the EarthMatch paper. Please cite EarthMatch if this repo is helpful to you!
