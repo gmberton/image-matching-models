@@ -4,6 +4,7 @@ a module is imported only if needed, reducing the number of raised errors and
 warnings due to unused modules.
 """
 
+import os
 from pathlib import Path
 from types import ModuleType
 import torch
@@ -16,7 +17,8 @@ THIRD_PARTY_DIR = Path(__file__).parent.joinpath("third_party")  # exported for 
 
 disable_progress_bars()  # disable all HF progress bars
 
-WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
+DEFAULT_WEIGHTS_DIR = Path(__file__).parent.joinpath("model_weights")
+WEIGHTS_DIR = Path(os.environ.get("VISMATCH_WEIGHTS_DIR", DEFAULT_WEIGHTS_DIR))
 WEIGHTS_DIR.mkdir(exist_ok=True)
 
 __version__ = "1.1.3"
