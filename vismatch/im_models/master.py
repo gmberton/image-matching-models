@@ -1,8 +1,9 @@
-import os
+from pathlib import Path
 import torchvision.transforms as tfm
 import py3_wget
 import numpy as np
 import torch
+from huggingface_hub import snapshot_download
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
 _original_torch_load = torch.load
@@ -16,7 +17,7 @@ def _patched_torch_load(*args, **kwargs):
 
 torch.load = _patched_torch_load
 
-from vismatch import BaseMatcher, WEIGHTS_DIR, THIRD_PARTY_DIR
+from vismatch import BaseMatcher, THIRD_PARTY_DIR
 from vismatch.utils import resize_to_divisible, add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("mast3r"))
@@ -28,7 +29,8 @@ from dust3r.inference import inference
 
 
 class Mast3rMatcher(BaseMatcher):
-    model_path = WEIGHTS_DIR.joinpath("MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth")
+    hf_model_id = "vismatch/master"
+    weight_filename = "MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth"
     vit_patch_size = 16
 
     def __init__(self, device="cpu", *args, **kwargs):
@@ -37,17 +39,18 @@ class Mast3rMatcher(BaseMatcher):
 
         self.verbose = False
 
-        self.download_weights()
+        model_path = self.download_weights()
+        self.model = AsymmetricMASt3R.from_pretrained(model_path).to(device)
 
-        self.model = AsymmetricMASt3R.from_pretrained(self.model_path).to(device)
-
-    @staticmethod
-    def download_weights():
+    @classmethod
+    def download_weights(cls):
         url = "https://download.europe.naverlabs.com/ComputerVision/MASt3R/MASt3R_ViTLarge_BaseDecoder_512_catmlpdpt_metric.pth"
-
-        if not os.path.isfile(Mast3rMatcher.model_path):
+        cache_dir = Path(snapshot_download(cls.hf_model_id))
+        model_path = cache_dir / cls.weight_filename
+        if not model_path.is_file():
             print("Downloading Master(ViT large)... (takes a while)")
-            py3_wget.download_file(url, Mast3rMatcher.model_path)
+            py3_wget.download_file(url, model_path)
+        return model_path
 
     def preprocess(self, img):
         _, h, w = img.shape

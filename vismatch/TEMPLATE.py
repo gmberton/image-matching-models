@@ -4,7 +4,7 @@ import py3_wget  # noqa: F401
 from huggingface_hub import hf_hub_download
 from safetensors.torch import load_file  # noqa: F401
 
-from vismatch import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher  # noqa: F401
+from vismatch import THIRD_PARTY_DIR, BaseMatcher  # noqa: F401
 from vismatch.utils import resize_to_divisible, add_to_path
 
 # Add third-party submodule to path (if needed)
@@ -38,14 +38,20 @@ class NewMatcher(BaseMatcher):
         return weights_path
 
         # # Option 2: Google Drive
-        # weights_path = WEIGHTS_DIR / "your_model.pth"
+        # from pathlib import Path
+        # from huggingface_hub import snapshot_download
+        # cache_dir = Path(snapshot_download("vismatch/your-model"))
+        # weights_path = cache_dir / "your_model.pth"
         # if not weights_path.is_file():
         #     print("Downloading model weights...")
         #     gdown.download("https://drive.google.com/file/d/abc123/view", output=str(weights_path), fuzzy=True)
         # return weights_path
 
         # # Option 3: Direct URL download with py3_wget
-        # weights_path = WEIGHTS_DIR / "your_model.pth"
+        # from pathlib import Path
+        # from huggingface_hub import snapshot_download
+        # cache_dir = Path(snapshot_download("vismatch/your-model"))
+        # weights_path = cache_dir / "your_model.pth"
         # py3_wget.download_file("https://example.com/weights.pth", output_path=weights_path, overwrite=False)
         # return weights_path
 

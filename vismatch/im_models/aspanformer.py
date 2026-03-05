@@ -3,8 +3,9 @@ from pathlib import Path
 import gdown
 import torchvision.transforms as tfm
 import tarfile
+from huggingface_hub import snapshot_download
 
-from vismatch import WEIGHTS_DIR, THIRD_PARTY_DIR, BaseMatcher
+from vismatch import THIRD_PARTY_DIR, BaseMatcher
 from vismatch.utils import resize_to_divisible, lower_config, add_to_path, pad_images_to_same_shape
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("aspanformer")
@@ -15,14 +16,16 @@ from src.config.default import get_cfg_defaults as aspan_cfg_defaults
 
 
 class AspanformerMatcher(BaseMatcher):
+    hf_model_id = "vismatch/aspanformer"
     weights_src = "https://drive.google.com/file/d/1eavM9dTkw9nbc-JqlVVfGPU5UvTTfc6k/view"
-    weights_path = WEIGHTS_DIR.joinpath("aspanformer", "weights", "outdoor.ckpt")
     divisible_size = 32
 
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
+        cache_dir = Path(snapshot_download(self.hf_model_id))
+        self.weights_path = cache_dir / "weights" / "outdoor.ckpt"
 
-        self.download_weights()
+        self.download_weights(cache_dir)
 
         config = aspan_cfg_defaults()
         config.merge_from_file(BASE_PATH.joinpath("configs", "aspan", "outdoor", "aspan_test.py"))
@@ -34,18 +37,16 @@ class AspanformerMatcher(BaseMatcher):
 
         self.matcher = self.matcher.to(device).eval()
 
-    def download_weights(self):
-        if not Path(self.weights_path).is_file():
+    def download_weights(self, cache_dir):
+        if not self.weights_path.is_file():
             print("Downloading Aspanformer outdoor... (takes a while)")
             gdown.download(
                 self.weights_src,
-                output=str(WEIGHTS_DIR.joinpath("weights_aspanformer.tar")),
+                output=str(cache_dir / "weights_aspanformer.tar"),
                 fuzzy=True,
             )
-        tar = tarfile.open(WEIGHTS_DIR.joinpath("weights_aspanformer.tar"))
-        weights_subdir = WEIGHTS_DIR.joinpath("aspanformer")
-        weights_subdir.mkdir(exist_ok=True)
-        tar.extractall(weights_subdir)
+        tar = tarfile.open(cache_dir / "weights_aspanformer.tar")
+        tar.extractall(cache_dir)
         tar.close()
 
     def preprocess(self, img):

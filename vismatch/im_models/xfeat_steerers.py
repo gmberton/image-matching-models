@@ -1,7 +1,9 @@
 import torch
+from pathlib import Path
 from torchvision.datasets.utils import download_file_from_google_drive
+from huggingface_hub import snapshot_download
 
-from vismatch import BaseMatcher, WEIGHTS_DIR
+from vismatch import BaseMatcher
 
 
 class xFeatSteerersMatcher(BaseMatcher):
@@ -12,14 +14,14 @@ class xFeatSteerersMatcher(BaseMatcher):
 
     steer_permutations = [torch.arange(64).reshape(4, 16).roll(k, dims=0).reshape(64) for k in range(4)]
 
+    hf_model_ids = {
+        "perm": "vismatch/xfeat-steerers-perm",
+        "learned": "vismatch/xfeat-steerers-learned",
+    }
+
     perm_weights_gdrive_id = "1nzYg4dmkOAZPi4sjOGpQnawMoZSXYXHt"
-    perm_weights_path = WEIGHTS_DIR.joinpath("xfeat_perm_steer.pth")
-
     learned_weights_gdrive_id = "1yJtmRhPVrpbXyN7Be32-FYctmX2Oz77r"
-    learned_weights_path = WEIGHTS_DIR.joinpath("xfeat_learn_steer.pth")
-
     steerer_weights_drive_id = "1Qh_5YMjK1ZIBFVFvZlTe_eyjNPrOQ2Dv"
-    steerer_weights_path = WEIGHTS_DIR.joinpath("xfeat_learn_steer_steerer.pth")
 
     def __init__(self, device="cpu", max_num_keypoints=4096, mode="sparse", steerer_type="learned", *args, **kwargs):
         super().__init__(device, **kwargs)
@@ -36,8 +38,13 @@ class xFeatSteerersMatcher(BaseMatcher):
                 f'unsupported type for xfeat-steerer: {steerer_type}. Must choose from ["perm", "learned"]. Learned usually perofrms better.'
             )
 
+        cache_dir = Path(snapshot_download(self.hf_model_ids[steerer_type]))
+        self.perm_weights_path = cache_dir / "xfeat_perm_steer.pth"
+        self.learned_weights_path = cache_dir / "xfeat_learn_steer.pth"
+        self.steerer_weights_path = cache_dir / "xfeat_learn_steer_steerer.pth"
+
         self.model = torch.hub.load("verlab/accelerated_features", "XFeat", pretrained=False, top_k=max_num_keypoints)
-        self.download_weights()
+        self.download_weights(cache_dir)
 
         # Load xfeat-fixed-perm-steerers weights
         state_dict = torch.load(self.weights_path, map_location="cpu", weights_only=True)
@@ -62,23 +69,23 @@ class xFeatSteerersMatcher(BaseMatcher):
         self.mode = mode
         self.min_cossim = kwargs.get("min_cossim", 0.8 if steerer_type == "learned" else 0.9)
 
-    def download_weights(self):
+    def download_weights(self, cache_dir):
         if self.steerer_type == "perm":
             self.weights_path = self.perm_weights_path
             if not self.perm_weights_path.exists():
                 download_file_from_google_drive(
-                    self.perm_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.perm_weights_path.name
+                    self.perm_weights_gdrive_id, root=cache_dir, filename=self.perm_weights_path.name
                 )
 
         if self.steerer_type == "learned":
             self.weights_path = self.learned_weights_path
             if not self.learned_weights_path.exists():
                 download_file_from_google_drive(
-                    self.learned_weights_gdrive_id, root=WEIGHTS_DIR, filename=self.learned_weights_path.name
+                    self.learned_weights_gdrive_id, root=cache_dir, filename=self.learned_weights_path.name
                 )
             if not self.steerer_weights_path.exists():
                 download_file_from_google_drive(
-                    self.steerer_weights_drive_id, root=WEIGHTS_DIR, filename=self.steerer_weights_path.name
+                    self.steerer_weights_drive_id, root=cache_dir, filename=self.steerer_weights_path.name
                 )
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
