@@ -1,17 +1,24 @@
 # vismatch (formerly Image Matching Models)
 
-Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growing!) image matching models. This project was formerly known as Image Matching Models (IMM), but will be released under the name `vismatch` going forward.
-
-<!-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/gmberton/vismatch/blob/main/demo.ipynb)  [![Model on HF](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg)](https://huggingface.co/models) -->
+Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growing!) image matching models.
 
 <a href="https://colab.research.google.com/github/gmberton/vismatch/blob/main/demo.ipynb">
   <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" style="vertical-align: middle;">
 </a>
 <a href="https://huggingface.co/vismatch">
-  <img src="https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-sm.svg" alt="Model on HF" style="vertical-align: middle;">
+  <img src="https://img.shields.io/badge/Models-HuggingFace-yellow" alt="Models on HF" style="vertical-align: middle;">
 </a>
 <a href="https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html">
   <img src="https://img.shields.io/badge/Downloads-Tracker-blue" alt="Downloads Tracker" style="vertical-align: middle;">
+</a>
+<a href="https://pypi.org/project/vismatch/">
+  <img src="https://img.shields.io/pypi/v/vismatch" alt="PyPI" style="vertical-align: middle;">
+</a>
+<a href="https://pypi.org/project/vismatch/">
+  <img src="https://img.shields.io/pypi/dm/vismatch" alt="Downloads" style="vertical-align: middle;">
+</a>
+<a href="https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html">
+  <img src="https://img.shields.io/endpoint?url=https://gmberton.github.io/vismatch-downloads-tracker/badge.json" alt="HF Downloads/month" style="vertical-align: middle;">
 </a>
 
 
@@ -61,11 +68,14 @@ SIFT and DeDoDe
 </details>
 
 ## Install
-vismatch can be installed directly from PyPi using pip or uv (faster)
+vismatch can be installed directly from PyPi. We strongly recommend using `uv`, but `pip` should work too
 ```bash
-pip install vismatch
-# or
+pip install uv             # install uv
+uv venv                    # create uv venv
+source .venv/bin/activate  # activate uv venv
 uv pip install vismatch
+# or, if you don't want to use uv
+pip install vismatch
 ```
 
 or, for development, clone this git repo and install with:
@@ -75,17 +85,19 @@ or, for development, clone this git repo and install with:
 git clone --recursive https://github.com/gmberton/vismatch
 cd vismatch
 
-# install packages
-pip install .
-# or, if you want an editable install for dev work
-pip install -e . 
+uv venv                    # create uv venv
+source .venv/bin/activate  # activate uv venv
+# editable install for dev work
+uv pip install -e . 
+# or non-editable install
+uv pip install .
 ```
 
 Some models require additional optional dependencies which are not included in the default list, like torch-geometric (required by SphereGlue) and tensorflow/larq (required by OmniGlue/ZippyPoint). To install these, use
 ```
-pip install .[all]
-# or 
 uv pip install ".[all]"
+# or
+pip install .[all]
 ```
 
 
