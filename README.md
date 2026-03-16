@@ -179,7 +179,9 @@ We support the following methods:
 
 **Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd, zippypoint```
 
-See [Model Details](docs/source/model_details.md) to see runtimes, supported devices, and source of each model.
+See [Model Details](docs/source/model_details.md) to see runtimes, supported devices, source, and license of each model.
+
+**Important:** although VisMatch uses a BSD 3-Clause License, the matchers we wrap can have different licenses. Please refer to each matcher's license when using them.
 
 ## Adding a new method
 See [CONTRIBUTING.md](CONTRIBUTING.md) for details. We follow the [1st principle of PyTorch](https://docs.pytorch.org/docs/stable/community/design.html#design-principles): Usability over Performance
