@@ -15,7 +15,7 @@ Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growi
   <img src="https://img.shields.io/pypi/v/vismatch" alt="PyPI" style="vertical-align: middle;">
 </a>
 <a href="https://pypi.org/project/vismatch/">
-  <img src="https://img.shields.io/pypi/dm/vismatch" alt="Downloads" style="vertical-align: middle;">
+  <img src="https://static.pepy.tech/badge/vismatch/month" alt="Downloads" style="vertical-align: middle;">
 </a>
 <a href="https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html">
   <img src="https://img.shields.io/endpoint?url=https://gmberton.github.io/vismatch-downloads-tracker/badge.json" alt="HF Downloads/month" style="vertical-align: middle;">
