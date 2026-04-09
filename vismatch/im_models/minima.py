@@ -5,7 +5,7 @@ from huggingface_hub import snapshot_download
 from vismatch import THIRD_PARTY_DIR, BaseMatcher
 from vismatch.utils import add_to_path, resize_to_divisible
 
-add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"), insert=0)
+add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"))
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA/third_party/RoMa"))
 
 from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr

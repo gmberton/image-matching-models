@@ -6,7 +6,7 @@ from vismatch import BaseMatcher, THIRD_PARTY_DIR
 from vismatch.utils import add_to_path
 
 ZIPPYPOINT_PATH = THIRD_PARTY_DIR.joinpath("ZippyPoint")
-add_to_path(ZIPPYPOINT_PATH, insert=0)
+add_to_path(ZIPPYPOINT_PATH)
 
 
 class ZippyPointMatcher(BaseMatcher):

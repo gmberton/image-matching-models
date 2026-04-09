@@ -11,17 +11,17 @@ from vismatch.utils import add_to_path, to_device, pad_images_to_same_shape, dis
 
 # Expose the MatchAnything HF Space code (nested under imcui/third_party/MatchAnything) and its deps.
 MATCHANYTHING_DIR = THIRD_PARTY_DIR.joinpath("MatchAnything", "imcui", "third_party", "MatchAnything")
-add_to_path(MATCHANYTHING_DIR, insert=0)
+add_to_path(MATCHANYTHING_DIR)
 
-# Also add ROMA to path for its internal imports (e.g., "from roma.models import ...")
-# Use insert=0 to give it priority over other potential 'roma' modules
-ROMA_DIR = MATCHANYTHING_DIR.joinpath("third_party", "ROMA")
-add_to_path(ROMA_DIR, insert=0)
+# Add ROMA's parent so ``ROMA`` is importable as a top-level namespace package,
+# and ROMA itself so its internal ``from roma.models import ...`` works.
+add_to_path(MATCHANYTHING_DIR.joinpath("third_party"))
+add_to_path(MATCHANYTHING_DIR.joinpath("third_party", "ROMA"))
 
 from yacs.config import CfgNode as CN  # noqa: E402
 from src.loftr import LoFTR  # noqa: E402
 from src.config.default import get_cfg_defaults  # noqa: E402
-from third_party.ROMA.roma.matchanything_roma_model import MatchAnything_Model  # noqa: E402
+from ROMA.roma.matchanything_roma_model import MatchAnything_Model  # noqa: E402
 
 
 def _lower_config(yacs_cfg):
@@ -57,6 +57,9 @@ class MatchAnythingMatcher(BaseMatcher):
             disable_xformers()
 
     def _load_model(self):
+        # Ensure MatchAnything's ``src`` is resolvable even when another
+        # matcher was loaded between module import and this instantiation.
+        add_to_path(MATCHANYTHING_DIR)
         cfg = get_cfg_defaults()
         if self.variant == "eloftr":
             cfg.merge_from_file(str(MATCHANYTHING_DIR.joinpath("configs", "models", "eloftr_model.py")))

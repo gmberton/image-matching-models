@@ -230,20 +230,50 @@ def load_module(module_name: str, module_path: Path | str) -> None:
     spec.loader.exec_module(module)
 
 
-def add_to_path(path: str | Path, insert: int | None = None) -> None:
-    """Add input path to sys.path ($PATH), allowing for imports from the specified path
+_THIRD_PARTY_DIR = str(Path(__file__).resolve().parent / "third_party") + "/"
 
-    Args:
-        path (str | Path): path to add to sys.path
-        insert (int | None, optional): insert location / order. Defaults to None, which inserts at end of sys.path
+
+def add_to_path(path: str | Path, **_kwargs) -> None:
+    """Add *path* to the front of ``sys.path``, allowing imports from it.
+
+    Always inserts at position 0 so the most recently added directory wins.
+    Auto-detects every package and module in *path* and, if any of them are
+    already cached in ``sys.modules`` from a different vismatch third-party
+    directory, flushes the stale entries so the next import resolves correctly.
+    User code, stdlib, and pip packages are never touched.
     """
-    path = str(path)
+    path = str(Path(path).resolve())
     if path in sys.path:
         sys.path.remove(path)
-    if insert is None:
-        sys.path.append(path)
-    else:
-        sys.path.insert(insert, path)
+    sys.path.insert(0, path)
+
+    # Auto-detect and flush stale modules from other third-party repos.
+    base = Path(path).resolve()
+    if not base.is_dir():
+        return
+    prefix = str(base) + "/"
+    for child in base.iterdir():
+        # Only consider regular Python packages (dir + __init__.py) and .py modules.
+        if child.is_dir() and child.joinpath("__init__.py").is_file():
+            name = child.name
+        elif child.is_file() and child.suffix == ".py" and child.name != "__init__.py":
+            name = child.stem
+        else:
+            continue
+        mod = sys.modules.get(name)
+        if mod is None:
+            continue
+        origin = getattr(mod, "__file__", None)
+        if not origin:
+            continue  # built-in — leave it alone
+        resolved = str(Path(origin).resolve())
+        if resolved.startswith(prefix):
+            continue  # already loaded from this directory
+        if not resolved.startswith(_THIRD_PARTY_DIR):
+            continue  # loaded from user code / pip / stdlib — never touch it
+        # Stale module from a different third-party repo — flush it
+        for k in [k for k in sys.modules if k == name or k.startswith(name + ".")]:
+            del sys.modules[k]
 
 
 def get_default_device() -> str:
