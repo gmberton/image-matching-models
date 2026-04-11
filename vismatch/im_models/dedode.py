@@ -22,9 +22,8 @@ class DedodeMatcher(BaseMatcher):
 
         if "cuda" not in self.device:
             import warnings
-            warnings.warn(
-                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
-            )
+
+            warnings.warn(f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested.")
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh

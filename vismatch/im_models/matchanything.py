@@ -82,6 +82,7 @@ class MatchAnythingMatcher(BaseMatcher):
         else:
             if self.device == "mps":
                 import warnings
+
                 warnings.warn(
                     f"{self.name} with variant {self.variant} is not fully tested on MPS. Device='{self.device}'"
                 )

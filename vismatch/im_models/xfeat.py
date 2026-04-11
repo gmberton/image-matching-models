@@ -26,6 +26,7 @@ class xFeatMatcher(BaseMatcher):
         if self.mode == "lighterglue":
             if "cuda" not in self.device:
                 import warnings
+
                 warnings.warn(
                     f"{self.name} with mode {self.mode} is optimized for CUDA. Device='{self.device}' may be slower."
                 )
@@ -33,12 +34,12 @@ class xFeatMatcher(BaseMatcher):
         elif self.mode != "semi-dense":
             if self.device == "mps":
                 import warnings
-                warnings.warn(
-                    f"{self.name} with mode {self.mode} is not fully tested on MPS. Device='{self.device}'"
-                )
+
+                warnings.warn(f"{self.name} with mode {self.mode} is not fully tested on MPS. Device='{self.device}'")
 
     def _init_lighterglue(self):
         from modules.lighterglue import LighterGlue
+
         self.model.lighterglue = LighterGlue()
         if "cuda" not in self.device:
             self.model.lighterglue.dev = torch.device(self.device)

@@ -69,9 +69,8 @@ class DognetLightGlue(LightGlueBase):
         super().__init__(device, **kwargs)
         if self.device == "mps":
             import warnings
-            warnings.warn(
-                f"{self.name} is not fully tested on MPS. Device='{self.device}'"
-            )
+
+            warnings.warn(f"{self.name} is not fully tested on MPS. Device='{self.device}'")
 
         self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features="doghardnet", depth_confidence=-1, width_confidence=-1).to(self.device)

@@ -98,6 +98,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
         if model_size == "large":
             if "cuda" not in self.device:
                 import warnings
+
                 warnings.warn(
                     f"{self.name} with model_size='large' is optimized for CUDA. Device='{self.device}' may be slow."
                 )

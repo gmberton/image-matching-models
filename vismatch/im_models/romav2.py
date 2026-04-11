@@ -14,9 +14,8 @@ class RoMaV2Matcher(BaseMatcher):
         super().__init__(device, **kwargs)
         if "cuda" not in self.device:
             import warnings
-            warnings.warn(
-                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
-            )
+
+            warnings.warn(f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested.")
 
         # Temporarily override the global device for proper initialization
         original_device = romav2_device.device

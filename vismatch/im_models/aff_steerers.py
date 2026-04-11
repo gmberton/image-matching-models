@@ -30,9 +30,8 @@ class AffSteererMatcher(BaseMatcher):
 
         if "cuda" not in self.device:
             import warnings
-            warnings.warn(
-                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
-            )
+
+            warnings.warn(f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested.")
 
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:

@@ -35,9 +35,8 @@ class SteererMatcher(BaseMatcher):
 
         if "cuda" not in self.device:
             import warnings
-            warnings.warn(
-                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
-            )
+
+            warnings.warn(f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested.")
 
         repo = snapshot_download("vismatch/steerers")
         self.detector_path_L = f"{repo}/dedode_detector_L.pth"
@@ -78,9 +77,7 @@ class SteererMatcher(BaseMatcher):
             steerer_gen = (2 * 3.14159 / steerer_order) * torch.load(
                 self.steerer_path_B, map_location="cpu", weights_only=True
             )
-            steerer = DiscreteSteerer(
-                generator=torch.matrix_exp(steerer_gen).to(device)
-            )
+            steerer = DiscreteSteerer(generator=torch.matrix_exp(steerer_gen).to(device))
 
         elif steerer_type == "S02":
             descriptor = dedode_descriptor_B(

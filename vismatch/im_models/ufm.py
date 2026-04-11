@@ -15,9 +15,8 @@ class UFMMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         if self.device == "mps":
             import warnings
-            warnings.warn(
-                f"{self.name} is not fully tested on MPS. Device='{self.device}'"
-            )
+
+            warnings.warn(f"{self.name} is not fully tested on MPS. Device='{self.device}'")
 
         self.model = UniFlowMatchClassificationRefinement.from_pretrained("infinity1096/UFM-Refine")
         self.model = self.model.eval().to(self.device)

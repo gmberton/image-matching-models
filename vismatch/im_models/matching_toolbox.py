@@ -35,9 +35,8 @@ class Patch2pixMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         if self.device == "mps":
             import warnings
-            warnings.warn(
-                f"{self.name} is not fully tested on MPS. Device='{self.device}'"
-            )
+
+            warnings.warn(f"{self.name} is not fully tested on MPS. Device='{self.device}'")
 
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]

@@ -30,9 +30,8 @@ class xFeatSteerersMatcher(BaseMatcher):
         if mode != "semi-dense":
             if self.device == "mps":
                 import warnings
-                warnings.warn(
-                    f"{self.name} with mode {mode} is not fully tested on MPS. Device='{self.device}'"
-                )
+
+                warnings.warn(f"{self.name} with mode {mode} is not fully tested on MPS. Device='{self.device}'")
 
         self.steerer_type = steerer_type
         if self.steerer_type not in ["learned", "perm"]:
