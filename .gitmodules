@@ -94,3 +94,6 @@
 	path = vismatch/third_party/ZippyPoint
 	url = https://github.com/menelaoskanakis/ZippyPoint
 	ignore = untracked
+[submodule "vismatch/third_party/LoMa"]
+	path = vismatch/third_party/LoMa
+	url = https://github.com/davnords/LoMa
