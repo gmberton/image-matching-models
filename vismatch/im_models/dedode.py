@@ -20,7 +20,11 @@ class DedodeMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        if "cuda" not in self.device:
+            import warnings
+            warnings.warn(
+                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
+            )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
@@ -36,6 +40,23 @@ class DedodeMatcher(BaseMatcher):
         self.detector = dedode_detector_L(weights=load_file(detector_path), device=device)
         self.descriptor = dedode_descriptor_G(weights=load_file(descriptor_path), device=device)
         self.matcher = DualSoftMaxMatcher()
+
+        if "cuda" not in self.device:
+            self._disable_amp()
+
+    def _disable_amp(self):
+        for module in self.detector.modules():
+            if hasattr(module, "amp"):
+                module.amp = False
+            if hasattr(module, "amp_dtype"):
+                module.amp_dtype = torch.float32
+        for module in self.descriptor.modules():
+            if hasattr(module, "amp"):
+                module.amp = False
+            if hasattr(module, "amp_dtype"):
+                module.amp_dtype = torch.float32
+        self.detector = self.detector.to(torch.float32)
+        self.descriptor = self.descriptor.to(torch.float32)
 
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes

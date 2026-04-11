@@ -1,3 +1,4 @@
+import torch
 from torch import Tensor
 from huggingface_hub import snapshot_download
 
@@ -23,13 +24,26 @@ class xFeatMatcher(BaseMatcher):
         self.mode = mode
 
         if self.mode == "lighterglue":
-            assert "cuda" in self.device, (
-                f"Device must be 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
-            )
+            if "cuda" not in self.device:
+                import warnings
+                warnings.warn(
+                    f"{self.name} with mode {self.mode} is optimized for CUDA. Device='{self.device}' may be slower."
+                )
+            self._init_lighterglue()
         elif self.mode != "semi-dense":
-            assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
-            )
+            if self.device == "mps":
+                import warnings
+                warnings.warn(
+                    f"{self.name} with mode {self.mode} is not fully tested on MPS. Device='{self.device}'"
+                )
+
+    def _init_lighterglue(self):
+        from modules.lighterglue import LighterGlue
+        self.model.lighterglue = LighterGlue()
+        if "cuda" not in self.device:
+            self.model.lighterglue.dev = torch.device(self.device)
+            self.model.lighterglue.net.conf.flash = False
+            self.model.lighterglue.net = self.model.lighterglue.net.to(self.device)
 
     def preprocess(self, img: Tensor) -> Tensor:
         # return a [B, C, Hs, W] tensor

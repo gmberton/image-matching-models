@@ -80,9 +80,11 @@ class MatchAnythingMatcher(BaseMatcher):
         if self.variant == "eloftr":
             self.net = LoFTR(config=cfg_lower["loftr"])
         else:
-            assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
-            )
+            if self.device == "mps":
+                import warnings
+                warnings.warn(
+                    f"{self.name} with variant {self.variant} is not fully tested on MPS. Device='{self.device}'"
+                )
 
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 

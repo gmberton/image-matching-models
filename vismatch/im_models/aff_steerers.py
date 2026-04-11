@@ -28,8 +28,11 @@ class AffSteererMatcher(BaseMatcher):
     ):
         super().__init__(device, **kwargs)
 
-        # only cuda devices work due to autocast in cuda in upstream.
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        if "cuda" not in self.device:
+            import warnings
+            warnings.warn(
+                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
+            )
 
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:
@@ -69,7 +72,17 @@ class AffSteererMatcher(BaseMatcher):
             ).to(self.device)
 
         matcher = MaxSimilarityMatcher(steerer=steerer, normalize=False, inv_temp=5, threshold=self.threshold)
-        if self.device == "cpu":
+        if "cuda" not in self.device:
+            for module in detector.modules():
+                if hasattr(module, "amp"):
+                    module.amp = False
+                if hasattr(module, "amp_dtype"):
+                    module.amp_dtype = torch.float32
+            for module in descriptor.modules():
+                if hasattr(module, "amp"):
+                    module.amp = False
+                if hasattr(module, "amp_dtype"):
+                    module.amp_dtype = torch.float32
             detector = detector.to(torch.float32)
             descriptor = descriptor.to(torch.float32)
             steerer = steerer.to(torch.float32)

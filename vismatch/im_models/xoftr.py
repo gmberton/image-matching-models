@@ -24,9 +24,14 @@ class XoFTRMatcher(BaseMatcher):
             840,
         ], f"Pretrained size must be in [640, 840], you entered {self.pretrained_size}"
 
-        self.matcher = self.build_matcher(**kwargs)
+        # Extract threshold parameters from kwargs before passing to build_matcher
+        coarse_thresh = kwargs.pop('coarse_thresh', 0.3)
+        fine_thresh = kwargs.pop('fine_thresh', 0.1)
+        denser = kwargs.pop('denser', False)
 
-    def build_matcher(self, coarse_thresh=0.3, fine_thresh=0.1, denser=False):
+        self.matcher = self.build_matcher(coarse_thresh=coarse_thresh, fine_thresh=fine_thresh, denser=denser)
+
+    def build_matcher(self, coarse_thresh=0.3, fine_thresh=0.1, denser=False, **kwargs):
         # Get default configurations
         config = get_cfg_defaults(inference=True)
         config = lower_config(config)

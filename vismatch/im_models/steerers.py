@@ -32,9 +32,13 @@ class SteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
-        # Download weights from HuggingFace Hub
+        if "cuda" not in self.device:
+            import warnings
+            warnings.warn(
+                f"{self.name} is optimized for CUDA. Device='{self.device}' may be slower and less tested."
+            )
+
         repo = snapshot_download("vismatch/steerers")
         self.detector_path_L = f"{repo}/dedode_detector_L.pth"
         self.descriptor_path_G = f"{repo}/dedode_descriptor_G.pth"
@@ -49,6 +53,9 @@ class SteererMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher(steerer_type, device=device)
+
+        if "cuda" not in self.device:
+            self._disable_amp()
 
     def build_matcher(self, steerer_type="C8", device="cpu"):
         if steerer_type == "C4":
@@ -68,11 +75,11 @@ class SteererMatcher(BaseMatcher):
                 weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
             )
             steerer_order = 8
+            steerer_gen = (2 * 3.14159 / steerer_order) * torch.load(
+                self.steerer_path_B, map_location="cpu", weights_only=True
+            )
             steerer = DiscreteSteerer(
-                generator=torch.matrix_exp(
-                    (2 * 3.14159 / steerer_order)
-                    * torch.load(self.steerer_path_B, map_location=device, weights_only=True)
-                )
+                generator=torch.matrix_exp(steerer_gen).to(device)
             )
 
         elif steerer_type == "S02":
@@ -92,6 +99,20 @@ class SteererMatcher(BaseMatcher):
             matcher = MaxSimilarityMatcher(steerer=steerer, steerer_order=steerer_order)
 
         return detector, descriptor, steerer, matcher
+
+    def _disable_amp(self):
+        for module in self.detector.modules():
+            if hasattr(module, "amp"):
+                module.amp = False
+            if hasattr(module, "amp_dtype"):
+                module.amp_dtype = torch.float32
+        for module in self.descriptor.modules():
+            if hasattr(module, "amp"):
+                module.amp = False
+            if hasattr(module, "amp_dtype"):
+                module.amp_dtype = torch.float32
+        self.detector = self.detector.to(torch.float32)
+        self.descriptor = self.descriptor.to(torch.float32)
 
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes

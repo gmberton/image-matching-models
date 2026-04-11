@@ -96,9 +96,11 @@ class MINIMARomaMatcher(MINIMAMatcher):
         super().__init__(device, **kwargs)
         assert model_size in self.ALLOWABLE_MODEL_SIZES
         if model_size == "large":
-            assert "cuda" in self.device, (
-                f"Device must be 'cuda' for {self.name} with model_size='large'. Device='{self.device}' not supported"
-            )
+            if "cuda" not in self.device:
+                import warnings
+                warnings.warn(
+                    f"{self.name} with model_size='large' is optimized for CUDA. Device='{self.device}' may be slow."
+                )
 
         self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_roma.pt"
         self.model_args.ckpt2 = model_size

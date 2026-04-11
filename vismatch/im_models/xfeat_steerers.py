@@ -28,9 +28,11 @@ class xFeatSteerersMatcher(BaseMatcher):
         if mode not in ["sparse", "semi-dense"]:
             raise ValueError(f'unsupported mode for xfeat: {self.mode}. Must choose from ["sparse", "semi-dense"]')
         if mode != "semi-dense":
-            assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda' for {self.name} with mode {mode}. Device='{self.device}' not supported"
-            )
+            if self.device == "mps":
+                import warnings
+                warnings.warn(
+                    f"{self.name} with mode {mode} is not fully tested on MPS. Device='{self.device}'"
+                )
 
         self.steerer_type = steerer_type
         if self.steerer_type not in ["learned", "perm"]:
@@ -90,8 +92,8 @@ class xFeatSteerersMatcher(BaseMatcher):
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
         img = self.model.parse_input(img)
-        if self.device == "cuda" and self.mode == "semi-dense" and img.dtype == torch.uint8:
-            img = img / 255  # cuda error in upsample_bilinear_2d_out_frame if img is ubyte
+        if self.device != "cpu" and img.dtype == torch.uint8:
+            img = img / 255
         return img
 
     def _forward(self, img0, img1):
