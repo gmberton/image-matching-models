@@ -91,8 +91,8 @@ class xFeatSteerersMatcher(BaseMatcher):
 
     def preprocess(self, img: torch.Tensor) -> torch.Tensor:
         img = self.model.parse_input(img)
-        if self.device != "cpu" and img.dtype == torch.uint8:
-            img = img / 255
+        if self.device == "cuda" and self.mode == "semi-dense" and img.dtype == torch.uint8:
+            img = img / 255  # cuda error in upsample_bilinear_2d_out_frame if img is ubyte
         return img
 
     def _forward(self, img0, img1):
