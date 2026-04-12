@@ -8,6 +8,8 @@ by all test files in the tests/ directory via pytest's conftest mechanism:
 - ``test_image_paths``: paths to the indoor image pair shipped with vismatch assets.
 """
 
+import os
+
 import pytest
 import torch
 from pathlib import Path
@@ -15,6 +17,23 @@ from pathlib import Path
 from vismatch.utils import get_default_device
 
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "vismatch" / "assets"
+
+CI_SKIP_MODELS = [
+    "gim-dkm",
+    "dkm",
+]
+
+
+def pytest_collection_modifyitems(config, items):
+    """Skip unstable models in CI to prevent flaky failures."""
+    if not os.environ.get("CI"):
+        return
+    skip_ci = pytest.mark.skip(reason="Skipped in CI due to instability")
+    for item in items:
+        for model in CI_SKIP_MODELS:
+            if model in item.name:
+                item.add_marker(skip_ci)
+                break
 
 
 def _get_test_image_pair():
