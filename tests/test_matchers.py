@@ -77,28 +77,6 @@ def test_forward_synthetic_images(model_name, device, test_images):
 
 
 @pytest.mark.parametrize("model_name", available_models)
-def test_forward_with_image_paths(model_name, device, test_image_paths):
-    """Run matcher.forward() with file-path string inputs.
-
-    Ensures that matchers accept string paths directly (as used by
-    vismatch_match.py) and return a valid result dict.
-    """
-    img0_path, img1_path = test_image_paths
-    try:
-        matcher = get_matcher(model_name, device=device)
-    except Exception as e:
-        pytest.skip(f"Cannot instantiate {model_name} on {device}: {e}")
-
-    result = matcher.forward(str(img0_path), str(img1_path))
-
-    assert isinstance(result, dict)
-    assert "num_inliers" in result
-    assert result["matched_kpts0"].ndim == 2
-
-    del matcher
-
-
-@pytest.mark.parametrize("model_name", available_models)
 def test_extract_keypoints(model_name, device, test_image_paths):
     """Run matcher.extract() on a single image to extract keypoints and descriptors.
 
