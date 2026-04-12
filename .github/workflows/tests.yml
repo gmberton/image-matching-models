@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: pip install -e ".[all]" 2>/dev/null || pip install -e .
       - name: Install pytest
-        run: pip install pytest
+        run: pip install pytest pytest-timeout
       - name: Run tests
         run: pytest tests -v --timeout=300
         continue-on-error: true
