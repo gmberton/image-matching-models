@@ -28,23 +28,22 @@ class xFeatMatcher(BaseMatcher):
                 import warnings
 
                 warnings.warn(
-                    f"{self.name} with mode {self.mode} is optimized for CUDA. Device='{self.device}' may be slower."
+                    f"LighterGlue is optimized for CUDA. Running on '{self.device}' may be slower.",
+                    stacklevel=2,
                 )
-            self._init_lighterglue()
+            from modules.lighterglue import LighterGlue
+
+            self.model.lighterglue = LighterGlue()
+            self.model.lighterglue.net = self.model.lighterglue.net.to(device)
+            self.model.lighterglue.dev = torch.device(device)
         elif self.mode != "semi-dense":
             if self.device == "mps":
                 import warnings
 
-                warnings.warn(f"{self.name} with mode {self.mode} is not fully tested on MPS. Device='{self.device}'")
-
-    def _init_lighterglue(self):
-        from modules.lighterglue import LighterGlue
-
-        self.model.lighterglue = LighterGlue()
-        if "cuda" not in self.device:
-            self.model.lighterglue.dev = torch.device(self.device)
-            self.model.lighterglue.net.conf.flash = False
-            self.model.lighterglue.net = self.model.lighterglue.net.to(self.device)
+                warnings.warn(
+                    f"MPS may have limited support for {self.name} in {self.mode} mode.",
+                    stacklevel=2,
+                )
 
     def preprocess(self, img: Tensor) -> Tensor:
         # return a [B, C, Hs, W] tensor
