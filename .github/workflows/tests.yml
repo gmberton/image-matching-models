@@ -38,5 +38,5 @@ jobs:
       - name: Install pytest
         run: pip install pytest pytest-timeout
       - name: Run tests
-        run: pytest tests -v --timeout=300
+        run: pytest tests -vv -rs --timeout=300
         continue-on-error: true
