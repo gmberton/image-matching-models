@@ -7,12 +7,28 @@ from vismatch.utils import add_to_path, resize_to_divisible
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LoMa/src"))
 
-from loma.loma import LoMaB, LoMaB128, LoMaL, LoMaG, LoMa, filter_matches, to_pixel_coords
+from loma.loma import (
+    LoMaB,
+    LoMaB128,
+    LoMaL,
+    LoMaG,
+    LoMaR,
+    LoMa,
+    filter_matches,
+    to_pixel_coords,
+)
 
 
 class LoMaMatcher(BaseMatcher):
-    divisible_size = 14 # for DINOv2 in LoMa-{B, L, G}
-    def __init__(self, device="cpu", max_num_keypoints=2048, arch: Literal["LoMa-B", "LoMa-L", "LoMa-G", "LoMa-B128"] = "LoMa-B", **kwargs):
+    divisible_size = 14  # for DINOv2 in the descriptor of LoMa-{B, L, G, R}. LoMa-B128 can handle arbitrary resolutions and is more lightweight.
+
+    def __init__(
+        self,
+        device="cpu",
+        max_num_keypoints=2048,
+        arch: Literal["LoMa-B", "LoMa-L", "LoMa-G", "LoMa-B128", "LoMa-R"] = "LoMa-B",
+        **kwargs,
+    ):
         super().__init__(device, **kwargs)
         self.max_num_keypoints = max_num_keypoints
 
@@ -24,8 +40,12 @@ class LoMaMatcher(BaseMatcher):
             cfg = LoMaG()
         elif arch == "LoMa-B128":
             cfg = LoMaB128()
+        elif arch == "LoMa-R":
+            cfg = LoMaR()
         else:
-            raise ValueError(f"Unsupported architecture '{arch}' for LoMa. Supported: 'LoMa-B', 'LoMa-L', 'LoMa-G', 'LoMa-B128'.")
+            raise ValueError(
+                f"Unsupported architecture '{arch}' for LoMa. Supported: 'LoMa-B', 'LoMa-L', 'LoMa-G', 'LoMa-B128', 'LoMa-R'."
+            )
 
         # This automatically loads weights using torch.hub.load_state_dict_from_url
         self.matcher = LoMa(cfg)
@@ -61,5 +81,12 @@ class LoMaMatcher(BaseMatcher):
         matched_kpts1 = self.rescale_coords(matched_kpts1, *img1_orig_shape, H1, W1)
         all_kpts0 = self.rescale_coords(all_kpts0, *img0_orig_shape, H0, W0)
         all_kpts1 = self.rescale_coords(all_kpts1, *img1_orig_shape, H1, W1)
+
+        # LoMa uses COLMAP convention for pixel coords (see https://github.com/gmberton/vismatch/pull/63) so we subtact 0.5 for repo compatability
+        offset = 0.5
+        matched_kpts0 -= offset
+        matched_kpts1 -= offset
+        all_kpts0 -= offset
+        all_kpts1 -= offset
 
         return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, desc0[0], desc1[0]
