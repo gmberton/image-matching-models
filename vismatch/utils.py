@@ -191,7 +191,7 @@ def resize_to_divisible(img: torch.Tensor, divisible_by: int = 14) -> torch.Tens
     """Resize to be divisible by a factor. Useful for ViT based models.
 
     Args:
-        img (torch.Tensor): img as tensor, in (\*, H, W) order
+        img (torch.Tensor): img as tensor, in (*, H, W) order
         divisible_by (int, optional): factor to make sure img is divisible by. Defaults to 14.
 
     Returns:
@@ -271,7 +271,7 @@ def add_to_path(path: str | Path, **_kwargs) -> None:
             continue  # already loaded from this directory
         if not resolved.startswith(_THIRD_PARTY_DIR):
             continue  # loaded from user code / pip / stdlib — never touch it
-        # Stale module from a different third-party repo — flush it
+        # Stale module from a different vismatch/third-party repo — flush it
         for k in [k for k in sys.modules if k == name or k.startswith(name + ".")]:
             del sys.modules[k]
 
