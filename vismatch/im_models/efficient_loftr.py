@@ -8,7 +8,7 @@ import torchvision.transforms as tfm
 from vismatch import THIRD_PARTY_DIR, BaseMatcher
 from vismatch.utils import resize_to_divisible, add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath("EfficientLoFTR"), insert=0)
+add_to_path(THIRD_PARTY_DIR.joinpath("EfficientLoFTR"))
 
 from src.loftr import LoFTR, full_default_cfg, opt_default_cfg, reparameter
 

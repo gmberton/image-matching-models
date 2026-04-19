@@ -6,7 +6,7 @@ from vismatch import THIRD_PARTY_DIR, BaseMatcher
 from vismatch.utils import resize_to_divisible, lower_config, add_to_path
 
 
-add_to_path(THIRD_PARTY_DIR.joinpath("Se2_LoFTR"), insert=0)
+add_to_path(THIRD_PARTY_DIR.joinpath("Se2_LoFTR"))
 from src.loftr.loftr import LoFTR
 from configs.loftr.outdoor.loftr_ds_e2_dense_8rot import cfg as rot8_cfg
 from configs.loftr.outdoor.loftr_ds_e2_dense_big import cfg as big_cfg

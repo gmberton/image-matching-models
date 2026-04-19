@@ -6,9 +6,7 @@ from huggingface_hub import snapshot_download
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
 from vismatch.utils import add_to_path, resize_to_divisible
 
-# Add TopicFM to path
 add_to_path(THIRD_PARTY_DIR.joinpath("TopicFM"))
-add_to_path(THIRD_PARTY_DIR.joinpath("TopicFM/src"))
 
 from src.models.topic_fm import TopicFM  # noqa: E402
 from src import get_model_cfg  # noqa: E402

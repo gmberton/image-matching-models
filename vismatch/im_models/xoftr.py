@@ -5,7 +5,7 @@ from huggingface_hub import snapshot_download
 from vismatch import THIRD_PARTY_DIR, BaseMatcher
 from vismatch.utils import resize_to_divisible, add_to_path
 
-add_to_path(THIRD_PARTY_DIR.joinpath("XoFTR"), insert=0)
+add_to_path(THIRD_PARTY_DIR.joinpath("XoFTR"))
 
 from src.xoftr import XoFTR
 from src.config.default import get_cfg_defaults
