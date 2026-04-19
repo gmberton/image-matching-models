@@ -37,6 +37,7 @@ def parse_args():
     parser.add_argument(
         "--matcher",
         type=str,
+        nargs="+",
         default="superpoint-lightglue",
         choices=available_models,
         metavar="MODEL",
@@ -69,7 +70,11 @@ def parse_args():
     args = parser.parse_args()
 
     if args.out_dir is None:
-        args.out_dir = Path("outputs") / args.matcher
+        if isinstance(args.matcher, list):
+            matcher_str = "_".join(args.matcher)
+        else:
+            matcher_str = args.matcher
+        args.out_dir = Path("outputs") / matcher_str
 
     return args
 
