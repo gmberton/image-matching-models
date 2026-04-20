@@ -26,6 +26,8 @@ Let's for example add a matcher called new_matcher.
    # Run this and make sure it passes the test
    python vismatch_test.py --matcher new_matcher
    ```
+   You may see a warning about mission HF repos - it's safe to ignore this error. We use this to track model downloads (see [model tracker](https://gmberton.github.io/vismatch-downloads-tracker/downloads_per_day.html)) and maintainers will add this once the PR is made. 
+
    Now submit a PR!
 
 Note: as authors update their model repos, consider updating the submodule reference here using the below:
