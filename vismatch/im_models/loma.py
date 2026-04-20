@@ -32,15 +32,17 @@ class LoMaMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         self.max_num_keypoints = max_num_keypoints
 
-        if arch == "LoMa-B":
+        arch = arch.lower()
+
+        if arch == "loma-b":
             cfg = LoMaB()
-        elif arch == "LoMa-L":
+        elif arch == "loma-l":
             cfg = LoMaL()
-        elif arch == "LoMa-G":
+        elif arch == "loma-g":
             cfg = LoMaG()
-        elif arch == "LoMa-B128":
+        elif arch == "loma-b128":
             cfg = LoMaB128()
-        elif arch == "LoMa-R":
+        elif arch == "loma-r":
             cfg = LoMaR()
         else:
             raise ValueError(
@@ -48,13 +50,13 @@ class LoMaMatcher(BaseMatcher):
             )
 
         # This automatically loads weights using torch.hub.load_state_dict_from_url
-        self.matcher = LoMa(cfg)
+        self.matcher = LoMa(cfg).to(self.device)
 
     def preprocess(self, img):
         _, h, w = img.shape
         orig_shape = h, w
         img = resize_to_divisible(img, self.divisible_size)
-        img = img.unsqueeze(0)
+        img = img.unsqueeze(0).to(self.device)
         return img, orig_shape
 
     def _forward(self, img0, img1):

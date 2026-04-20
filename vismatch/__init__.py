@@ -96,6 +96,7 @@ available_models = [
     "xfeat-star-steerers-perm",
     "xfeat-star-steerers-learned",
     "loma",
+    "loma-r",
 ]
 
 
@@ -483,6 +484,11 @@ def get_matcher(
         from vismatch.im_models import loma
 
         return loma.LoMaMatcher(device, max_num_keypoints, *args, **kwargs)
+    elif matcher_name == "loma-r":
+        from vismatch.im_models import loma
+
+        return loma.LoMaMatcher(device, max_num_keypoints, arch="LoMa-R", *args, **kwargs)
+
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
