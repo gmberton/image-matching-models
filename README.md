@@ -112,7 +112,7 @@ You can use any of the over 50 matchers simply like this. All model weights are 
 ### Python API
 ```python
 from vismatch import get_matcher
-from vismatch.viz import plot_matches, plot_kpts
+from vismatch.viz import plot_matches, plot_keypoints
 
 # Choose any of the 50+ matchers listed below
 matcher = get_matcher("superpoint-lightglue", device="cuda")
@@ -130,11 +130,11 @@ plot_matches(img0, img1, result, save_path="plot_matches.png")
 # Or you can extract and visualize keypoints as easily as
 result = matcher.extract(img0)
 # result.keys() = ["all_kpts0", "all_desc0"]
-plot_kpts(img0, result, save_path="plot_kpts.png")
+plot_keypoints(img0, result, save_path="plot_keypoints.png")
 ```
 
 ### Command Line Interface / Standalone Scripts
-You can also run matching or extraction as standalone scripts, to get the same results as above. 
+You can also run matching or extraction as standalone scripts, to get the same results as above.
 #### Matching:
 ```bash
 # if you cloned this repo, vismatch_match.py is available, else see CLI below
