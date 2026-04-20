@@ -95,6 +95,7 @@ available_models = [
     "xfeat-steerers-learned",
     "xfeat-star-steerers-perm",
     "xfeat-star-steerers-learned",
+    "loma",
 ]
 
 
@@ -478,6 +479,10 @@ def get_matcher(
         from vismatch.im_models import zippypoint
 
         return zippypoint.ZippyPointMatcher(device, max_num_keypoints=max_num_keypoints, *args, **kwargs)
+    elif matcher_name == "loma":
+        from vismatch.im_models import loma
+
+        return loma.LoMaMatcher(device, max_num_keypoints, *args, **kwargs)
     else:
         raise RuntimeError(
             f"Matcher {matcher_name} not yet supported. Consider submitted a PR to add it. Available models: {available_models}"
