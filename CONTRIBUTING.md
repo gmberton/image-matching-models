@@ -56,7 +56,7 @@ import torch
 
 weights_src = "https://drive.google.com/file/d/1jFy2JbMKlIp82541TakhQPaoyB5qDeic/view"
 model_path = "eloftr_outdoor.ckpt"
-gdown.download(weights_src, output=model_path, fuzzy=True)
+gdown.download(weights_src, output=model_path)
 ```
 
 2. Although weights can be uploaded as PyTorch file, safetensor is preferred. Save the state dict as a [safetensor](https://huggingface.co/docs/safetensors/en/index)

@@ -44,7 +44,7 @@ class NewMatcher(BaseMatcher):
         # weights_path = cache_dir / "your_model.pth"
         # if not weights_path.is_file():
         #     print("Downloading model weights...")
-        #     gdown.download("https://drive.google.com/file/d/abc123/view", output=str(weights_path), fuzzy=True)
+        #     gdown.download("https://drive.google.com/file/d/abc123/view", output=str(weights_path))
         # return weights_path
 
         # # Option 3: Direct URL download with py3_wget

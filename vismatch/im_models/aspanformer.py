@@ -44,7 +44,6 @@ class AspanformerMatcher(BaseMatcher):
             gdown.download(
                 self.weights_src,
                 output=str(cache_dir / "weights_aspanformer.tar"),
-                fuzzy=True,
             )
             tar = tarfile.open(cache_dir / "weights_aspanformer.tar")
             tar.extractall(cache_dir)
