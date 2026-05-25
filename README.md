@@ -1,4 +1,4 @@
-# vismatch (formerly Image Matching Models)
+# vismatch
 
 Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growing!) image matching models.
 
@@ -22,6 +22,9 @@ Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growi
 </a>
 <a href="https://vismatch.readthedocs.io/en/latest/">
   <img src="https://app.readthedocs.org/projects/vismatch/badge/?version=latest&style=flat" alt="ReadTheDocs Page" style="vertical-align: middle;">
+</a>
+<a href="https://github.com/gmberton/vismatch">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=gmberton.vismatch" alt="Visitors" style="vertical-align: middle;">
 </a>
 
 <br/>
