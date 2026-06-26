@@ -63,7 +63,7 @@ class GIM_DKM(BaseMatcher):
 
         # b_ids = torch.where(mconf[None])[0]
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf
 
 
 class GIM_LightGlue(BaseMatcher):
@@ -182,6 +182,6 @@ class GIM_LightGlue(BaseMatcher):
         mkpts0 = torch.cat([kpts0[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
         mkpts1 = torch.cat([kpts1[m_bids == b_id][matches[b_id][..., 1]] for b_id in range(bs)])
         # b_ids = torch.cat([m_bids[m_bids == b_id][matches[b_id][..., 0]] for b_id in range(bs)])
-        # mconf = torch.cat(pred['scores'])
+        mconf = torch.cat(pred["scores"])
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0[0], desc1[0]
+        return mkpts0, mkpts1, kpts0, kpts1, desc0[0], desc1[0], mconf

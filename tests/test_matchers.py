@@ -15,9 +15,10 @@ vismatch_match.py:
 
 import pytest
 import numpy as np
+import torch
 
 import vismatch
-from vismatch import get_matcher, available_models
+from vismatch import get_matcher, available_models, BaseMatcher
 
 
 def test_import_vismatch_main():
@@ -25,6 +26,52 @@ def test_import_vismatch_main():
     assert hasattr(vismatch, "get_matcher")
     assert hasattr(vismatch, "available_models")
     assert hasattr(vismatch, "BaseMatcher")
+
+
+class LegacyMatcher(BaseMatcher):
+    def _forward(self, img0, img1):
+        kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
+        empty = np.empty([0, 2])
+        return kpts, kpts, empty, empty, empty, empty
+
+
+class ConfidenceMatcher(BaseMatcher):
+    def _forward(self, img0, img1):
+        kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
+        empty = np.empty([0, 2])
+        confidences = torch.tensor([0.25, 0.75])
+        return kpts, kpts, empty, empty, empty, empty, confidences
+
+
+class BadConfidenceMatcher(BaseMatcher):
+    def _forward(self, img0, img1):
+        kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
+        empty = np.empty([0, 2])
+        confidences = np.array([0.5], dtype=np.float32)
+        return kpts, kpts, empty, empty, empty, empty, confidences
+
+
+@pytest.mark.parametrize(
+    ("matcher_cls", "expected_confidences"),
+    [
+        (LegacyMatcher, None),
+        (ConfidenceMatcher, np.array([0.25, 0.75])),
+    ],
+)
+def test_forward_matcher_confidences(test_images, matcher_cls, expected_confidences):
+    img0, img1 = test_images
+    result = matcher_cls().forward(img0, img1)
+    if expected_confidences is None:
+        assert result["matched_confidences"] is None
+    else:
+        assert isinstance(result["matched_confidences"], np.ndarray)
+        np.testing.assert_allclose(result["matched_confidences"], expected_confidences)
+
+
+def test_forward_bad_confidence_shape_fails(test_images):
+    img0, img1 = test_images
+    with pytest.raises(AssertionError):
+        BadConfidenceMatcher().forward(img0, img1)
 
 
 @pytest.mark.parametrize("model_name", available_models)
@@ -63,12 +110,17 @@ def test_forward_synthetic_images(model_name, device, test_images):
     assert "num_inliers" in result
     assert "matched_kpts0" in result
     assert "matched_kpts1" in result
+    assert "matched_confidences" in result
     assert "all_kpts0" in result
     assert "all_kpts1" in result
     assert isinstance(result["matched_kpts0"], np.ndarray)
     assert isinstance(result["matched_kpts1"], np.ndarray)
+    assert result["matched_confidences"] is None or isinstance(result["matched_confidences"], np.ndarray)
     assert result["matched_kpts0"].ndim == 2
     assert result["matched_kpts1"].ndim == 2
+    if result["matched_confidences"] is not None:
+        assert result["matched_confidences"].ndim == 1
+        assert len(result["matched_confidences"]) == len(result["matched_kpts0"])
     if result["matched_kpts0"].shape[0] > 0:
         assert result["matched_kpts0"].shape[1] == 2
         assert result["matched_kpts1"].shape[1] == 2

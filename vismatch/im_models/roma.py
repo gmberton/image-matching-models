@@ -64,7 +64,7 @@ class RomaMatcher(BaseMatcher):
         matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, certainty
 
 
 class TinyRomaMatcher(BaseMatcher):
@@ -91,4 +91,4 @@ class TinyRomaMatcher(BaseMatcher):
         matches, certainty = self.roma_model.sample(warp, certainty, num=self.max_keypoints)
         mkpts0, mkpts1 = self.roma_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, certainty

@@ -46,12 +46,13 @@ class MINIMASuperpointLightGlueMatcher(MINIMAMatcher):
 
         mkpts0 = batch["keypoints0"]
         mkpts1 = batch["keypoints1"]
+        mconf  = batch["matching_scores"]
 
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf
 
 
 class MINIMALoFTRMatcher(MINIMAMatcher):
@@ -125,7 +126,7 @@ class MINIMARomaMatcher(MINIMAMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf
 
 
 class MINIMAXoFTRMatcher(MINIMAMatcher):

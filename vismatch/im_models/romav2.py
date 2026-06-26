@@ -59,4 +59,4 @@ class RoMaV2Matcher(BaseMatcher):
 
         mkpts0, mkpts1 = self.romav2_model.to_pixel_coordinates(matches, h0, w0, h1, w1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, confidence

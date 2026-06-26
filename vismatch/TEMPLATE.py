@@ -72,6 +72,7 @@ class NewMatcher(BaseMatcher):
         Returns (np.ndarray or torch.Tensor)
         -------
         matched_kpts0, matched_kpts1 : (N, 2) matched keypoints
+        matched_confidences : (N,) per-match confidence scores (None if unavailable)
         all_kpts0, all_kpts1 : (M, 2), (K, 2) all detected keypoints (None for detector-free methods)
         all_desc0, all_desc1 : (M, D), (K, D) descriptors (None for detector-free methods)
         """
@@ -93,6 +94,7 @@ class NewMatcher(BaseMatcher):
         all_kpts1 = np.random.rand(n_kpts, 2) * np.array([[w1, h1]])
         all_desc0 = np.random.rand(n_kpts, desc_dim)
         all_desc1 = np.random.rand(n_kpts, desc_dim)
+        matched_confidences = np.random.rand(n_matches)
 
         # If preprocessing resized the image, rescale keypoints back to original size
         # H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
@@ -100,8 +102,12 @@ class NewMatcher(BaseMatcher):
         # matched_kpts1 = self.rescale_coords(matched_kpts1, *img1_orig_shape, H1, W1)
 
         # RANSAC is handled in BaseMatcher.forward() which wraps this function, no need to filter inliers here
-        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1
-        # For detector-free methods (like LoFTR):
-        #   return matched_kpts0, matched_kpts1, None, None, None, None
+        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, matched_confidences
+        # If the model does not provide per-match confidence:
+        #   return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, None
+        # For detector-free methods with confidence (like LoFTR):
+        #   return matched_kpts0, matched_kpts1, None, None, None, None, matched_confidences
+        # For detector-free methods without confidence:
+        #   return matched_kpts0, matched_kpts1, None, None, None, None, None
         # Some methods might even return no descriptors:
-        #   return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, None, None
+        #   return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, None, None, matched_confidences

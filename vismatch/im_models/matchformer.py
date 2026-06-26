@@ -54,8 +54,9 @@ class MatchformerMatcher(BaseMatcher):
 
         mkpts0 = batch["mkpts0_f"]
         mkpts1 = batch["mkpts1_f"]
+        mconf = batch["mconf"]
 
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf

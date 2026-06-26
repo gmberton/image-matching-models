@@ -70,9 +70,11 @@ class LoMaMatcher(BaseMatcher):
         kpts1, desc1, _, _ = self.matcher.detect_and_describe(img1, self.max_num_keypoints)
 
         scores = self.matcher(kpts0, kpts1, desc0, desc1)["scores"]
-        m0, _, _, _ = filter_matches(scores, self.matcher.cfg.filter_threshold)
+        m0, _, mscores0, _ = filter_matches(scores, self.matcher.cfg.filter_threshold)
 
+        # LoMa returns bfloat16 conf values. for numpy to convert this we need to cast it to float.
         valid = m0[0] > -1
+        matched_conf = mscores0[0][valid].float() 
         matched_kpts0 = to_pixel_coords(kpts0[0][torch.where(valid)[0]], H0, W0)
         matched_kpts1 = to_pixel_coords(kpts1[0][m0[0][valid]], H1, W1)
 
@@ -91,4 +93,4 @@ class LoMaMatcher(BaseMatcher):
         all_kpts0 -= offset
         all_kpts1 -= offset
 
-        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, desc0[0], desc1[0]
+        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, desc0[0], desc1[0], matched_conf

@@ -147,12 +147,13 @@ class MatchAnythingMatcher(BaseMatcher):
 
         mkpts0 = batch["mkpts0_f"].detach().cpu()
         mkpts1 = batch["mkpts1_f"].detach().cpu()
+        mconf = batch["mconf"].detach().cpu() if "mconf" in batch else None
 
         if self.variant == "eloftr":
             mkpts0 *= torch.tensor(img0_scale)[[1, 0]]
             mkpts1 *= torch.tensor(img1_scale)[[1, 0]]
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf
 
 
 # Custom resize logic from MatchAnything to preserve padding/masks expected by the upstream config.

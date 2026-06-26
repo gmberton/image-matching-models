@@ -32,8 +32,9 @@ class LightGlueBase(BaseMatcher):
         desc1 = feats1["descriptors"]
 
         mkpts0, mkpts1 = kpts0[matches[..., 0]], kpts1[matches[..., 1]]
+        mconf = matches01.get("scores")
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1, mconf
 
 
 class SiftLightGlue(LightGlueBase):

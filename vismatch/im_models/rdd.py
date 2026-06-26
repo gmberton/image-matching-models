@@ -101,7 +101,7 @@ class RDDMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1, conf
 
 
 class _rdd_lightglue_wrapper(LightGlue):
@@ -183,14 +183,14 @@ class RDD_LightGlueMatcher(RDDMatcher):
         valid_mask = conf > self.thresh
         mkpts0 = mkpts0[valid_mask]
         mkpts1 = mkpts1[valid_mask]
-        # conf = conf[valid_mask]
+        conf = conf[valid_mask]
 
         # if we had to resize the img to divisible, then rescale the kpts back to input img size
         H0, W0, H1, W1 = *img0.shape[-2:], *img1.shape[-2:]
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1, conf
 
 
 class RDD_ThirdPartyMatcher(RDDMatcher):
@@ -247,4 +247,4 @@ class RDD_ThirdPartyMatcher(RDDMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1, conf

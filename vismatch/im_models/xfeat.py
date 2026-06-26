@@ -51,6 +51,7 @@ class xFeatMatcher(BaseMatcher):
                 matches.append(self.model.refine_matches(output0, output1, matches=idxs_list, batch_idx=batch_idx))
 
             mkpts0, mkpts1 = matches if batch_size > 1 else (matches[0][:, :2], matches[0][:, 2:])
+            matched_confidences = None
 
         elif self.mode in ["sparse", "lighterglue"]:
             output0 = self.model.detectAndCompute(img0, top_k=self.max_num_keypoints)[0]
@@ -61,10 +62,16 @@ class xFeatMatcher(BaseMatcher):
                 output0.update({"image_size": (img0.shape[-1], img0.shape[-2])})
                 output1.update({"image_size": (img1.shape[-1], img1.shape[-2])})
 
-                mkpts0, mkpts1 = self.model.match_lighterglue(output0, output1)
+                pred = self.model.match_lighterglue(output0, output1)
+                if len(pred) == 3:
+                    mkpts0, mkpts1, matched_confidences = pred
+                else:
+                    mkpts0, mkpts1 = pred
+                    matched_confidences = None
             else:  # sparse
                 idxs0, idxs1 = self.model.match(output0["descriptors"], output1["descriptors"], min_cossim=-1)
                 mkpts0, mkpts1 = output0["keypoints"][idxs0], output1["keypoints"][idxs1]
+                matched_confidences = None
         else:
             raise ValueError(f'unsupported mode for xfeat: {self.mode}. Must choose from ["sparse", "semi-dense"]')
 
@@ -75,4 +82,5 @@ class xFeatMatcher(BaseMatcher):
             output1["keypoints"].squeeze(),
             output0["descriptors"].squeeze(),
             output1["descriptors"].squeeze(),
+            matched_confidences,
         )

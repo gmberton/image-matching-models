@@ -69,11 +69,11 @@ class Patch2pixMatcher(BaseMatcher):
         if len(pos_ids) > 0:
             coarse_matches = coarse_matches[pos_ids]
             matches = fine_matches[pos_ids]
-            # scores = fine_scores[pos_ids]
+            scores = fine_scores[pos_ids]
         else:
             # Simply take all matches for this case
             matches = fine_matches
-            # scores = fine_scores
+            scores = fine_scores
 
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
@@ -82,7 +82,7 @@ class Patch2pixMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, scores
 
 
 class SuperGlueMatcher(BaseMatcher):
@@ -120,11 +120,11 @@ class SuperGlueMatcher(BaseMatcher):
         img0_gray = self.to_gray(img0).unsqueeze(0).to(self.device)
         img1_gray = self.to_gray(img1).unsqueeze(0).to(self.device)
 
-        matches, kpts0, kpts1, _ = self.matcher.match_inputs_(img0_gray, img1_gray)
+        matches, kpts0, kpts1, scores = self.matcher.match_inputs_(img0_gray, img1_gray)
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
 
-        return mkpts0, mkpts1, kpts0, kpts1, None, None
+        return mkpts0, mkpts1, kpts0, kpts1, None, None, scores
 
 
 class R2D2Matcher(BaseMatcher):
@@ -165,7 +165,7 @@ class R2D2Matcher(BaseMatcher):
         mkpts0 = kpts0[match_ids[:, 0], :2].cpu().numpy()
         mkpts1 = kpts1[match_ids[:, 1], :2].cpu().numpy()
 
-        return mkpts0, mkpts1, kpts0[:, :2], kpts1[:, :2], desc0, desc1
+        return mkpts0, mkpts1, kpts0[:, :2], kpts1[:, :2], desc0, desc1, scores
 
 
 class D2netMatcher(BaseMatcher):
@@ -203,11 +203,11 @@ class D2netMatcher(BaseMatcher):
         kpts0, desc0 = self.model.extract_features(img0)
         kpts1, desc1 = self.model.extract_features(img1)
 
-        match_ids, _ = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
+        match_ids, scores = self.model.mutual_nn_match(desc0, desc1, threshold=self.match_threshold)
         mkpts0 = kpts0[match_ids[:, 0], :2]
         mkpts1 = kpts1[match_ids[:, 1], :2]
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1, scores
 
 
 class DogAffHardNNMatcher(BaseMatcher):
@@ -234,8 +234,8 @@ class DogAffHardNNMatcher(BaseMatcher):
         img0 = self.tensor_to_numpy_int(img0)
         img1 = self.tensor_to_numpy_int(img1)
 
-        matches, _, _, _ = self.model.match_inputs_(img0, img1)
+        matches, _, _, scores = self.model.match_inputs_(img0, img1)
         mkpts0 = matches[:, :2]
         mkpts1 = matches[:, 2:4]
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, scores.reshape(-1)

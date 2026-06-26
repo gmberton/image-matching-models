@@ -18,6 +18,6 @@ class LoftrMatcher(BaseMatcher):
         batch = {"image0": img0, "image1": img1}
 
         output = self.model(batch)
-        mkpts0, mkpts1 = output["keypoints0"], output["keypoints1"]
+        mkpts0, mkpts1, mconf = output["keypoints0"], output["keypoints1"], output["confidence"]
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, mconf
