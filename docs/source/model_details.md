@@ -16,6 +16,23 @@ Most models can run on both CPU and GPU. If a runtime shows ❌, that model cann
     </tr>
   </thead>
   <tbody>
+      <tr>
+      <td colspan="5" align="center"><strong>2026</strong></td>
+    </tr>
+    <tr>
+      <td>LoMa-R (CVPR IMW '26)</td>
+      <td><a href="https://github.com/davnords/LoMa">Official</a></td>
+      <td><a href="https://arxiv.org/abs/2604.11809">arxiv</a></td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>LoMa (arXiv '26)</td>
+      <td><a href="https://github.com/davnords/LoMa">Official</a></td>
+      <td><a href="https://arxiv.org/abs/2604.04931">arxiv</a></td>
+      <td></td>
+      <td></td>
+    </tr>
     <tr>
       <td colspan="5" align="center"><strong>2025</strong></td>
     </tr>

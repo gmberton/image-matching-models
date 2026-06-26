@@ -1,4 +1,4 @@
-# vismatch (formerly Image Matching Models)
+# vismatch
 
 Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growing!) image matching models.
 
@@ -22,6 +22,9 @@ Vis(ion)Match(ers) is a unified API for quickly and easily trying 50+ (and growi
 </a>
 <a href="https://vismatch.readthedocs.io/en/latest/">
   <img src="https://app.readthedocs.org/projects/vismatch/badge/?version=latest&style=flat" alt="ReadTheDocs Page" style="vertical-align: middle;">
+</a>
+<a href="https://github.com/gmberton/vismatch">
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=gmberton.vismatch" alt="Visitors" style="vertical-align: middle;">
 </a>
 
 <br/>
@@ -112,7 +115,7 @@ You can use any of the over 50 matchers simply like this. All model weights are 
 ### Python API
 ```python
 from vismatch import get_matcher
-from vismatch.viz import plot_matches, plot_kpts
+from vismatch.viz import plot_matches, plot_keypoints
 
 # Choose any of the 50+ matchers listed below
 matcher = get_matcher("superpoint-lightglue", device="cuda")
@@ -130,11 +133,11 @@ plot_matches(img0, img1, result, save_path="plot_matches.png")
 # Or you can extract and visualize keypoints as easily as
 result = matcher.extract(img0)
 # result.keys() = ["all_kpts0", "all_desc0"]
-plot_kpts(img0, result, save_path="plot_kpts.png")
+plot_keypoints(img0, result, save_path="plot_keypoints.png")
 ```
 
 ### Command Line Interface / Standalone Scripts
-You can also run matching or extraction as standalone scripts, to get the same results as above. 
+You can also run matching or extraction as standalone scripts, to get the same results as above.
 #### Matching:
 ```bash
 # if you cloned this repo, vismatch_match.py is available, else see CLI below
@@ -177,7 +180,7 @@ We support the following methods:
 
 **Semi-dense**: ```loftr, eloftr, se2loftr, xoftr, minima-loftr, aspanformer, matchformer, xfeat-star, xfeat-star-steerers[-perm/-learned], edm, rdd-star, topicfm[-plus]```
 
-**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd, zippypoint```
+**Sparse**: ```[sift, superpoint, disk, aliked, dedode, doghardnet, gim, xfeat]-lightglue, dedode, steerers, affine-steerers, xfeat-steerers[-perm/learned], dedode-kornia, [sift, orb, doghardnet]-nn, patch2pix, superglue, r2d2, d2net,  gim-dkm, xfeat, omniglue, [dedode, xfeat, aliked]-subpx, [sift, superpoint]-sphereglue, minima-superpoint-lightglue, liftfeat, rdd-[sparse,lightglue, aliked], ripe, lisrd, zippypoint, loma, loma-r```
 
 See [Model Details](docs/source/model_details.md) to see runtimes, supported devices, source, and license of each model.
 

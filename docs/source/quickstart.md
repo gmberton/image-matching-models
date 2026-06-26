@@ -22,12 +22,12 @@ plot_matches(img0, img1, result, save_path="matches.png")
 ## Keypoint Extraction
 
 ```python
-from vismatch.viz import plot_kpts
+from vismatch.viz import plot_keypoints
 
 result = matcher.extract(img0)
 # result keys: all_kpts0, all_desc0
 
-plot_kpts(img0, result, save_path="kpts.png")
+plot_keypoints(img0, result, save_path="kpts.png")
 ```
 
 ## Ensemble Matching
