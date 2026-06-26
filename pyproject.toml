@@ -34,7 +34,10 @@ HuggingFace = "https://huggingface.co/vismatch"
 omniglue = ["tensorflow"]
 sphereglue = ["torch-geometric", "torch-cluster"]
 zippypoint = ["tensorflow>=2.15,<2.16", "keras<3", "larq>=0.12.2"]
-all = ["vismatch[omniglue, sphereglue, zippypoint]"]
+all = [
+    "vismatch[omniglue, sphereglue]",
+    'vismatch[zippypoint]; python_version < "3.12"',
+]
 docs = [
     "sphinx>=7.0",
     "sphinx-rtd-theme",
