@@ -99,5 +99,6 @@ class LISRDMatcher(BaseMatcher):
             keypoints1,
             None,  # desc0,
             None,  # desc1,
+            None,  # matched_confidences
         )
         # lisrd has N x 4 x D dimensional descriptors, inconsistent with other methods, hence return None as descs

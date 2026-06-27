@@ -74,7 +74,7 @@ class SphereGlueBase(BaseMatcher):
         mkpts0 = kpts0[kpts0_idx]
         mkpts1 = kpts1[kpts1_idx]
 
-        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1
+        return mkpts0, mkpts1, kpts0, kpts1, desc0, desc1, None
 
 
 class SiftSphereGlue(SphereGlueBase):

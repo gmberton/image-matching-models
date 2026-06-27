@@ -89,4 +89,4 @@ class OmniglueMatcher(BaseMatcher):
             mkpts1 = mkpts1[keep_idx]
             match_conf = match_conf[keep_idx]
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, None

@@ -160,4 +160,5 @@ class xFeatSteerersMatcher(BaseMatcher):
             output1["keypoints"].squeeze(),
             output0["descriptors"].squeeze(),
             output1["descriptors"].squeeze(),
+            None,
         )

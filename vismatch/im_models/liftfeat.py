@@ -41,4 +41,5 @@ class LiftFeatMatcher(BaseMatcher):
             None,  # keypoints_1
             None,  # desc0
             None,  # desc1
+            None,  # matched_confidences
         )

@@ -99,11 +99,11 @@ class ZippyPointMatcher(BaseMatcher):
         all_kpts1, all_desc1, desc1 = self.infer(img1)
 
         if desc0.shape[1] == 0 or desc1.shape[1] == 0:
-            return None, None, all_kpts0, all_kpts1, all_desc0, all_desc1
+            return None, None, all_kpts0, all_kpts1, all_desc0, all_desc1, None
 
         matches = self.matching({"descriptors0": desc0, "descriptors1": desc1})["matches0"][0].numpy()
         valid = matches > -1
         matched_kpts0 = all_kpts0[valid]
         matched_kpts1 = all_kpts1[matches[valid]]
 
-        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1
+        return matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, None

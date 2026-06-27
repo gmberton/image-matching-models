@@ -93,7 +93,7 @@ class Dust3rMatcher(BaseMatcher):
 
         # return if there is no 3d points found on either one of the image
         if pts3d_list[0].shape[0] == 0 or pts3d_list[1].shape[0] == 0:
-            return np.empty((0, 2)), np.empty((0, 2)), None, None, None, None
+            return np.empty((0, 2)), np.empty((0, 2)), None, None, None, None, None
         reciprocal_in_P2, nn2_in_P1, _ = find_reciprocal_matches(*pts3d_list)
 
         mkpts1 = pts2d_list[1][reciprocal_in_P2]
@@ -105,4 +105,4 @@ class Dust3rMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, None, None, None, None
+        return mkpts0, mkpts1, None, None, None, None, None

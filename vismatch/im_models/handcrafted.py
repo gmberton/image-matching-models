@@ -59,7 +59,7 @@ class HandcraftedBaseMatcher(BaseMatcher):
         keypoints_0 = np.array([(x.pt[0], x.pt[1]) for x in kp0])
         keypoints_1 = np.array([(x.pt[0], x.pt[1]) for x in kp1])
 
-        return mkpts0, mkpts1, keypoints_0, keypoints_1, des0, des1
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, des0, des1, None
 
 
 class SiftNNMatcher(HandcraftedBaseMatcher):

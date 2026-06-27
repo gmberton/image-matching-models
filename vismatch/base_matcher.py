@@ -130,11 +130,9 @@ class BaseMatcher(torch.nn.Module):
         img1 = to_tensor_image(img1).to(self.device)
 
         # self._forward() is implemented by the children modules
-        matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, *optional_outputs = self._forward(
-            img0, img1
+        matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, matched_confidences = (
+            self._forward(img0, img1)
         )
-        assert len(optional_outputs) <= 1, f"_forward() should return 6 or 7 values, got {6 + len(optional_outputs)}"
-        matched_confidences = optional_outputs[0] if optional_outputs else None
 
         # Check that returned objects are of accepted types (nd.array, torch.tensor or None)
         self.check_types(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, matched_confidences)
@@ -250,12 +248,13 @@ class EnsembleMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
         self.matchers = [get_matcher(name, device=device, **kwargs) for name in matcher_names]
 
-    def _forward(self, img0: torch.Tensor, img1: torch.Tensor) -> tuple[np.ndarray, np.ndarray, None, None, None, None]:
+    def _forward(
+        self, img0: torch.Tensor, img1: torch.Tensor
+    ) -> tuple[np.ndarray, np.ndarray, None, None, None, None, None]:
         all_matched_kpts0, all_matched_kpts1 = [], []
         for matcher in self.matchers:
-            matched_kpts0, matched_kpts1, _, _, _, _, *optional_outputs = matcher._forward(img0, img1)
-            assert len(optional_outputs) <= 1, f"{matcher.name}._forward() should return 6 or 7 values"
+            matched_kpts0, matched_kpts1, _, _, _, _, _ = matcher._forward(img0, img1)
             all_matched_kpts0.append(to_numpy(matched_kpts0))
             all_matched_kpts1.append(to_numpy(matched_kpts1))
         all_matched_kpts0, all_matched_kpts1 = np.concatenate(all_matched_kpts0), np.concatenate(all_matched_kpts1)
-        return all_matched_kpts0, all_matched_kpts1, None, None, None, None
+        return all_matched_kpts0, all_matched_kpts1, None, None, None, None, None
