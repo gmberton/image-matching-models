@@ -52,4 +52,4 @@ class RIPEMatcher(BaseMatcher):
         mkpts0 = self.rescale_coords(mkpts0, *img0_orig_shape, H0, W0)
         mkpts1 = self.rescale_coords(mkpts1, *img1_orig_shape, H1, W1)
 
-        return mkpts0, mkpts1, keypoints_1, keypoints_1, desc0, desc1, None
+        return mkpts0, mkpts1, keypoints_0, keypoints_1, desc0, desc1, None
