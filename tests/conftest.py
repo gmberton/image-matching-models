@@ -9,6 +9,7 @@ by all test files in the tests/ directory via pytest's conftest mechanism:
 """
 
 import os
+import shutil
 
 import pytest
 import torch
@@ -34,6 +35,14 @@ def pytest_collection_modifyitems(config, items):
             if model in item.name:
                 item.add_marker(skip_ci)
                 break
+
+
+@pytest.fixture(autouse=True)
+def _clear_hf_cache_in_ci():
+    """In CI, delete downloaded model weights after each test to cap peak disk usage."""
+    yield
+    if os.environ.get("CI"):
+        shutil.rmtree(Path.home() / ".cache" / "huggingface" / "hub", ignore_errors=True)
 
 
 def _get_test_image_pair():
