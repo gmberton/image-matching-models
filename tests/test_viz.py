@@ -11,6 +11,7 @@ match results:
 - ``torch.save / torch.load``: persist and reload a match result dict.
 """
 
+import pytest
 import torch
 import numpy as np
 import tempfile
@@ -54,10 +55,11 @@ def test_stitch(test_images, device):
     img0, img1 = test_images
     matcher = get_matcher("sift-lightglue", device=device)
     result = matcher.forward(img0, img1)
-    if result["H"] is not None:
-        stitched = stitch(img0, img1, result)
-        assert isinstance(stitched, np.ndarray)
-        assert stitched.ndim == 3
+    if result["H"] is None:
+        pytest.skip("no homography estimated for the synthetic pair")
+    stitched = stitch(img0, img1, result)
+    assert isinstance(stitched, np.ndarray)
+    assert stitched.ndim == 3
 
 
 def test_save_and_load_result(test_images, device, tmp_path):

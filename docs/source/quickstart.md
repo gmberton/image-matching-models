@@ -14,8 +14,9 @@ img1 = matcher.load_image("img1.jpg", resize=512)
 result = matcher(img0, img1)
 # result keys: num_inliers, H, all_kpts0, all_kpts1,
 #              all_desc0, all_desc1, matched_kpts0, matched_kpts1,
-#              matched_confidences, inlier_kpts0, inlier_kpts1
+#              inlier_kpts0, inlier_kpts1, matched_confidences
 # matched_confidences is None if the matcher does not provide confidence.
+# Confidence scores are matcher-specific and not normalized or comparable across matchers.
 
 plot_matches(img0, img1, result, save_path="matches.png")
 ```

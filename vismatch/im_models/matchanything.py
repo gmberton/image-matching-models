@@ -147,7 +147,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
         mkpts0 = batch["mkpts0_f"].detach().cpu()
         mkpts1 = batch["mkpts1_f"].detach().cpu()
-        mconf = batch["mconf"].detach().cpu() if "mconf" in batch else None
+        mconf = batch["mconf"] if "mconf" in batch else None
 
         if self.variant == "eloftr":
             mkpts0 *= torch.tensor(img0_scale)[[1, 0]]

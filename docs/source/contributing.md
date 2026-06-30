@@ -9,7 +9,7 @@ Let's for example add a matcher called new_matcher.
    ```
    This command automatically modifies `.gitmodules` (you should not modify `.gitmodules` manually!), and when cloning the repository it will automatically clone also the LightGlue repo in `vismatch/third_party`.
 
-3. In `vismatch/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 6 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1]`, or 7 if per-match confidence is available: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1, mconf]`. The template has more details on how to implement the class.
+3. In `vismatch/im_models/new_matcher.py` you only need to implement the method `_forward`, which takes two image tensors as input and returns 7 objects: `[mkpts0, mkpts1, kpts0, kpts1, desc0, desc1, mconf]`, where `mconf` is the per-match confidence (or `None` if the matcher does not provide it). The template has more details on how to implement the class.
 
 4. Open `vismatch/__init__.py` and add the model name (all lowercase) to the `available_models` list. Add an `elif` case to instantiate the class, as for the other matchers.
 

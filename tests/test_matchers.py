@@ -8,7 +8,8 @@ vismatch_match.py:
 - Instantiation: every model in ``available_models`` can be constructed on the
   current device; incompatible models are skipped gracefully.
 - Inference (forward): matching two images via ``matcher.forward()`` returns the
-  expected result dict with keypoints, descriptors, and inlier counts.
+  expected result dict with keypoints, descriptors, inlier counts, and optional
+  per-match confidence.
 - Inference (extract): single-image keypoint extraction via ``matcher.extract()``
   returns keypoints and descriptors.
 """
@@ -28,22 +29,29 @@ def test_import_vismatch_main():
     assert hasattr(vismatch, "BaseMatcher")
 
 
-@pytest.mark.parametrize(
-    ("confidences", "expected_confidences"),
-    [
-        (None, None),
-        (torch.tensor([0.25, 0.75]), np.array([0.25, 0.75])),
-    ],
-)
-def test_forward_matcher_confidences(test_images, confidences, expected_confidences):
+def _mock_matcher(confidences):
+    """Build a BaseMatcher whose _forward returns two matched kpts and the given confidence."""
+
     class Matcher(BaseMatcher):
         def _forward(self, img0, img1):
             kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
             empty = np.empty([0, 2])
             return kpts, kpts, empty, empty, empty, empty, confidences
 
-    img0, img1 = test_images
-    result = Matcher().forward(img0, img1)
+    return Matcher()
+
+
+@pytest.mark.parametrize(
+    ("confidences", "expected_confidences"),
+    [
+        (None, None),
+        (torch.tensor([0.25, 0.75]), np.array([0.25, 0.75])),
+        (np.array([0.25, 0.75], dtype=np.float32), np.array([0.25, 0.75])),
+    ],
+)
+def test_forward_matcher_confidences(test_images, confidences, expected_confidences):
+    """forward() passes None confidence through and converts tensors/arrays to numpy."""
+    result = _mock_matcher(confidences).forward(*test_images)
     if expected_confidences is None:
         assert result["matched_confidences"] is None
     else:
@@ -52,28 +60,20 @@ def test_forward_matcher_confidences(test_images, confidences, expected_confiden
 
 
 def test_forward_requires_confidence_slot(test_images):
+    """A matcher returning only 6 objects (missing the confidence slot) is rejected."""
+
     class Matcher(BaseMatcher):
         def _forward(self, img0, img1):
-            kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
-            empty = np.empty([0, 2])
-            return kpts, kpts, empty, empty, empty, empty
+            return (None,) * 6  # missing the 7th object: matched_confidences
 
-    img0, img1 = test_images
-    with pytest.raises(ValueError, match="not enough values to unpack \\(expected 7, got 6\\)"):
-        Matcher().forward(img0, img1)
+    with pytest.raises(AssertionError, match="must return 7 values"):
+        Matcher().forward(*test_images)
 
 
 def test_forward_bad_confidence_shape_fails(test_images):
-    class Matcher(BaseMatcher):
-        def _forward(self, img0, img1):
-            kpts = np.array([[0.0, 0.0], [1.0, 1.0]], dtype=np.float32)
-            empty = np.empty([0, 2])
-            confidences = np.array([0.5], dtype=np.float32)
-            return kpts, kpts, empty, empty, empty, empty, confidences
-
-    img0, img1 = test_images
+    """Confidence not aligned 1:1 with the matched keypoints is rejected."""
     with pytest.raises(AssertionError):
-        Matcher().forward(img0, img1)
+        _mock_matcher(np.array([0.5], dtype=np.float32)).forward(*test_images)
 
 
 @pytest.mark.parametrize("model_name", available_models)

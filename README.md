@@ -125,7 +125,7 @@ img0 = matcher.load_image("assets/example_pairs/outdoor/montmartre_close.jpg", r
 img1 = matcher.load_image("assets/example_pairs/outdoor/montmartre_far.jpg", resize=img_size)
 
 result = matcher(img0, img1)
-# result.keys() = ["num_inliers", "H", "all_kpts0", "all_kpts1", "all_desc0", "all_desc1", "matched_kpts0", "matched_kpts1", "inlier_kpts0", "inlier_kpts1"]
+# result.keys() = ["num_inliers", "H", "all_kpts0", "all_kpts1", "all_desc0", "all_desc1", "matched_kpts0", "matched_kpts1", "inlier_kpts0", "inlier_kpts1", "matched_confidences"]
 
 # This will plot visualizations for matches as shown in the figures above
 plot_matches(img0, img1, result, save_path="plot_matches.png")

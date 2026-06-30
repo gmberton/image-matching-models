@@ -72,9 +72,9 @@ class NewMatcher(BaseMatcher):
         Returns (np.ndarray or torch.Tensor)
         -------
         matched_kpts0, matched_kpts1 : (N, 2) matched keypoints
-        matched_confidences : (N,) per-match confidence scores (None if unavailable)
         all_kpts0, all_kpts1 : (M, 2), (K, 2) all detected keypoints (None for detector-free methods)
         all_desc0, all_desc1 : (M, D), (K, D) descriptors (None for detector-free methods)
+        matched_confidences : (N,) per-match confidence scores (None if unavailable)
         """
         img0, img0_orig_shape = self.preprocess(img0)
         img1, img1_orig_shape = self.preprocess(img1)
