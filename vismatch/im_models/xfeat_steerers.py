@@ -43,7 +43,9 @@ class xFeatSteerersMatcher(BaseMatcher):
         self.learned_weights_path = cache_dir / "xfeat_learn_steer.pth"
         self.steerer_weights_path = cache_dir / "xfeat_learn_steer_steerer.pth"
 
-        self.model = torch.hub.load("verlab/accelerated_features", "XFeat", pretrained=False, top_k=max_num_keypoints)
+        self.model = torch.hub.load(
+            "verlab/accelerated_features", "XFeat", pretrained=False, top_k=max_num_keypoints, trust_repo=True
+        )
         self.download_weights(cache_dir)
 
         # Load xfeat-fixed-perm-steerers weights

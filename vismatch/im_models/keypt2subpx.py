@@ -37,11 +37,10 @@ class Keypt2SubpxMatcher(BaseMatcher):
         else:
             self.matcher = get_matcher(detector_name, device=device, **kwargs)
         detector = self.THIRDPARTY_NAMES[detector_name]
-        self.keypt2subpx = (
-            torch.hub.load("KimSinjeong/keypt2subpx", "Keypt2Subpx", pretrained=True, detector=detector, verbose=False)
-            .eval()
-            .to(self.device)
+        self.keypt2subpx = torch.hub.load(
+            "KimSinjeong/keypt2subpx", "Keypt2Subpx", pretrained=True, detector=detector, verbose=False, trust_repo=True
         )
+        self.keypt2subpx = self.keypt2subpx.eval().to(self.device)
 
     def get_match_idxs(self, mkpts: np.ndarray | torch.Tensor, kpts: np.ndarray | torch.Tensor) -> np.ndarray:
         idxs = []
