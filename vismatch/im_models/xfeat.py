@@ -6,6 +6,7 @@ from vismatch.utils import add_to_path
 
 add_to_path(THIRD_PARTY_DIR.joinpath("accelerated_features"))
 from modules.xfeat import XFeat
+from modules.lighterglue import LighterGlue
 
 
 class xFeatMatcher(BaseMatcher):
@@ -23,10 +24,9 @@ class xFeatMatcher(BaseMatcher):
         self.mode = mode
 
         if self.mode == "lighterglue":
-            assert "cuda" in self.device, (
-                f"Device must be 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
-            )
-        elif self.mode != "semi-dense":
+            # LighterGlue ignores the device we pass and moves itself to cuda-if-available; put it on self.device.
+            self.model.lighterglue = LighterGlue().to(self.device)
+        if self.mode != "semi-dense":
             assert self.device != "mps", (
                 f"Device must be 'cpu' or 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
             )
