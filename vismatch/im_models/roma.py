@@ -70,7 +70,9 @@ class RomaMatcher(BaseMatcher):
 class TinyRomaMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        self.roma_model = tiny_roma_v1_outdoor(device=device)
+        # Load XFeat with trust_repo=True and pass it in, so the vendored builder skips its own trust prompt.
+        xfeat = torch.hub.load("verlab/accelerated_features", "XFeat", pretrained=True, top_k=4096, trust_repo=True)
+        self.roma_model = tiny_roma_v1_outdoor(device=device, xfeat=xfeat.net)
         self.max_keypoints = max_num_keypoints
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         self.roma_model.train(False)
