@@ -121,6 +121,7 @@ def get_matcher(
             print(f"\n{'!' * 70}\n!!! HF repo 'vismatch/{name}' not found: {e}\n{'!' * 70}\n")
 
     device = str(device)  # In case device is passed as torch.device
+    _ = torch.device(device)  # Check that device is a valid device
     if device.startswith("cuda"):
         assert torch.cuda.is_available(), f"CUDA not available, cannot use device='{device}'"
 
