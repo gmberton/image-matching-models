@@ -4,7 +4,7 @@ from safetensors.torch import load_file
 
 from huggingface_hub import snapshot_download
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import resize_to_divisible, add_to_path
+from vismatch.utils import resize_to_divisible, add_to_path, force_float32
 
 add_to_path(THIRD_PARTY_DIR.joinpath("affine-steerers"))
 from affine_steerers.utils import build_affine
@@ -28,8 +28,10 @@ class AffSteererMatcher(BaseMatcher):
     ):
         super().__init__(device, **kwargs)
 
-        # only cuda devices work due to autocast in cuda in upstream.
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
+        assert "cuda" in self.device or not torch.cuda.is_available(), (
+            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        )
 
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:
@@ -43,6 +45,8 @@ class AffSteererMatcher(BaseMatcher):
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
         self.detector, self.descriptor, self.steerer, self.matcher = self.build_matcher()
+        if "cuda" not in self.device:
+            force_float32(self)  # half precision is not supported on CPU
 
     def build_matcher(self):
         repo = snapshot_download("vismatch/affine-steerers")

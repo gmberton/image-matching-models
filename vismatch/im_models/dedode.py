@@ -6,7 +6,7 @@ import kornia
 
 from huggingface_hub import snapshot_download
 from vismatch import get_version, THIRD_PARTY_DIR, BaseMatcher
-from vismatch.utils import add_to_path, resize_to_divisible, disable_xformers
+from vismatch.utils import add_to_path, resize_to_divisible, disable_xformers, force_float32
 
 add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
 
@@ -20,7 +20,10 @@ class DedodeMatcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
         super().__init__(device, **kwargs)
 
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
+        assert "cuda" in self.device or not torch.cuda.is_available(), (
+            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh
@@ -36,6 +39,8 @@ class DedodeMatcher(BaseMatcher):
         self.detector = dedode_detector_L(weights=load_file(detector_path), device=device)
         self.descriptor = dedode_descriptor_G(weights=load_file(descriptor_path), device=device)
         self.matcher = DualSoftMaxMatcher()
+        if "cuda" not in self.device:
+            force_float32(self)  # half precision is not supported on CPU
 
     def preprocess(self, img):
         # ensure that the img has the proper w/h to be compatible with patch sizes

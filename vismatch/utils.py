@@ -23,6 +23,20 @@ def disable_xformers():
             module.XFORMERS_AVAILABLE = False
 
 
+def force_float32(module: torch.nn.Module):
+    """Fully convert a model to float32 (e.g. for CPU), including submodules hidden in plain lists
+    and amp_dtype attributes, which module.float() does not reach."""
+    module.float()
+    for mod in module.modules():
+        if hasattr(mod, "amp_dtype"):
+            mod.amp_dtype = torch.float32
+        for attribute in vars(mod).values():
+            if isinstance(attribute, list):
+                for item in attribute:
+                    if isinstance(item, torch.nn.Module):
+                        item.float()
+
+
 def get_image_pairs_paths(inputs: list[Path] | Path) -> list[tuple[Path, Path]]:
     """process input to produce a list of image pairs paths
 

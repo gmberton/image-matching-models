@@ -32,7 +32,10 @@ class SteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
+        assert "cuda" in self.device or not torch.cuda.is_available(), (
+            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
+        )
 
         # Download weights from HuggingFace Hub
         repo = snapshot_download("vismatch/steerers")
