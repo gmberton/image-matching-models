@@ -1,5 +1,6 @@
 from torch import Tensor
 from huggingface_hub import snapshot_download
+from kornia.feature.lightglue import LightGlue
 
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
 from vismatch.utils import add_to_path
@@ -25,7 +26,11 @@ class xFeatMatcher(BaseMatcher):
 
         if self.mode == "lighterglue":
             # LighterGlue ignores the device we pass and moves itself to cuda-if-available; put it on self.device.
+            # Its init also overwrites kornia's LightGlue.default_conf globally, breaking other LightGlue-based
+            # matchers (e.g. dedode-lightglue), so restore the original conf afterwards.
+            default_conf = LightGlue.default_conf
             self.model.lighterglue = LighterGlue().to(self.device)
+            LightGlue.default_conf = default_conf
         if self.mode != "semi-dense":
             assert self.device != "mps", (
                 f"Device must be 'cpu' or 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
