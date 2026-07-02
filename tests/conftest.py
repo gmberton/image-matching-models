@@ -59,9 +59,10 @@ def _get_test_image_pair():
 
 
 def _make_synthetic_pair():
-    """Return a pair of random 3x256x256 tensors for synthetic inference tests."""
-    img0 = torch.rand(3, 256, 256)
-    img1 = torch.rand(3, 256, 256)
+    """Return a pair of seeded random 3x256x256 tensors, identical across runs and machines."""
+    generator = torch.Generator().manual_seed(0)
+    img0 = torch.rand(3, 256, 256, generator=generator)
+    img1 = torch.rand(3, 256, 256, generator=generator)
     return img0, img1
 
 
