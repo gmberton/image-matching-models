@@ -250,13 +250,19 @@ _THIRD_PARTY_DIR = str(Path(__file__).resolve().parent / "third_party") + "/"
 def add_to_path(path: str | Path, **_kwargs) -> None:
     """Add *path* to the front of ``sys.path``, allowing imports from it.
 
-    Always inserts at position 0 so the most recently added directory wins.
-    Auto-detects every package and module in *path* and, if any of them are
-    already cached in ``sys.modules`` from a different vismatch third-party
-    directory, flushes the stale entries so the next import resolves correctly.
-    User code, stdlib, and pip packages are never touched.
+    When a matcher's ImportSandbox is active (the normal case) the dir is registered with it and
+    kept on ``sys.path`` only while that wrapper's code runs; see vismatch/import_sandbox.py.
+    Otherwise the legacy behavior applies: insert at the front and flush any same-named module
+    cached from a different third-party dir (user, stdlib and pip modules are never touched).
     """
+    from vismatch.import_sandbox import ImportSandbox
+
     path = str(Path(path).resolve())
+    sandbox = ImportSandbox.active()
+    if sandbox is not None:
+        sandbox.add_path(path)
+        return
+
     if path in sys.path:
         sys.path.remove(path)
     sys.path.insert(0, path)

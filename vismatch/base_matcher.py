@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 
+from vismatch.import_sandbox import sandboxed_method
 from vismatch.utils import to_normalized_coords, to_px_coords, to_numpy, _load_image, to_tensor_image
 
 
@@ -14,6 +15,19 @@ class BaseMatcher(torch.nn.Module):
     __init__ and _forward methods. It also provides a common image_loader and
     homography estimator
     """
+
+    def __init_subclass__(cls, **kwargs):
+        # Run each wrapper-defined matcher's __init__ and _forward inside that wrapper's
+        # ImportSandbox: third-party code does lazy imports at construction time (MINIMA, EDM's
+        # yacs configs) and at inference time (xfeat's lighterglue), and EnsembleMatcher /
+        # Keypt2SubpxMatcher call inner matchers' _forward directly, bypassing forward().
+        super().__init_subclass__(**kwargs)
+        if not cls.__module__.startswith("vismatch.im_models."):
+            return
+        for method_name in ("__init__", "_forward"):
+            method = cls.__dict__.get(method_name)
+            if method is not None:
+                setattr(cls, method_name, sandboxed_method(method, cls.__module__))
 
     def __init__(self, device: str = "cpu", **kwargs):
         super().__init__()
