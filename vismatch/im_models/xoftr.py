@@ -15,7 +15,7 @@ from src.utils.misc import lower_config
 class XoFTRMatcher(BaseMatcher):
     divisible_size = 8
 
-    def __init__(self, device="cpu", pretrained_size=640, **kwargs):
+    def __init__(self, device="cpu", pretrained_size=640, coarse_thresh=0.3, fine_thresh=0.1, denser=False, **kwargs):
         super().__init__(device, **kwargs)
 
         self.pretrained_size = pretrained_size
@@ -24,7 +24,7 @@ class XoFTRMatcher(BaseMatcher):
             840,
         ], f"Pretrained size must be in [640, 840], you entered {self.pretrained_size}"
 
-        self.matcher = self.build_matcher(**kwargs)
+        self.matcher = self.build_matcher(coarse_thresh=coarse_thresh, fine_thresh=fine_thresh, denser=denser)
 
     def build_matcher(self, coarse_thresh=0.3, fine_thresh=0.1, denser=False):
         # Get default configurations
