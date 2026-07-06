@@ -40,7 +40,6 @@ class SteererMatcher(BaseMatcher):
         # Download weights from HuggingFace Hub
         repo = snapshot_download("vismatch/steerers")
         self.detector_path_L = f"{repo}/dedode_detector_L.pth"
-        self.descriptor_path_G = f"{repo}/dedode_descriptor_G.pth"
         self.descriptor_path_B_C4 = f"{repo}/B_C4_Perm_descriptor_setting_C.pth"
         self.descriptor_path_B_SO2 = f"{repo}/B_SO2_Spread_descriptor_setting_B.pth"
         self.steerer_path_C = f"{repo}/B_C4_Perm_steerer_setting_C.pth"

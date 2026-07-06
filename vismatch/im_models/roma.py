@@ -17,9 +17,6 @@ from skimage.util import img_as_ubyte
 
 
 class RomaMatcher(BaseMatcher):
-    dino_patch_size = 14
-    coarse_ratio = 560 / 864
-
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
         self.roma_model = roma_outdoor(device=device)
