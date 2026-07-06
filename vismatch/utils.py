@@ -244,16 +244,11 @@ def load_module(module_name: str, module_path: Path | str) -> None:
     spec.loader.exec_module(module)
 
 
-_THIRD_PARTY_DIR = str(Path(__file__).resolve().parent / "third_party") + "/"
-
-
-def add_to_path(path: str | Path, **_kwargs) -> None:
+def add_to_path(path: str | Path) -> None:
     """Add *path* to the front of ``sys.path``, allowing imports from it.
 
     When a matcher's ImportSandbox is active (the normal case) the dir is registered with it and
     kept on ``sys.path`` only while that wrapper's code runs; see vismatch/import_sandbox.py.
-    Otherwise the legacy behavior applies: insert at the front and flush any same-named module
-    cached from a different third-party dir (user, stdlib and pip modules are never touched).
     """
     from vismatch.import_sandbox import ImportSandbox
 
@@ -266,34 +261,6 @@ def add_to_path(path: str | Path, **_kwargs) -> None:
     if path in sys.path:
         sys.path.remove(path)
     sys.path.insert(0, path)
-
-    # Auto-detect and flush stale modules from other third-party repos.
-    base = Path(path).resolve()
-    if not base.is_dir():
-        return
-    prefix = str(base) + "/"
-    for child in base.iterdir():
-        # Only consider regular Python packages (dir + __init__.py) and .py modules.
-        if child.is_dir() and child.joinpath("__init__.py").is_file():
-            name = child.name
-        elif child.is_file() and child.suffix == ".py" and child.name != "__init__.py":
-            name = child.stem
-        else:
-            continue
-        mod = sys.modules.get(name)
-        if mod is None:
-            continue
-        origin = getattr(mod, "__file__", None)
-        if not origin:
-            continue  # built-in — leave it alone
-        resolved = str(Path(origin).resolve())
-        if resolved.startswith(prefix):
-            continue  # already loaded from this directory
-        if not resolved.startswith(_THIRD_PARTY_DIR):
-            continue  # loaded from user code / pip / stdlib — never touch it
-        # Stale module from a different vismatch/third-party repo — flush it
-        for k in [k for k in sys.modules if k == name or k.startswith(name + ".")]:
-            del sys.modules[k]
 
 
 def get_default_device() -> str:

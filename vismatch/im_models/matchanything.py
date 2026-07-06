@@ -57,9 +57,6 @@ class MatchAnythingMatcher(BaseMatcher):
             disable_xformers()
 
     def _load_model(self):
-        # Ensure MatchAnything's ``src`` is resolvable even when another
-        # matcher was loaded between module import and this instantiation.
-        add_to_path(MATCHANYTHING_DIR)
         cfg = get_cfg_defaults()
         if self.variant == "eloftr":
             cfg.merge_from_file(str(MATCHANYTHING_DIR.joinpath("configs", "models", "eloftr_model.py")))

@@ -27,7 +27,6 @@ class AspanformerMatcher(BaseMatcher):
 
         self.download_weights(cache_dir)
 
-        add_to_path(BASE_PATH)  # ensure aspanformer's ``src`` is resolvable
         config = aspan_cfg_defaults()
         config.merge_from_file(BASE_PATH.joinpath("configs", "aspan", "outdoor", "aspan_test.py"))
         self.matcher = ASpanFormer(config=lower_config(config)["aspan"])
