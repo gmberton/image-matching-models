@@ -70,12 +70,11 @@ class SteererMatcher(BaseMatcher):
                 weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
             )
             steerer_order = 8
-            steerer = DiscreteSteerer(
-                generator=torch.matrix_exp(
-                    (2 * 3.14159 / steerer_order)
-                    * torch.load(self.steerer_path_B, map_location=device, weights_only=True)
-                )
+            # matrix_exp is not implemented on MPS, so compute it on CPU and then move to device
+            steerer_generator = (2 * 3.14159 / steerer_order) * torch.load(
+                self.steerer_path_B, map_location="cpu", weights_only=True
             )
+            steerer = DiscreteSteerer(generator=torch.matrix_exp(steerer_generator).to(device))
 
         elif steerer_type == "S02":
             descriptor = dedode_descriptor_B(
