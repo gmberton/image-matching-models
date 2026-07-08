@@ -185,8 +185,9 @@ def main():
             ]
         )
 
-        # Timeout of 10 minutes because Dust3r is slow to download
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=600)
+        # 1 hour per matcher: generous for first-time model downloads (e.g. Dust3r/MASt3r are
+        # multi-GB) while still bounding a hung subprocess
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=3600)
 
         try:
             output = json.loads(result.stdout)
