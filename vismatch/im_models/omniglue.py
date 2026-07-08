@@ -1,4 +1,10 @@
-import tensorflow  # noqa: F401 -- must import before torch to avoid segfault (github.com/tensorflow/tensorflow/issues/14812)
+from vismatch.utils import add_to_path, hide_gpu_from_tensorflow, prime_cublas_before_tensorflow
+
+prime_cublas_before_tensorflow()
+import tensorflow
+
+hide_gpu_from_tensorflow(tensorflow)
+
 import py3_wget
 import tarfile
 import zipfile
@@ -10,7 +16,6 @@ from skimage.util import img_as_ubyte
 from huggingface_hub import snapshot_download
 
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import add_to_path
 
 
 BASE_PATH = THIRD_PARTY_DIR.joinpath("omniglue")

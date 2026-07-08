@@ -1,9 +1,14 @@
 import numpy as np
+
+from vismatch.utils import add_to_path, hide_gpu_from_tensorflow, prime_cublas_before_tensorflow
+
+prime_cublas_before_tensorflow()
 import tensorflow as tf
 import sys
 
+hide_gpu_from_tensorflow(tf)
+
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import add_to_path
 
 ZIPPYPOINT_PATH = THIRD_PARTY_DIR.joinpath("ZippyPoint")
 add_to_path(ZIPPYPOINT_PATH)
