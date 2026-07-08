@@ -1,35 +1,55 @@
+import sys
 import torch
 
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import add_to_path
+from vismatch.utils import add_to_path, set_device_globals
 
 add_to_path(THIRD_PARTY_DIR.joinpath("RoMaV2/src"))
 
 from romav2 import RoMaV2  # noqa: E402
-import romav2.device as romav2_device  # noqa: E402
+
+
+class _AutocastDisabledTorch:
+    """`torch` stand-in whose autocast contexts are always disabled."""
+
+    def __getattr__(self, name):
+        return getattr(torch, name)
+
+    @staticmethod
+    def autocast(*args, **kwargs):
+        kwargs["enabled"] = False
+        return torch.autocast(*args, **kwargs)
+
+
+def _disable_autocast():
+    """RoMaV2 hardcodes bfloat16 autocast at inference with no flag to turn it off, and cpus lack
+    native bf16 kernels so they run it far slower than float32: swap the romav2 modules'
+    `torch` binding for a proxy that disables every autocast context."""
+    for name, module in list(sys.modules.items()):
+        if (name == "romav2" or name.startswith("romav2.")) and getattr(module, "torch", None) is torch:
+            module.torch = _AutocastDisabledTorch()
 
 
 class RoMaV2Matcher(BaseMatcher):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        assert "cuda" in self.device, f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
 
-        # Temporarily override the global device for proper initialization
-        original_device = romav2_device.device
-        romav2_device.device = torch.device(device)
+        # RoMaV2 reads a module-level `device` global everywhere (tensor creation, autocast,
+        # image loading), resolved at import time to cuda whenever a GPU is visible
+        set_device_globals("romav2", device)
+        if self.device == "cpu":
+            _disable_autocast()
 
-        try:
-            # Disable compilation to avoid dtype issues
-            cfg = RoMaV2.Cfg(compile=False)
-            self.romav2_model = RoMaV2(cfg=cfg)
-            # Load pretrained weights (not loaded automatically when custom cfg is provided)
-            weights = torch.hub.load_state_dict_from_url(
-                "https://github.com/Parskatt/RoMaV2/releases/download/weights/romav2.pt"
-            )
-            self.romav2_model.load_state_dict(weights)
-        finally:
-            # Restore original device
-            romav2_device.device = original_device
+        # Disable compilation to avoid dtype issues
+        cfg = RoMaV2.Cfg(compile=False)
+        self.romav2_model = RoMaV2(cfg=cfg)
+        # Load pretrained weights (not loaded automatically when custom cfg is provided).
+        # map_location cpu: load_state_dict copies per-tensor, avoiding a second full copy on gpu
+        weights = torch.hub.load_state_dict_from_url(
+            "https://github.com/Parskatt/RoMaV2/releases/download/weights/romav2.pt",
+            map_location="cpu",
+        )
+        self.romav2_model.load_state_dict(weights)
 
         # Convert to float32 for better CPU compatibility (bfloat16 not fully supported on CPU)
         self.romav2_model = self.romav2_model.float()

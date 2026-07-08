@@ -3,7 +3,7 @@ import torch
 from typing import Literal
 
 from vismatch import THIRD_PARTY_DIR, BaseMatcher  # noqa: F401
-from vismatch.utils import add_to_path, resize_to_divisible
+from vismatch.utils import add_to_path, resize_to_divisible, set_device_globals
 
 add_to_path(THIRD_PARTY_DIR.joinpath("LoMa/src"))
 
@@ -48,6 +48,12 @@ class LoMaMatcher(BaseMatcher):
             raise ValueError(
                 f"Unsupported architecture '{arch}' for LoMa. Supported: 'LoMa-B', 'LoMa-L', 'LoMa-G', 'LoMa-B128', 'LoMa-R'."
             )
+
+        # LoMa moves inputs to a module-level `device` global, resolved at import time to cuda
+        # whenever a GPU is visible; rebind it so inference tensors follow the requested device.
+        # On cpu also drop the bfloat16 amp global: cpus lack native bf16 kernels and run it far
+        # slower than fp32 (measured ~5x on x86, 100x+ on Apple Silicon).
+        set_device_globals("loma", self.device, amp_dtype=torch.float32 if self.device == "cpu" else None)
 
         # This automatically loads weights using torch.hub.load_state_dict_from_url
         self.matcher = LoMa(cfg).to(self.device)

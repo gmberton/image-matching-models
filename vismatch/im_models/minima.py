@@ -1,14 +1,16 @@
+import torch
 import torchvision.transforms as tfm
 from argparse import Namespace
 
 from huggingface_hub import snapshot_download
 from vismatch import THIRD_PARTY_DIR, BaseMatcher
-from vismatch.utils import add_to_path, resize_to_divisible
+from vismatch.utils import add_to_path, resize_to_divisible, disable_xformers
 
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA"))
 add_to_path(THIRD_PARTY_DIR.joinpath("MINIMA/third_party/RoMa"))
 
-from src.utils.load_model import load_sp_lg, load_loftr, load_roma, load_xoftr
+from src.utils.load_model import load_sp_lg, load_loftr, load_xoftr
+from romatch import roma_outdoor, tiny_roma_v1_outdoor
 
 
 class MINIMAMatcher(BaseMatcher):
@@ -97,14 +99,20 @@ class MINIMARomaMatcher(MINIMAMatcher):
     def __init__(self, device="cpu", model_size="tiny", **kwargs):
         super().__init__(device, **kwargs)
         assert model_size in self.ALLOWABLE_MODEL_SIZES
-        if model_size == "large":
-            assert "cuda" in self.device, (
-                f"Device must be 'cuda' for {self.name} with model_size='large'. Device='{self.device}' not supported"
-            )
+        self.model_size = model_size
 
-        self.model_args.ckpt = f"{snapshot_download('vismatch/minima')}/minima_roma.pt"
-        self.model_args.ckpt2 = model_size
-        self.matcher = load_roma(self.model_args).model.eval().to(self.device)
+        # MINIMA's load_roma hardcodes cuda-if-available, so build the model directly on the
+        # requested device with float32 amp on non-cuda devices (float16 is cuda-only). MINIMA
+        # only finetuned the large model; tiny uses the original RoMa weights, as in load_roma.
+        if model_size == "large":
+            ckpt = f"{snapshot_download('vismatch/minima')}/minima_roma.pt"
+            weights = torch.load(ckpt, map_location=self.device)
+            amp_dtype = torch.float16 if "cuda" in self.device else torch.float32
+            self.matcher = roma_outdoor(device=self.device, weights=weights, amp_dtype=amp_dtype).eval()
+        else:
+            self.matcher = tiny_roma_v1_outdoor(device=self.device).eval()
+        if "cuda" not in self.device:
+            disable_xformers()
 
     def preprocess(self, img):
         _, h, w = img.shape
@@ -117,7 +125,10 @@ class MINIMARomaMatcher(MINIMAMatcher):
         orig_H0, orig_W0 = img0_orig_shape
         orig_H1, orig_W1 = img1_orig_shape
 
-        warp, certainty = self.matcher.match(img0, img1, batched=False)
+        # large's match() defaults its device to cuda-if-available, ignoring where the model
+        # lives; tiny's match() has no device argument and follows the model's parameters
+        device_kwarg = {"device": self.device} if self.model_size == "large" else {}
+        warp, certainty = self.matcher.match(img0, img1, batched=False, **device_kwarg)
 
         matches, mconf = self.matcher.sample(warp, certainty)
 
