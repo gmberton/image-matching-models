@@ -20,9 +20,11 @@ from vismatch.utils import get_default_device
 ASSETS_DIR = Path(__file__).resolve().parent.parent / "vismatch" / "assets"
 
 # Models that OOM GitHub CI runners (~16 GB RAM) at the 256px test resolution: a memory limit,
-# not nondeterminism. gim-dkm (dense DKM) peaks ~14 GB on CPU, leaving no safe headroom.
+# not nondeterminism. gim-dkm peaks ~14 GB on CPU and romav2 ~12 GB, which overflows the runner
+# once earlier tests leave memory resident in the shared pytest process.
 CI_OOM_MODELS = [
     "gim-dkm",
+    "romav2",
 ]
 
 # Minimum gpu memory (GiB) to run at the 256px test resolution; smaller cards OOM. Set from the
