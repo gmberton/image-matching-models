@@ -5,6 +5,7 @@ import numpy as np
 import os
 import torchvision.transforms as tfm
 import torch
+from contextlib import contextmanager
 from pathlib import Path
 
 # Monkey patch torch.load to use weights_only=False by default for compatibility with PyTorch 2.6+
@@ -28,22 +29,56 @@ add_to_path(BASE_PATH)
 import immatch
 
 
+@contextmanager
+def _hardcoded_cuda_as_noop():
+    """Make hardcoded ``module.cuda()`` calls no-ops while CUDA is unavailable.
+
+    The vendored patch2pix networks call ``.cuda()`` unconditionally at construction
+    (e.g. NeighConsensus, FeatureExtraction), which crashes on CUDA-less machines;
+    the caller moves the model to the right device afterwards anyway.
+    """
+    if torch.cuda.is_available():
+        yield
+        return
+    original_cuda = torch.nn.Module.cuda
+    torch.nn.Module.cuda = lambda module, device=None: module
+    try:
+        yield
+    finally:
+        torch.nn.Module.cuda = original_cuda
+
+
+class _OnCpu(torch.nn.Module):
+    """Run a submodule on CPU, moving its inputs over and leaving its output there."""
+
+    def __init__(self, module):
+        super().__init__()
+        self.module = module.cpu()
+
+    def forward(self, *args):
+        return self.module(*[a.cpu() for a in args])
+
+
 class Patch2pixMatcher(BaseMatcher):
     divisible_by = 32
 
     def __init__(self, device="cpu", *args, **kwargs):
         super().__init__(device, **kwargs)
-        assert "cuda" in self.device or self.device == "cpu", (
-            f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
-        )
-
         with open(BASE_PATH.joinpath("configs/patch2pix.yml"), "r") as f:
             args = yaml.load(f, Loader=yaml.FullLoader)["sat"]
 
         args["ckpt"] = f"{snapshot_download('vismatch/patch2pix')}/model.pth"
-        self.matcher = immatch.__dict__[args["class"]](args)
+        with _hardcoded_cuda_as_noop():
+            self.matcher = immatch.__dict__[args["class"]](args)
         self.matcher.model = self.matcher.model.to(device)
         self.matcher.model.device = torch.device(device)
+        if "mps" in self.device:
+            # The matching stages build work buffers, index grids and coordinates on CPU and only
+            # move them to CUDA (never MPS), so on MPS they mix devices and crash. Force these small
+            # stages fully onto CPU (via _OnCpu, which moves their inputs over too), leaving only the
+            # heavy CNN backbone (`extract`) on MPS -- no device mixing, no MPS-unsupported ops.
+            for name in ("combine", "ncn", "regress_mid", "regress_fine"):
+                setattr(self.matcher.model, name, _OnCpu(getattr(self.matcher.model, name)))
         self.normalize = tfm.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 
     def preprocess(self, img):

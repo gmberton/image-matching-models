@@ -11,6 +11,23 @@ add_to_path(THIRD_PARTY_DIR.joinpath("SphereGlue"))
 from model.sphereglue import SphereGlue
 from utils.Utils import sphericalToCartesian
 
+# torch_geometric >= 2.7 delegates knn_graph to pyg-lib, which has no wheels for recent torch
+# builds; torch-cluster ships the same function, so rebind it in the SphereGlue module
+import model.sphereglue
+from torch_cluster import knn_graph as _torch_cluster_knn_graph
+
+
+def knn_graph(x, *args, **kwargs):
+    # torch-cluster only ships cpu (and optionally cuda) kernels, so on any other device
+    # (e.g. mps) compute the graph on cpu and move the indices back
+    if x.device.type not in ("cpu", "cuda"):
+        moved = {k: (v.cpu() if isinstance(v, torch.Tensor) else v) for k, v in kwargs.items()}
+        return _torch_cluster_knn_graph(x.cpu(), *args, **moved).to(x.device)
+    return _torch_cluster_knn_graph(x, *args, **kwargs)
+
+
+model.sphereglue.knn_graph = knn_graph
+
 
 def unit_cartesian(points):
     phi, theta = torch.split(torch.as_tensor(points), 1, dim=1)
@@ -29,6 +46,10 @@ class SphereGlueBase(BaseMatcher):
 
     def __init__(self, device="cpu", **kwargs):
         super().__init__(device, **kwargs)
+        if "cuda" in self.device:
+            assert torch.ops.torch_cluster.cuda_version() != -1, (
+                f"torch-cluster was built without cuda support; reinstall it with cuda to use {self.name} on gpu"
+            )
         self.sphereglue_cfg = {
             "K": kwargs.get("K", 2),
             "GNN_layers": kwargs.get("GNN_layers", ["cross"]),
