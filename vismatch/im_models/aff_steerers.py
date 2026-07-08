@@ -4,13 +4,17 @@ from safetensors.torch import load_file
 
 from huggingface_hub import snapshot_download
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import resize_to_divisible, add_to_path, force_float32
+from vismatch.utils import resize_to_divisible, add_to_path, force_float32, patch_sample_keypoints_device
 
 add_to_path(THIRD_PARTY_DIR.joinpath("affine-steerers"))
 from affine_steerers.utils import build_affine
 from affine_steerers.matchers.dual_softmax_matcher import MaxSimilarityMatcher
 from affine_steerers.steerers import SteererSpread
 from affine_steerers import dedode_detector_L, dedode_descriptor_B, dedode_descriptor_G
+from affine_steerers import utils as aff_steerers_utils
+from affine_steerers.detectors import dedode_detector as aff_detector_module
+
+patch_sample_keypoints_device(aff_steerers_utils, aff_detector_module)
 
 
 class AffSteererMatcher(BaseMatcher):
@@ -27,11 +31,6 @@ class AffSteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-
-        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
-        assert "cuda" in self.device or not torch.cuda.is_available(), (
-            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
-        )
 
         self.steerer_type = steerer_type
         if self.steerer_type not in self.STEERER_TYPES:
@@ -50,13 +49,13 @@ class AffSteererMatcher(BaseMatcher):
 
     def build_matcher(self):
         repo = snapshot_download("vismatch/affine-steerers")
-        detector = dedode_detector_L(weights=load_file(f"{repo}/dedode_detector_C4.safetensors"))
+        detector = dedode_detector_L(device=self.device, weights=load_file(f"{repo}/dedode_detector_C4.safetensors"))
 
         descriptor_path = f"{repo}/descriptor_aff_{self.steerer_type}.safetensors"
         if "G" in self.steerer_type:
-            descriptor = dedode_descriptor_G(weights=load_file(descriptor_path))
+            descriptor = dedode_descriptor_G(device=self.device, weights=load_file(descriptor_path))
         else:
-            descriptor = dedode_descriptor_B(weights=load_file(descriptor_path))
+            descriptor = dedode_descriptor_B(device=self.device, weights=load_file(descriptor_path))
 
         steerer_path = f"{repo}/steerer_aff_{self.steerer_type}.safetensors"
         steerer = self.load_steerer(steerer_path).to(self.device).eval()

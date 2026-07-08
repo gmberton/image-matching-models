@@ -6,12 +6,22 @@ import kornia
 
 from huggingface_hub import snapshot_download
 from vismatch import get_version, THIRD_PARTY_DIR, BaseMatcher
-from vismatch.utils import add_to_path, resize_to_divisible, disable_xformers, force_float32
+from vismatch.utils import (
+    add_to_path,
+    resize_to_divisible,
+    disable_xformers,
+    force_float32,
+    patch_sample_keypoints_device,
+)
 
 add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
 
 from DeDoDe import dedode_detector_L, dedode_descriptor_G
+from DeDoDe import utils as dedode_utils
+from DeDoDe.detectors import dedode_detector as dedode_detector_module
 from DeDoDe.matchers.dual_softmax_matcher import DualSoftMaxMatcher
+
+patch_sample_keypoints_device(dedode_utils, dedode_detector_module)
 
 
 class DedodeMatcher(BaseMatcher):
@@ -19,11 +29,6 @@ class DedodeMatcher(BaseMatcher):
 
     def __init__(self, device="cpu", max_num_keypoints=2048, dedode_thresh=0.05, detector_version=2, *args, **kwargs):
         super().__init__(device, **kwargs)
-
-        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
-        assert "cuda" in self.device or not torch.cuda.is_available(), (
-            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
-        )
 
         self.max_keypoints = max_num_keypoints
         self.threshold = dedode_thresh

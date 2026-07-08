@@ -2,7 +2,7 @@ import torch
 import torchvision.transforms as tfm
 from huggingface_hub import snapshot_download
 from vismatch import BaseMatcher, THIRD_PARTY_DIR
-from vismatch.utils import resize_to_divisible, add_to_path
+from vismatch.utils import resize_to_divisible, add_to_path, patch_sample_keypoints_device
 
 
 add_to_path(THIRD_PARTY_DIR.joinpath("DeDoDe"))
@@ -10,6 +10,8 @@ from DeDoDe import (
     dedode_detector_L,
     dedode_descriptor_B,
 )
+from DeDoDe import utils as dedode_utils
+from DeDoDe.detectors import dedode_detector as dedode_detector_module
 
 add_to_path(THIRD_PARTY_DIR.joinpath("Steerers"))
 from rotation_steerers.steerers import DiscreteSteerer, ContinuousSteerer
@@ -17,6 +19,8 @@ from rotation_steerers.matchers.max_similarity import (
     MaxSimilarityMatcher,
     ContinuousMaxSimilarityMatcher,
 )
+
+patch_sample_keypoints_device(dedode_utils, dedode_detector_module)
 
 
 class SteererMatcher(BaseMatcher):
@@ -32,10 +36,6 @@ class SteererMatcher(BaseMatcher):
         **kwargs,
     ):
         super().__init__(device, **kwargs)
-        # With a GPU present DeDoDe picks cuda internally, so only cuda inputs work
-        assert "cuda" in self.device or not torch.cuda.is_available(), (
-            f"Device must be 'cuda' for {self.name}. Device='{self.device}' not supported"
-        )
 
         # Download weights from HuggingFace Hub
         repo = snapshot_download("vismatch/steerers")
@@ -55,19 +55,19 @@ class SteererMatcher(BaseMatcher):
     def build_matcher(self, steerer_type="C8", device="cpu"):
         if steerer_type == "C4":
             detector = dedode_detector_L(
-                weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
+                device=device, weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
             )
             descriptor = dedode_descriptor_B(
-                weights=torch.load(self.descriptor_path_B_C4, map_location=device, weights_only=True)
+                device=device, weights=torch.load(self.descriptor_path_B_C4, map_location=device, weights_only=True)
             )
             steerer = DiscreteSteerer(generator=torch.load(self.steerer_path_C, map_location=device, weights_only=True))
             steerer_order = 4
         elif steerer_type == "C8":
             detector = dedode_detector_L(
-                weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
+                device=device, weights=torch.load(self.detector_path_L, map_location=device, weights_only=True)
             )
             descriptor = dedode_descriptor_B(
-                weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
+                device=device, weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
             )
             steerer_order = 8
             # matrix_exp is not implemented on MPS, so compute it on CPU and then move to device
@@ -78,7 +78,7 @@ class SteererMatcher(BaseMatcher):
 
         elif steerer_type == "S02":
             descriptor = dedode_descriptor_B(
-                weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
+                device=device, weights=torch.load(self.descriptor_path_B_SO2, map_location=device, weights_only=True)
             )
             steerer = ContinuousSteerer(
                 generator=torch.load(self.steerer_path_B, map_location=device, weights_only=True)
