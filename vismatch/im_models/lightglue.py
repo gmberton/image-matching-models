@@ -68,9 +68,5 @@ class AlikedLightGlue(LightGlueBase):
 class DognetLightGlue(LightGlueBase):
     def __init__(self, device="cpu", max_num_keypoints=2048, *args, **kwargs):
         super().__init__(device, **kwargs)
-        assert self.device != "mps", (
-            f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
-        )
-
         self.extractor = DoGHardNet(max_num_keypoints=max_num_keypoints).eval().to(self.device)
         self.matcher = LightGlue(features="doghardnet", depth_confidence=-1, width_confidence=-1).to(self.device)

@@ -46,7 +46,7 @@ class MatchAnythingMatcher(BaseMatcher):
 
         self.model_name = f"matchanything_{self.variant}"
         self._load_model()
-        if device == "cpu":
+        if "cuda" not in device:
             disable_xformers()
 
     def _load_model(self):
@@ -59,7 +59,7 @@ class MatchAnythingMatcher(BaseMatcher):
                     cfg.LOFTR.COARSE.NPE = [832, 832, target_size, target_size]
         else:
             cfg.merge_from_file(str(MATCHANYTHING_DIR.joinpath("configs", "models", "roma_model.py")))
-            if self.device == "cpu":
+            if "cuda" not in self.device:
                 cfg.LOFTR.FP16 = False
                 cfg.ROMA.MODEL.AMP = False
 
@@ -70,10 +70,6 @@ class MatchAnythingMatcher(BaseMatcher):
         if self.variant == "eloftr":
             self.net = LoFTR(config=cfg_lower["loftr"])
         else:
-            assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda' for {self.name}. Device='{self.device}' not supported"
-            )
-
             self.net = MatchAnything_Model(config=cfg_lower["roma"], test_mode=True)
 
         weights_path = f"{snapshot_download(f'vismatch/matchanything-{self.variant}')}/model.safetensors"

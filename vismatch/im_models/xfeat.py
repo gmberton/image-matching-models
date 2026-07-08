@@ -31,10 +31,6 @@ class xFeatMatcher(BaseMatcher):
             default_conf = LightGlue.default_conf
             self.model.lighterglue = LighterGlue().to(self.device)
             LightGlue.default_conf = default_conf
-        if self.mode != "semi-dense":
-            assert self.device != "mps", (
-                f"Device must be 'cpu' or 'cuda' for {self.name} with mode {self.mode}. Device='{self.device}' not supported"
-            )
 
     def preprocess(self, img: Tensor) -> Tensor:
         # return a [B, C, Hs, W] tensor
