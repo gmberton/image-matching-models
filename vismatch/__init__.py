@@ -6,8 +6,10 @@ warnings due to unused modules.
 
 from importlib.metadata import version, PackageNotFoundError
 
+import warnings
 from pathlib import Path
 from types import ModuleType
+from packaging.version import Version
 import torch
 from huggingface_hub import snapshot_download
 from huggingface_hub.utils import disable_progress_bars
@@ -101,9 +103,8 @@ available_models = [
 
 
 def get_version(pkg: ModuleType) -> tuple[int, int, int]:
-    version_num = pkg.__version__.split("-")[0]
-    major, minor, patch = [int(num) for num in version_num.split(".")]
-    return major, minor, patch
+    v = Version(pkg.__version__)
+    return v.major, v.minor, v.micro
 
 
 def get_matcher(
@@ -124,6 +125,12 @@ def get_matcher(
     _ = torch.device(device)  # Check that device is a valid device
     if device.startswith("cuda"):
         assert torch.cuda.is_available(), f"CUDA not available, cannot use device='{device}'"
+    if device.startswith("mps") and get_version(torch) < (2, 11, 0):
+        warnings.warn(
+            f"vismatch MPS support is validated on torch>=2.11 (yours: {torch.__version__}); several matchers "
+            "hit missing Metal ops (e.g. grid_sample bicubic/border) on older versions. "
+            "Upgrade torch, or use device='cpu' if a matcher fails."
+        )
 
     if isinstance(matcher_name, list):
         from vismatch.base_matcher import EnsembleMatcher

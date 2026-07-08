@@ -1,3 +1,4 @@
+import functools
 import importlib
 import logging
 from pathlib import Path
@@ -10,6 +11,61 @@ import sys
 
 logger = logging.getLogger(__name__)
 logger.setLevel(31)  # Avoid printing useless low-level logs
+
+
+def set_device_globals(package: str, device: str | torch.device, amp_dtype: torch.dtype | None = None) -> None:
+    """Rebind the `device` (and optionally `amp_dtype`) globals in every loaded module of *package*.
+
+    Repos like LoMa and RoMaV2 resolve them once at import time (cuda whenever a GPU is visible)
+    and each submodule keeps its own binding, so overwriting the source module alone has no effect.
+    """
+    device = torch.device(device)
+    for name, module in list(sys.modules.items()):
+        if name == package or name.startswith(package + "."):
+            if isinstance(getattr(module, "device", None), torch.device):
+                module.device = device
+            if amp_dtype is not None and isinstance(getattr(module, "amp_dtype", None), torch.dtype):
+                module.amp_dtype = amp_dtype
+
+
+def patch_sample_keypoints_device(*modules) -> None:
+    """Wrap DeDoDe-style `sample_keypoints` so its tensors follow the scoremap's device.
+
+    DeDoDe-family repos evaluate `device=get_best_device()` in its signature at import time,
+    hardcoding cuda whenever a GPU is visible, and their detectors call it without a device.
+    """
+    for module in modules:
+        func = module.sample_keypoints
+        if getattr(func, "_device_follows_input", False):
+            continue
+
+        @functools.wraps(func)
+        def wrapper(scoremap, *args, _func=func, **kwargs):
+            kwargs.setdefault("device", scoremap.device)
+            return _func(scoremap, *args, **kwargs)
+
+        wrapper._device_follows_input = True
+        module.sample_keypoints = wrapper
+
+
+def prime_cublas_before_tensorflow() -> None:
+    """Force torch to initialize its batched cuBLAS handle before TensorFlow loads CUDA.
+
+    In a process importing both torch and TensorFlow, if TensorFlow initializes CUDA first, every
+    later *batched* ``torch.linalg`` op fails with CUBLAS_STATUS_INTERNAL_ERROR (e.g. matchanything-roma's
+    gp posterior). Running the batched path once here claims the handle first; a plain matmul or handle
+    creation is not enough. Call before ``import tensorflow``; no-op without CUDA.
+    """
+    if torch.cuda.is_available():
+        torch.linalg.inv(torch.eye(2, device="cuda").repeat(2, 1, 1))
+
+
+def hide_gpu_from_tensorflow(tensorflow) -> None:
+    """Stop TensorFlow from claiming GPU memory: vismatch runs its TF models (omniglue, zippypoint) on CPU.
+
+    Call right after ``import tensorflow``.
+    """
+    tensorflow.config.set_visible_devices([], "GPU")
 
 
 def disable_xformers():
@@ -129,6 +185,8 @@ def to_tensor(x: np.ndarray | torch.Tensor, device: str = None) -> torch.Tensor:
         x = torch.from_numpy(x)
 
     if device is not None:
+        if "mps" in str(device) and x.dtype == torch.float64:
+            x = x.float()  # MPS does not support float64
         return x.to(device)
     else:
         return x

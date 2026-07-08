@@ -10,6 +10,7 @@ kornia_moons>=0.1
 yacs>=0.1.8
 gdown>=6.0.0
 huggingface_hub>=0.22.0
+packaging>=20.9
 safetensors>=0.3.1
 imageio>=2.8
 tensorboard>=2.14
