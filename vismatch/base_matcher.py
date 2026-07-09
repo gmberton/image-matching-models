@@ -172,6 +172,15 @@ class BaseMatcher(torch.nn.Module):
         # Check that shapes are correct and consistent
         self.check_shapes(matched_kpts0, matched_kpts1, all_kpts0, all_kpts1, all_desc0, all_desc1, matched_confidences)
 
+        # Drop matches with a kpt outside its image, e.g. on regions added by padding (see issue #69)
+        (h0, w0), (h1, w1) = img0.shape[-2:], img1.shape[-2:]
+        valid = (
+            (matched_kpts0 >= 0) & (matched_kpts0 < [w0, h0]) & (matched_kpts1 >= 0) & (matched_kpts1 < [w1, h1])
+        ).all(1)
+        matched_kpts0, matched_kpts1 = matched_kpts0[valid], matched_kpts1[valid]
+        if matched_confidences is not None:
+            matched_confidences = matched_confidences[valid]
+
         # Compute RANSAC to obtain the inliers and homography matrix
         H, inlier_kpts0, inlier_kpts1 = self.compute_ransac(matched_kpts0, matched_kpts1)
 
