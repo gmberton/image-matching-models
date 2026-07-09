@@ -51,8 +51,8 @@ dependencies = {file = "requirements.txt"}
 [tool.setuptools_scm]
 version_file = "vismatch/_version.py"
 
-[tool.setuptools.packages]
-find = {}
+[tool.setuptools.packages.find]
+include = ["vismatch*"]
 
 [tool.ruff]
 line-length = 120
