@@ -79,6 +79,21 @@ def disable_xformers():
             module.XFORMERS_AVAILABLE = False
 
 
+def route_linalg_inv_through_cpu() -> None:
+    """Route ``torch.linalg.inv`` through cpu: on mps the kernel intermittently returns NaN from a
+    finite input (an uninitialized-workspace bug), nan-poisoning RoMa/DKM's GP posterior so its
+    sampling fails at random. Idempotent; cpu/cuda inputs pass straight through."""
+    inv = torch.linalg.inv
+    if getattr(inv, "_mps_safe", False):
+        return
+
+    def mps_safe_inv(A, *a, **k):
+        return inv(A.cpu(), *a, **k).to(A.device) if A.device.type == "mps" else inv(A, *a, **k)
+
+    mps_safe_inv._mps_safe = True
+    torch.linalg.inv = mps_safe_inv
+
+
 def force_float32(module: torch.nn.Module):
     """Fully convert a model to float32 (e.g. for CPU), including submodules hidden in plain lists
     and amp_dtype attributes, which module.float() does not reach."""

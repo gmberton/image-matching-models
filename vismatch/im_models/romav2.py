@@ -37,7 +37,9 @@ class RoMaV2Matcher(BaseMatcher):
         # RoMaV2 reads a module-level `device` global everywhere (tensor creation, autocast,
         # image loading), resolved at import time to cuda whenever a GPU is visible
         set_device_globals("romav2", device)
-        if self.device == "cpu":
+        # RoMaV2 hardcodes bf16 autocast at inference; on mps that yields an all-nan confidence
+        # volume, and cpu lacks bf16 kernels — cuda is its only safe fast path, so disable it off-cuda
+        if "cuda" not in str(self.device):
             _disable_autocast()
 
         # Disable compilation to avoid dtype issues
@@ -74,6 +76,9 @@ class RoMaV2Matcher(BaseMatcher):
         h0, w0 = img0.shape[-2:]
         h1, w1 = img1.shape[-2:]
 
+        # RoMaV2.match() hard-asserts float32 matmul precision is "highest"; set it here so romav2
+        # stays robust when another matcher (e.g. a pytorch-lightning one) lowered it earlier in-process
+        torch.set_float32_matmul_precision("highest")
         preds = self.romav2_model.match(img0, img1)
         matches, confidence, precision_AB, precision_BA = self.romav2_model.sample(preds, self.max_keypoints)
 
