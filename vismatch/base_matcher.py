@@ -37,7 +37,7 @@ class BaseMatcher(torch.nn.Module):
 
         # OpenCV default ransac params
         self.ransac_iters: int = kwargs.get("ransac_iters", 2000)
-        self.ransac_conf: float = kwargs.get("ransac_conf", 0.95)
+        self.ransac_conf: float = kwargs.get("ransac_conf", 0.995)
         self.ransac_reproj_thresh: float = kwargs.get("ransac_reproj_thresh", 3)
 
     @property
@@ -100,10 +100,10 @@ class BaseMatcher(torch.nn.Module):
         H, inliers_mask = cv2.findHomography(
             matched_kpts0,
             matched_kpts1,
-            cv2.USAC_MAGSAC,
-            self.ransac_reproj_thresh,
-            self.ransac_conf,
-            self.ransac_iters,
+            method=cv2.USAC_MAGSAC,
+            ransacReprojThreshold=self.ransac_reproj_thresh,
+            maxIters=self.ransac_iters,
+            confidence=self.ransac_conf,
         )
         inliers_mask = inliers_mask[:, 0].astype(bool)
         inlier_kpts0 = matched_kpts0[inliers_mask]
