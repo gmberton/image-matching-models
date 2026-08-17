@@ -26,8 +26,8 @@ loguru>=0.6
 timm>=0.4.5
 omegaconf>=2.3.0
 poselib>=2.0
-lightning==2.3.3 # from EDM
+lightning>=2.4 # for EDM and RIPE
 flow_vis>=0.1 # for UFM
 uniception==0.1.1 # for UFM
 h5py>=3.6
-setuptools<81  # pkg_resources compatibility
+setuptools>=83
