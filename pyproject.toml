@@ -64,6 +64,7 @@ line-length = 120
 exclude = ["vismatch/third_party"]
 
 [tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]  # pre-0.16 ruff defaults
 ignore = ["E402", "E501"]
 
 [tool.uv.extra-build-dependencies]
