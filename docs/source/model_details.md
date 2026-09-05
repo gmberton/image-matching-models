@@ -339,5 +339,3 @@ Runtime benchmark is the average of 5 iterations over the 5 pairs of examples in
 * `MINIMA` model runtimes are listed in the order: `superpoint-lightglue, LoFTR, RoMa (large), RoMa (tiny)`
 
 * `RDD` model runtimes are listed in the order: `sparse, star (semi-dense), lightglue, aliked`
-
-* `UPAL` currently exposes point extraction and matching only.
