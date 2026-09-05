@@ -28,6 +28,7 @@ except PackageNotFoundError:
     pass
 
 available_models = [
+    "upal",
     "liftfeat",
     "loftr",
     "eloftr",
@@ -116,6 +117,8 @@ def get_matcher(
 ) -> BaseMatcher:
     # Track usage via HF (downloads repo on first access)
     for name in [matcher_name] if isinstance(matcher_name, str) else matcher_name:
+        if name == "upal":
+            continue
         try:
             snapshot_download(f"vismatch/{name}")
         except Exception as e:
@@ -165,6 +168,11 @@ def get_matcher(
         from vismatch.im_models import keypt2subpx
 
         return keypt2subpx.Keypt2SubpxMatcher(device, detector_name="aliked-lightglue", *args, **kwargs)
+
+    elif matcher_name == "upal":
+        from vismatch.im_models import upal
+
+        return upal.UPALMatcher(device, max_num_keypoints, *args, **kwargs)
 
     elif matcher_name == "liftfeat":
         from vismatch.im_models import liftfeat
