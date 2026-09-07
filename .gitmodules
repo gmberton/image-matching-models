@@ -97,3 +97,6 @@
 [submodule "vismatch/third_party/LoMa"]
 	path = vismatch/third_party/LoMa
 	url = https://github.com/davnords/LoMa
+[submodule "vismatch/third_party/UPAL"]
+	path = vismatch/third_party/UPAL
+	url = https://github.com/francois141/upal
