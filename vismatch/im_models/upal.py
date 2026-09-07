@@ -6,6 +6,7 @@ from vismatch.utils import add_to_path
 add_to_path(THIRD_PARTY_DIR / "UPAL")
 from upal import load_model
 from upal.postprocess import mutual_nearest_neighbors
+from huggingface_hub import snapshot_download
 
 
 class UPALMatcher(BaseMatcher):
@@ -13,7 +14,7 @@ class UPALMatcher(BaseMatcher):
         super().__init__(device, **kwargs)
 
         if weights_path is None:
-            weights_path = THIRD_PARTY_DIR / "UPAL" / "weights" / "upal.tar"
+            weights_path = Path(snapshot_download("vismatch/upal")) / "upal.tar"
         weights_path = Path(weights_path)
         if not weights_path.is_file():
             raise FileNotFoundError(f"UPAL weights not found: {weights_path}")

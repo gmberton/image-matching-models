@@ -117,8 +117,6 @@ def get_matcher(
 ) -> BaseMatcher:
     # Track usage via HF (downloads repo on first access)
     for name in [matcher_name] if isinstance(matcher_name, str) else matcher_name:
-        if name == "upal":
-            continue
         try:
             snapshot_download(f"vismatch/{name}")
         except Exception as e:
